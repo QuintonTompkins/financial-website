@@ -63,6 +63,7 @@ class Dao():
                 elif returnType == self.RETURN_TYPE.COMMIT:
                     self.connection.commit()
         except Exception as e:
+            print(e)
             self.connection.rollback()
         return fetchResult
     
@@ -78,6 +79,22 @@ class Dao():
             else:
                 self.executeQuery(insertQuery, (file[0], json.dumps(file[1])), self.RETURN_TYPE.COMMIT)
         except Exception as e:
-            pass
+            print(e)
+        finally:
+            self.closeConnection()
+    
+    def addSubmissions(self, file):
+        try:
+            self.openConnection()
+            existenceCheckQuery = "SELECT COUNT(*) FROM finance.submissions WHERE file_name = %s;"
+            insertQuery = "INSERT INTO finance.submissions ( file_name, file_data ) VALUES ( %s, %s );"
+            updateQuery = "UPDATE finance.submissions SET file_data = %s WHERE file_name = %s;"
+            count = self.executeQuery(existenceCheckQuery, (file[0],), self.RETURN_TYPE.FETCH_ONE)[0]
+            if count == 1:
+                self.executeQuery(updateQuery, (json.dumps(file[1]), file[0]), self.RETURN_TYPE.COMMIT)
+            else:
+                self.executeQuery(insertQuery, (file[0], json.dumps(file[1])), self.RETURN_TYPE.COMMIT)
+        except Exception as e:
+            print(e)
         finally:
             self.closeConnection()

@@ -25,6 +25,7 @@ RUN pip install jsonschema==4.21.1
 WORKDIR /
 COPY --chown=1000:1000 ./daemon.py daemon.py
 COPY --chown=1000:1000 ./companyFacts.py companyFacts.py
+COPY --chown=1000:1000 ./submissions.py submissions.py
 COPY --chown=1000:1000 ./Dao.py Dao.py
 
 CMD ["python","-u","daemon.py"]

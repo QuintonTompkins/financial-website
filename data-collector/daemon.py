@@ -22,6 +22,7 @@ import threading
 
 #Local imports
 from companyFacts import processCompanyFacts
+from submissions import processSubmissions
 
 def collectData():
     thread = threading.Thread(target=processCompanyFacts, args=())
