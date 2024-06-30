@@ -1,0 +1,7 @@
+
+
+services:
+  data-collector:
+    build: ./data-collector
+    env_file:
+      - .env
