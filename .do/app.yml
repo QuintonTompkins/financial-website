@@ -1,8 +1,0 @@
-name: financial-website
-workers:
-- dockerfile_path: /data-collector/Dockerfile
-  github:
-    branch: main
-    deploy_on_push: false
-    repo: QuintonTompkins/financial-website
-  name: data-collector
