@@ -25,7 +25,8 @@ class Dao():
     class RETURN_TYPE(Enum):
         FETCH_ONE = 1
         FETCH_MANY = 2
-        COMMIT = 3
+        FETCH_ALL = 3
+        COMMIT = 4
 
     def __init__(self):
         self.connection = None
@@ -60,6 +61,8 @@ class Dao():
                     fetchResult = curs.fetchone()
                 elif returnType == self.RETURN_TYPE.FETCH_MANY:
                     fetchResult = curs.fetchmany()
+                elif returnType == self.RETURN_TYPE.FETCH_ALL:
+                    fetchResult = curs.fetchall()
                 elif returnType == self.RETURN_TYPE.COMMIT:
                     self.connection.commit()
         except Exception as e:
@@ -71,8 +74,8 @@ class Dao():
         try:
             self.openConnection()
             existenceCheckQuery = "SELECT COUNT(*) FROM finance.company_facts WHERE file_name = %s;"
-            insertQuery = "INSERT INTO finance.company_facts ( file_name, file_data ) VALUES ( %s, %s );"
-            updateQuery = "UPDATE finance.company_facts SET file_data = %s WHERE file_name = %s;"
+            insertQuery = "INSERT INTO finance.company_facts ( file_name, file_data, updated_date ) VALUES ( %s, %s, now() );"
+            updateQuery = "UPDATE finance.company_facts SET file_data = %s , updated_date = now() WHERE file_name = %s;"
             count = self.executeQuery(existenceCheckQuery, (file[0],), self.RETURN_TYPE.FETCH_ONE)[0]
             if count == 1:
                 self.executeQuery(updateQuery, (json.dumps(file[1]), file[0]), self.RETURN_TYPE.COMMIT)
@@ -83,12 +86,24 @@ class Dao():
         finally:
             self.closeConnection()
     
+    def getCompanyFactsFileNames(self):
+        fileNames = []
+        try:
+            self.openConnection()
+            fileNameQuery = "SELECT file_name FROM finance.company_facts;"
+            fileNames = self.executeQuery(fileNameQuery, None, self.RETURN_TYPE.FETCH_ALL)
+        except Exception as e:
+            print(e)
+        finally:
+            self.closeConnection()
+        return fileNames
+    
     def addSubmissions(self, file):
         try:
             self.openConnection()
             existenceCheckQuery = "SELECT COUNT(*) FROM finance.submissions WHERE file_name = %s;"
-            insertQuery = "INSERT INTO finance.submissions ( file_name, file_data ) VALUES ( %s, %s );"
-            updateQuery = "UPDATE finance.submissions SET file_data = %s WHERE file_name = %s;"
+            insertQuery = "INSERT INTO finance.submissions ( file_name, file_data, updated_date ) VALUES ( %s, %s, now() );"
+            updateQuery = "UPDATE finance.submissions SET file_data = %s , updated_date = now() WHERE file_name = %s;"
             count = self.executeQuery(existenceCheckQuery, (file[0],), self.RETURN_TYPE.FETCH_ONE)[0]
             if count == 1:
                 self.executeQuery(updateQuery, (json.dumps(file[1]), file[0]), self.RETURN_TYPE.COMMIT)

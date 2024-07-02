@@ -29,7 +29,7 @@ CREATE TABLE finance.user (
 CREATE TABLE finance.auth_request (
     user_name VARCHAR,
     user_email VARCHAR,
-    player_id_found INT,
+    user_id_found INT,
     origin VARCHAR NOT NULL,
     auth_type VARCHAR NOT NULL,
     date_attempted TIMESTAMP NOT NULL DEFAULT NOW()
@@ -37,10 +37,12 @@ CREATE TABLE finance.auth_request (
 
 CREATE TABLE finance.company_facts (
     file_name VARCHAR,
-    file_data JSON
+    file_data JSON,
+    updated_date TIMESTAMP
 );
 
 CREATE TABLE finance.submissions (
     file_name VARCHAR,
-    file_data JSON
+    file_data JSON,
+    updated_date TIMESTAMP
 );

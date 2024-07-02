@@ -39,6 +39,10 @@ def processCompanyFacts():
     with open(zipFileName, 'wb') as outfile:
         outfile.write(r.content)
 
+    print("Deleting json folder if it still exists")
+    if os.path.isdir(folderName):
+        shutil.rmtree(folderName)
+
     print("extracting zip")
     with ZipFile(zipFileName, 'r') as zip_ref:
         zip_ref.extractall(folderName)
@@ -51,6 +55,7 @@ def processCompanyFacts():
     dao = Dao()
     fileList = os.listdir(folderName)
     for fileName in fileList:
+        print("Saving company facts for "+fileName)
         with open(folderName+"/"+fileName) as file:
             fileJson = json.load(file)
             dao.addCompanyfacts((fileName,fileJson))

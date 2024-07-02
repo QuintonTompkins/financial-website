@@ -18,23 +18,33 @@
 
 import time
 import datetime
+from pytz import timezone
 import threading
 
 #Local imports
-from companyFacts import processCompanyFacts
-from submissions import processSubmissions
+from processCompanyFacts import processCompanyFacts
+from processSubmissions import processSubmissions
 
 def collectData():
-    thread = threading.Thread(target=processCompanyFacts, args=())
-    thread.run()
+    startTime = datetime.datetime.now()
+    threadCompanyFacts = threading.Thread(target=processCompanyFacts, args=())
+    threadSubmissions = threading.Thread(target=processSubmissions, args=())
+    threadCompanyFacts.start()
+    threadSubmissions.start()
+    threadCompanyFacts.join()
+    threadSubmissions.join()
+    endTime = datetime.datetime.now()
+    print(endTime - startTime)
 
 if __name__ == '__main__':
     try:
         today = None
         while True:
-            if today != datetime.datetime.today():
+            # data released nightly at about 3 am EST - https://www.sec.gov/search-filings/edgar-application-programming-interfaces
+            if today != datetime.datetime.now(timezone('EST')).day and datetime.datetime.now(timezone('EST')).hour > 0:
                 collectData()
-                today = datetime.datetime.today()
+                today = datetime.datetime.now(timezone('EST')).day
+            print("Main waiting")
             time.sleep(3600)
     finally:
         print('Shutting Down')
