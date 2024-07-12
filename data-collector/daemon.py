@@ -22,19 +22,7 @@ from pytz import timezone
 import threading
 
 #Local imports
-from processCompanyFacts import processCompanyFacts
-from processSubmissions import processSubmissions
-
-def collectData():
-    startTime = datetime.datetime.now()
-    threadCompanyFacts = threading.Thread(target=processCompanyFacts, args=())
-    threadSubmissions = threading.Thread(target=processSubmissions, args=())
-    threadCompanyFacts.start()
-    threadSubmissions.start()
-    threadCompanyFacts.join()
-    threadSubmissions.join()
-    endTime = datetime.datetime.now()
-    print(endTime - startTime)
+from ingestBulkData import ingestBulkData
 
 if __name__ == '__main__':
     try:
@@ -42,7 +30,9 @@ if __name__ == '__main__':
         while True:
             # data released nightly at about 3 am EST - https://www.sec.gov/search-filings/edgar-application-programming-interfaces
             if today != datetime.datetime.now(timezone('EST')).day and datetime.datetime.now(timezone('EST')).hour > 0:
-                collectData()
+                threadBulkIngest = threading.Thread(target=ingestBulkData, args=())
+                threadBulkIngest.start()
+                threadBulkIngest.join()
                 today = datetime.datetime.now(timezone('EST')).day
             print("Main waiting")
             time.sleep(3600)

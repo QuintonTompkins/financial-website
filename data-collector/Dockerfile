@@ -25,8 +25,7 @@ RUN pip install pytz==2024.1
 
 WORKDIR /
 COPY --chown=1000:1000 ./daemon.py daemon.py
-COPY --chown=1000:1000 ./processCompanyFacts.py processCompanyFacts.py
-COPY --chown=1000:1000 ./processSubmissions.py processSubmissions.py
+COPY --chown=1000:1000 ./ingestBulkData.py ingestBulkData.py
 COPY --chown=1000:1000 ./Dao.py Dao.py
 
 CMD ["python","-u","daemon.py"]

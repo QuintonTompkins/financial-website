@@ -18,6 +18,7 @@
 
 CREATE SCHEMA finance
 
+-- Create Tables
 CREATE TABLE finance.user (
     user_id INT GENERATED ALWAYS AS IDENTITY,
     user_name VARCHAR UNIQUE NOT NULL,
@@ -35,14 +36,67 @@ CREATE TABLE finance.auth_request (
     date_attempted TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE finance.company_facts (
-    file_name VARCHAR,
-    file_data JSON,
-    updated_date TIMESTAMP
+CREATE TABLE finance.data_collector (
+    start_time TIMESTAMP,
+    end_time TIMESTAMP
 );
 
-CREATE TABLE finance.submissions (
+CREATE TABLE finance.failed_files (
     file_name VARCHAR,
+    type VARCHAR,
+    exception VARCHAR,
     file_data JSON,
-    updated_date TIMESTAMP
+    attempted_date TIMESTAMP
 );
+
+CREATE TABLE finance.company_summary (
+    cik VARCHAR(10),
+    name VARCHAR,
+    sic_description VARCHAR,
+    category VARCHAR,
+    entity_type VARCHAR,
+    street1 VARCHAR,
+    street2 VARCHAR,
+    city VARCHAR,
+    state_country VARCHAR,
+    zip_code VARCHAR,
+    state_country_description VARCHAR,
+    UNIQUE (cik)
+);
+
+CREATE TABLE finance.company_exchange (
+    cik VARCHAR(10),
+    exchange VARCHAR,
+    ticker VARCHAR,
+    UNIQUE (cik, exchange)
+);
+
+CREATE TABLE finance.company_filings (
+    cik VARCHAR(10),
+    accession_number VARCHAR,
+    filing_date DATE,
+    report_date DATE,
+    form VARCHAR,
+    data JSON,
+    UNIQUE (cik, accession_number)
+);
+
+-- Materialized views
+
+CREATE MATERIALIZED VIEW finance.recent_company_filings_with_potential_data_view AS 
+    SELECT cf.cik, cf.accession_number, cf.filing_date, cf.report_date, cf.form, cf.data  FROM finance.company_filings cf
+    where filing_date > now() - interval '6' year and cf.form in (select form from finance.company_filings cf  where data::text <> '{}'::text group by form);
+
+CREATE UNIQUE INDEX recent_company_filings_with_potential_data_view_index ON finance.recent_company_filings_with_potential_data_view (cik, accession_number);
+
+CREATE OR REPLACE FUNCTION refresh_materialized_views()
+RETURNS trigger LANGUAGE plpgsql
+AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW finance.recent_company_filings_with_potential_data_view;
+    RETURN NULL;
+END $$;
+
+CREATE TRIGGER refresh_materialized_views
+AFTER INSERT ON finance.data_collector FOR EACH STATEMENT 
+EXECUTE PROCEDURE refresh_materialized_views();

@@ -20,6 +20,7 @@ import psycopg
 import os
 import json
 from enum import Enum
+import time
 
 class Dao():
     class RETURN_TYPE(Enum):
@@ -43,15 +44,25 @@ class Dao():
             port=self.db_port,
             dbname=self.db_name,
             user=self.db_username,
-            password=self.db_password)
+            password=self.db_password,
+            keepalives=1,
+            keepalives_idle=60,
+            keepalives_interval=60,
+            keepalives_count=3
+        )
 
     def closeConnection(self):
         print("Database closing connection")
-        if self.connection != None:
+        if self.connection != None and self.connection.closed == 0:
             self.connection.close()
+
+    def rollback(self, returnType):
+        if self.connection != None and self.connection.closed == 0 and returnType == self.RETURN_TYPE.COMMIT:
+            print("Attempt to roll back commit")
+            self.connection.rollback()
         
     def executeQuery(self, query, values, returnType):
-        print("Database executing query: " + query)
+        print("Database executing query: " + query[:100])
         print("Database executing values: " + str(values)[:100])
         fetchResult = None
         try:
@@ -67,49 +78,97 @@ class Dao():
                     self.connection.commit()
         except Exception as e:
             print(e)
-            self.connection.rollback()
         return fetchResult
     
-    def addCompanyfacts(self, file):
-        try:
-            self.openConnection()
-            existenceCheckQuery = "SELECT COUNT(*) FROM finance.company_facts WHERE file_name = %s;"
-            insertQuery = "INSERT INTO finance.company_facts ( file_name, file_data, updated_date ) VALUES ( %s, %s, now() );"
-            updateQuery = "UPDATE finance.company_facts SET file_data = %s , updated_date = now() WHERE file_name = %s;"
-            count = self.executeQuery(existenceCheckQuery, (file[0],), self.RETURN_TYPE.FETCH_ONE)[0]
-            if count == 1:
-                self.executeQuery(updateQuery, (json.dumps(file[1]), file[0]), self.RETURN_TYPE.COMMIT)
-            else:
-                self.executeQuery(insertQuery, (file[0], json.dumps(file[1])), self.RETURN_TYPE.COMMIT)
-        except Exception as e:
-            print(e)
-        finally:
-            self.closeConnection()
+    def addFailedFile(self, fileName, type, fileData, exception):
+        insertQuery = "INSERT INTO finance.failed_files ( file_name, type, exception, file_data, attempted_date ) VALUES ( %s, %s, %s, %s, now() )"
+        self.executeQuery(insertQuery, (fileName, type, exception, json.dumps(fileData) ), self.RETURN_TYPE.COMMIT)
     
-    def getCompanyFactsFileNames(self):
-        fileNames = []
-        try:
-            self.openConnection()
-            fileNameQuery = "SELECT file_name FROM finance.company_facts;"
-            fileNames = self.executeQuery(fileNameQuery, None, self.RETURN_TYPE.FETCH_ALL)
-        except Exception as e:
-            print(e)
-        finally:
-            self.closeConnection()
-        return fileNames
+    def addCompanyExchanges(self, cik, exchangeList):
+        for ticker in exchangeList:
+            upsertQuery = """INSERT INTO finance.company_exchange ( cik, exchange, ticker ) VALUES ( %s, %s, %s )
+                                ON CONFLICT ( cik, exchange ) 
+                                DO UPDATE SET ticker = %s """
+            
+            self.executeQuery(upsertQuery, (# Insert
+                                            cik,
+                                            ticker["exchange"],
+                                            ticker["ticker"],
+                                            # update
+                                            ticker["ticker"]
+                                            ), self.RETURN_TYPE.COMMIT)
+        
+        exchangesStringList = ""
+        if len(exchangeList) > 0:
+            exchangesStringList = "AND exchange not in ('"+"','".join([i["exchange"] for i in exchangeList])+"')" 
+
+        deleteQuery = "DELETE FROM finance.company_exchange WHERE cik = %s " + exchangesStringList
+        
+        self.executeQuery(deleteQuery, ( cik, ), self.RETURN_TYPE.COMMIT)
     
-    def addSubmissions(self, file):
-        try:
-            self.openConnection()
-            existenceCheckQuery = "SELECT COUNT(*) FROM finance.submissions WHERE file_name = %s;"
-            insertQuery = "INSERT INTO finance.submissions ( file_name, file_data, updated_date ) VALUES ( %s, %s, now() );"
-            updateQuery = "UPDATE finance.submissions SET file_data = %s , updated_date = now() WHERE file_name = %s;"
-            count = self.executeQuery(existenceCheckQuery, (file[0],), self.RETURN_TYPE.FETCH_ONE)[0]
-            if count == 1:
-                self.executeQuery(updateQuery, (json.dumps(file[1]), file[0]), self.RETURN_TYPE.COMMIT)
-            else:
-                self.executeQuery(insertQuery, (file[0], json.dumps(file[1])), self.RETURN_TYPE.COMMIT)
-        except Exception as e:
-            print(e)
-        finally:
-            self.closeConnection()
+    def addCompanySummary(self, companySummary):
+        upsertQuery = """INSERT INTO finance.company_summary (  cik ,
+                                                                name ,
+                                                                sic_description ,
+                                                                category ,
+                                                                entity_type ,
+                                                                street1 ,
+                                                                street2 ,
+                                                                city ,
+                                                                state_country ,
+                                                                zip_code ,
+                                                                state_country_description )
+                            VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )
+                            ON CONFLICT ( cik ) 
+                            DO UPDATE SET   name = %s ,
+                                            sic_description = %s ,
+                                            category = %s ,
+                                            entity_type = %s ,
+                                            street1 = %s ,
+                                            street2 = %s ,
+                                            city = %s ,
+                                            state_country = %s ,
+                                            zip_code = %s ,
+                                            state_country_description = %s"""
+        
+        self.executeQuery(upsertQuery, (# Insert
+                                        companySummary["cik"],
+                                        companySummary["name"],
+                                        companySummary["sic_description"],
+                                        companySummary["category"],
+                                        companySummary["entity_type"],
+                                        companySummary["street1"],
+                                        companySummary["street2"],
+                                        companySummary["city"],
+                                        companySummary["state_country"],
+                                        companySummary["zip_code"],
+                                        companySummary["state_country_description"],
+                                        # update
+                                        companySummary["name"],
+                                        companySummary["sic_description"],
+                                        companySummary["category"],
+                                        companySummary["entity_type"],
+                                        companySummary["street1"],
+                                        companySummary["street2"],
+                                        companySummary["city"],
+                                        companySummary["state_country"],
+                                        companySummary["zip_code"],
+                                        companySummary["state_country_description"]), self.RETURN_TYPE.COMMIT)
+    
+    def addSubmissionFilings(self, filings):
+        insertQuery = """INSERT INTO finance.company_filings (  cik , accession_number , filing_date , report_date , form ) VALUES {0} 
+                                ON CONFLICT ( cik , accession_number ) DO NOTHING""".format(filings)
+        self.executeQuery(insertQuery, None, self.RETURN_TYPE.COMMIT)
+    
+    def getAccessionNumbersForCompanyFacts(self, cik):
+        anQuery = "SELECT accession_number FROM finance.company_filings WHERE cik = %s AND data IS NULL;"
+        anList = self.executeQuery(anQuery, (cik,), self.RETURN_TYPE.FETCH_ALL)
+        return [i[0] for i in anList]
+    
+    def updateCompanyFilings(self, cik, accessionNumber, data):
+        updateQuery = "UPDATE finance.company_filings SET data = %s WHERE cik = %s AND accession_number = %s"
+        self.executeQuery(updateQuery, (json.dumps(data), cik, accessionNumber), self.RETURN_TYPE.COMMIT)
+    
+    def completeDataCollector(self, startTime, endTime):
+        insertQuery = "INSERT INTO finance.data_collector ( start_time, end_time ) VALUES ( %s, %s );"
+        self.executeQuery(insertQuery, (startTime,endTime), self.RETURN_TYPE.COMMIT)
