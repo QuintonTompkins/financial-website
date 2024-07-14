@@ -24,6 +24,7 @@ import java.util.List;
 
 public class GenericFilterList {
     private List<GenericFilter> filters;
+    private GenericSort sort;
 
     public List<GenericFilter> getFilters() {
         return filters;
@@ -31,6 +32,14 @@ public class GenericFilterList {
 
     public void setFilters(List<GenericFilter> filters) {
         this.filters = filters;
+    }
+
+    public GenericSort getSort() {
+        return sort;
+    }
+
+    public void setSort(GenericSort sort) {
+        this.sort = sort;
     }
 
     public void validateGenericFilterList(List<String> stringColumnList, List<String> dateColumnList) {
@@ -45,7 +54,7 @@ public class GenericFilterList {
         for (GenericFilter filter : this.filters) {
             filterStringList.add(String.format(" %s %s ? ", filter.getField(), filter.getComparator()));
         }
-        return String.join(" AND ", filterStringList);
+        return filterStringList.size() == 0 ? " " : " WHERE " + String.join(" AND ", filterStringList);
     }
 
     public int setValues(PreparedStatement statement, int i, List<String> stringColumnList, List<String> dateColumnList) throws SQLException {
@@ -57,6 +66,11 @@ public class GenericFilterList {
             }
         }
         return i;
+    }
+
+    public String generateSortString(List<String> stringColumnList, List<String> dateColumnList) {
+        String sortString = this.sort == null ? "" : " ORDER BY " + this.sort.generateSortString(stringColumnList, dateColumnList);
+        return sortString;
     }
 
 }

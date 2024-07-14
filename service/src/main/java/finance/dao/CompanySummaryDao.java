@@ -39,24 +39,23 @@ public class CompanySummaryDao extends Dao {
     private static final List<String> DATE_COLUMN_LIST = new ArrayList<String>();
 
     private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", STRING_COLUMN_LIST)+" FROM finance.company_summary ";
+    private static final String QUERY_LIMIT = " LIMIT 50;";
 
     public CompanySummaryDao() {
         super(); 
     }
 
-    public List<CompanySummary> getCompanySummaries(GenericFilterList filterList) {
-        String filter = "";
-        if(filterList != null){
-            filter = filterList.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
-            filter = " WHERE " + filter;
-        }
+    public List<CompanySummary> getCompanySummaries(GenericFilterList params) {
+        String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
+        String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
         getConnection(url, user, password);
-        String sql = SELECT_ALL_QUERY +filter+ " LIMIT 2;";
+        String sql = SELECT_ALL_QUERY +filter+sort+QUERY_LIMIT;
+        LOGGER.log(Level.INFO, sql);
         List<CompanySummary> companySummaries = new ArrayList<CompanySummary>();
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql);
-            if(filterList != null){
-                filterList.setValues(statement, 1, STRING_COLUMN_LIST, DATE_COLUMN_LIST);
+            if(params != null){
+                params.setValues(statement, 1, STRING_COLUMN_LIST, DATE_COLUMN_LIST);
             }
             ResultSet resultSet = statement.executeQuery();
 

@@ -25,6 +25,12 @@ input GenericFilter {
     value: Object
 }
 
+input GenericSort {
+    field: String
+    ascending: Boolean
+}
+
 input GenericFilterList {
     filters: [GenericFilter]
+    sort: GenericSort
 }

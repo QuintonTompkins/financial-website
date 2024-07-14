@@ -48,24 +48,22 @@ public class CompanyFilingDao extends Dao{
                                                           .collect(Collectors.toList());
 
     private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", COLUMN_LIST)+" FROM finance.recent_company_filings_with_potential_data_view ";
+    private static final String QUERY_LIMIT = " LIMIT 50;";
 
     public CompanyFilingDao() {
         super(); 
     }
 
-    public List<CompanyFiling> getCompanyFilings(GenericFilterList filterList) {
-        String filter = "";
-        if(filterList != null){
-            filter = filterList.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
-            filter = " WHERE " + filter;
-        }
+    public List<CompanyFiling> getCompanyFilings(GenericFilterList params) {
+        String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
+        String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
         getConnection(url, user, password);
-        String sql = SELECT_ALL_QUERY +filter+ " LIMIT 2;";
+        String sql = SELECT_ALL_QUERY +filter+sort+QUERY_LIMIT;
         List<CompanyFiling> companyFilings = new ArrayList<CompanyFiling>();
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql);
-            if(filterList != null){
-                filterList.setValues(statement, 1, STRING_COLUMN_LIST, DATE_COLUMN_LIST);
+            if(params != null){
+                params.setValues(statement, 1, STRING_COLUMN_LIST, DATE_COLUMN_LIST);
             }
             ResultSet resultSet = statement.executeQuery();
 
