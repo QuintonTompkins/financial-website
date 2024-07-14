@@ -33,7 +33,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import finance.models.CompanyFiling;
-import finance.models.GenericFilterList;
+import finance.models.GenericParameters;
 
 
 @Component
@@ -54,7 +54,7 @@ public class CompanyFilingDao extends Dao{
         super(); 
     }
 
-    public List<CompanyFiling> getCompanyFilings(GenericFilterList params) {
+    public List<CompanyFiling> getCompanyFilings(GenericParameters params) {
         String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
         String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
         getConnection(url, user, password);

@@ -30,7 +30,7 @@ input GenericSort {
     ascending: Boolean
 }
 
-input GenericFilterList {
+input GenericParameters {
     filters: [GenericFilter]
     sort: GenericSort
 }

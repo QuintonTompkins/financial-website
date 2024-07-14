@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import org.springframework.stereotype.Component;
 
 import finance.models.CompanySummary;
-import finance.models.GenericFilterList;
+import finance.models.GenericParameters;
 
 @Component
 public class CompanySummaryDao extends Dao {
@@ -45,7 +45,7 @@ public class CompanySummaryDao extends Dao {
         super(); 
     }
 
-    public List<CompanySummary> getCompanySummaries(GenericFilterList params) {
+    public List<CompanySummary> getCompanySummaries(GenericParameters params) {
         String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
         String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
         getConnection(url, user, password);

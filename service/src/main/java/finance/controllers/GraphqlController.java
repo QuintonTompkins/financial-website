@@ -30,7 +30,7 @@ import finance.dao.CompanyFilingDao;
 import finance.dao.CompanySummaryDao;
 import finance.models.CompanyFiling;
 import finance.models.CompanySummary;
-import finance.models.GenericFilterList;
+import finance.models.GenericParameters;
 
 @Controller
 public class GraphqlController {
@@ -42,12 +42,12 @@ public class GraphqlController {
     CompanySummaryDao companySummaryDao;
 	
 	@QueryMapping
-    public List<CompanyFiling> companyFilings(@Argument GenericFilterList filter){
+    public List<CompanyFiling> companyFilings(@Argument GenericParameters filter){
         return companyFilingDao.getCompanyFilings(filter);
     }
 	
 	@QueryMapping
-    public List<CompanySummary> companySummaries(@Argument GenericFilterList filter){
+    public List<CompanySummary> companySummaries(@Argument GenericParameters filter){
         return companySummaryDao.getCompanySummaries(filter);
     }
 }

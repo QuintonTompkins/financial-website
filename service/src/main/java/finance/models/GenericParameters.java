@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GenericFilterList {
+public class GenericParameters {
     private List<GenericFilter> filters;
     private GenericSort sort;
 
@@ -42,14 +42,14 @@ public class GenericFilterList {
         this.sort = sort;
     }
 
-    public void validateGenericFilterList(List<String> stringColumnList, List<String> dateColumnList) {
+    public void validateGenericParameters(List<String> stringColumnList, List<String> dateColumnList) {
         for (GenericFilter filter : this.filters) {
             filter.validateGenericFilter(stringColumnList, dateColumnList);
         }
     }
 
     public String generateFilterString(List<String> stringColumnList, List<String> dateColumnList) {
-        validateGenericFilterList(stringColumnList, dateColumnList);
+        validateGenericParameters(stringColumnList, dateColumnList);
         ArrayList<String> filterStringList = new ArrayList<String>();
         for (GenericFilter filter : this.filters) {
             filterStringList.add(String.format(" %s %s ? ", filter.getField(), filter.getComparator()));

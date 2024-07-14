@@ -17,6 +17,6 @@
 """
 
 type Query{  
-    companyFilings(filter: GenericFilterList): [CompanyFiling]
-    companySummaries(filter: GenericFilterList): [CompanySummary]
+    companyFilings(filter: GenericParameters): [CompanyFiling]
+    companySummaries(filter: GenericParameters): [CompanySummary]
 }
