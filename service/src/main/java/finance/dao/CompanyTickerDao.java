@@ -28,29 +28,29 @@ import java.util.logging.Logger;
 
 import org.springframework.stereotype.Component;
 
-import finance.models.CompanySummary;
+import finance.models.CompanyTicker;
 import finance.models.GenericParameters;
 
 @Component
-public class CompanySummaryDao extends Dao {
-    private static final Logger LOGGER = Logger.getLogger( CompanySummaryDao.class.getName() );
-
-    private static final List<String> STRING_COLUMN_LIST = Arrays.asList("cik", "name", "sic_description", "category", "entity_type", "street1", "street2", "city", "state_country", "zip_code", "state_country_description");
+public class CompanyTickerDao extends Dao {
+    private static final Logger LOGGER = Logger.getLogger( CompanyTickerDao.class.getName() );
+    
+    private static final List<String> STRING_COLUMN_LIST = Arrays.asList("cik", "exchange", "ticker");
     private static final List<String> DATE_COLUMN_LIST = new ArrayList<String>();
 
-    private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", STRING_COLUMN_LIST)+" FROM finance.company_summary ";
-    private static final String QUERY_LIMIT = " LIMIT 50;";
-
-    public CompanySummaryDao() {
+    private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", STRING_COLUMN_LIST)+" FROM finance.company_exchange ";
+    private static final String QUERY_LIMIT = " LIMIT 500;";
+    
+    public CompanyTickerDao() {
         super(); 
     }
 
-    public List<CompanySummary> getCompanySummaries(GenericParameters params) {
+    public List<CompanyTicker> getCompanyTickers(GenericParameters params) {
         String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
         String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
         getConnection(url, user, password);
         String sql = SELECT_ALL_QUERY +filter+sort+QUERY_LIMIT;
-        List<CompanySummary> companySummaries = new ArrayList<CompanySummary>();
+        List<CompanyTicker> companyTickers = new ArrayList<CompanyTicker>();
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql);
             if(params != null){
@@ -59,26 +59,17 @@ public class CompanySummaryDao extends Dao {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                companySummaries.add(new CompanySummary(
+                companyTickers.add(new CompanyTicker(
                     resultSet.getString("cik"),
-                    resultSet.getString("name"),
-                    resultSet.getString("sic_description"),
-                    resultSet.getString("category"),
-                    resultSet.getString("entity_type"),
-                    resultSet.getString("street1"),
-                    resultSet.getString("street2"),
-                    resultSet.getString("city"),
-                    resultSet.getString("state_country"),
-                    resultSet.getString("zip_code"),
-                    resultSet.getString("state_country_description"),
-                    null
+                    resultSet.getString("exchange"),
+                    resultSet.getString("ticker")
                 ));
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
         }
 
-        return companySummaries;
+        return companyTickers;
     }
 
 }

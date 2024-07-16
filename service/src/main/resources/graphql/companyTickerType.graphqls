@@ -14,13 +14,10 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
+""" 
 
-type Query{  
-    companyFilings(input: GenericParameters): [CompanyFiling]
-    companySummaries(input: GenericParameters): [CompanySummary]
-    companyTickers(input: GenericParameters): [CompanyTicker]
-    timeSinceRefresh: Int
-    savedCiks: [String]
-    userComments(input: GenericParameters): [UserComment]
+type CompanyTicker {
+    cik: String!
+    exchange: String
+    ticker: String
 }

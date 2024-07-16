@@ -18,26 +18,16 @@
 package finance.authorization.requests;
 
 public class UpdatePasswordRequest {
-    private String username;
-    private String password;
     private String email;
+    private String password;
     private String newPassword;
 
     UpdatePasswordRequest() {}
 
     UpdatePasswordRequest(String username, String email, String password, String newPassword) {
-        this.username = username;
         this.password = password;
         this.email = email;
         this.newPassword = newPassword;
-    }
-    
-    public String getUsername() {
-        return this.username;
-    }
-    
-    public void setUsername(String username) {
-        this.username = username;
     }
     
     public String getPassword() {

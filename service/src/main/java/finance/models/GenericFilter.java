@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import finance.exceptions.InvalidInputException;
+
 public class GenericFilter {
 
     private String field;
@@ -34,13 +36,12 @@ public class GenericFilter {
     public GenericFilter() {
     }
 
-    public GenericFilter(String field, String comparator, List<String> value) {
+    public GenericFilter(String field, String comparator, Object value) {
         this.field = field;
         this.comparator = comparator;
         this.value = value;
     }
 
-    // Getters and Setters
     public String getField() {
         return field;
     }
@@ -65,16 +66,16 @@ public class GenericFilter {
         this.value = value;
     }
 
-    public void validateGenericFilter(List<String> StringColumnList, List<String> DateColumnList) throws RuntimeException{
+    public void validateGenericFilter(List<String> StringColumnList, List<String> DateColumnList) throws InvalidInputException {
         if( !StringColumnList.contains(getField()) && !DateColumnList.contains(getField())  ){
-                throw new RuntimeException(String.format("Invalid filter Column (Valid Values: %s)", 
+                throw new InvalidInputException(String.format("Invalid filter Column (Valid Values: %s)", 
                                                 String.join(", ", 
                                                     Stream.of(StringColumnList, DateColumnList)
                                                             .flatMap(List::stream).collect(Collectors.toList()))));
         }
         if( (StringColumnList.contains(getField()) && !VALID_STRING_COMPARATORS.contains(getComparator())) ||
             (DateColumnList.contains(getField()) && !VALID_DATE_COMPARATORS.contains(getComparator()))  ){
-                throw new RuntimeException(String.format("Invalid filter Comparator (Valid Values: %s)", 
+                throw new InvalidInputException(String.format("Invalid filter Comparator (Valid Values: %s)", 
                                                 String.join(", ", 
                                                     Stream.of(VALID_STRING_COMPARATORS, VALID_DATE_COMPARATORS)
                                                             .flatMap(List::stream).collect(Collectors.toList()))));

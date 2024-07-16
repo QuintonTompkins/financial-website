@@ -17,6 +17,8 @@
 */
 package finance.models;
 
+import java.util.List;
+
 public class CompanySummary {
 
     private String cik;
@@ -30,10 +32,11 @@ public class CompanySummary {
     private String stateCountry;
     private String zipCode;
     private String stateCountryDescription;
+    private List<CompanyTicker> tickers;
 
     public CompanySummary(String cik, String name, String sicDescription, String category, String entityType,
                           String street1, String street2, String city, String stateCountry, String zipCode,
-                          String stateCountryDescription) {
+                          String stateCountryDescription, List<CompanyTicker> tickers) {
         this.cik = cik;
         this.name = name;
         this.sicDescription = sicDescription;
@@ -45,6 +48,7 @@ public class CompanySummary {
         this.stateCountry = stateCountry;
         this.zipCode = zipCode;
         this.stateCountryDescription = stateCountryDescription;
+        this.tickers = tickers;
     }
 
     public String getCik() {
@@ -89,5 +93,57 @@ public class CompanySummary {
 
     public String getStateCountryDescription() {
         return stateCountryDescription;
+    }
+
+    public List<CompanyTicker> getTickers() {
+        return tickers;
+    }
+
+    public void setCik(String cik) {
+        this.cik = cik;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSicDescription(String sicDescription) {
+        this.sicDescription = sicDescription;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
+    }
+
+    public void setStreet1(String street1) {
+        this.street1 = street1;
+    }
+
+    public void setStreet2(String street2) {
+        this.street2 = street2;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setStateCountry(String stateCountry) {
+        this.stateCountry = stateCountry;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public void setStateCountryDescription(String stateCountryDescription) {
+        this.stateCountryDescription = stateCountryDescription;
+    }
+
+    public void setTickers(List<CompanyTicker> tickers) {
+        this.tickers = tickers;
     }
 }

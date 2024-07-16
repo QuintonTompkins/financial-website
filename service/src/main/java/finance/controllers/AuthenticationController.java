@@ -17,6 +17,8 @@
 */
 package finance.controllers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +48,7 @@ import finance.authorization.requests.LoginRequest;
 import finance.authorization.requests.ResetPasswordRequest;
 import finance.authorization.requests.UpdatePasswordRequest;
 import finance.authorization.responses.AuthResponse;
+import finance.email.EmailHandler;
 import finance.authorization.AuthDao;
 
 @Controller
@@ -68,6 +71,8 @@ public class AuthenticationController {
     AuthDao authDao;
     @Autowired
     JwtUtils jwtUtils;
+    @Autowired
+    EmailHandler emailHandler;
 
     private void callFrequencyCheck(HttpServletRequest request) throws InterruptedException{
         if(authDao.getRecentAuthRequestCount(request.getRemoteAddr()) > TOO_MANY_REQUESTS){
@@ -87,6 +92,7 @@ public class AuthenticationController {
         Map<String, Object> claims = new HashMap<String, Object>() {{
             put("userId", userId);
             put("ip", request.getRemoteAddr());
+            put("roles", new ArrayList<String>());
         }};
         String jwt = jwtUtils.createToken(claims, createRequest.getUsername(), userId, encryptedPassword);
         AuthResponse response = new AuthResponse(jwt);
@@ -98,13 +104,15 @@ public class AuthenticationController {
     public AuthResponse logInUser(@RequestBody LoginRequest loginRequest, HttpServletRequest request) throws InterruptedException {
         callFrequencyCheck(request);
         User userFound = authDao.getUser(loginRequest.getUsernameEmail());
+        ArrayList<String> roles = authDao.getUserRoles(userFound.getUserId());
         AuthResponse response = new AuthResponse(null);
         if(userFound.getUserId() != 0 && encoder.matches(loginRequest.getPassword(), userFound.getPassword())){
             Map<String, Object> claims = new HashMap<String, Object>() {{
                 put("userId", userFound.getUserId());
                 put("ip", request.getRemoteAddr());
+                put("roles", roles);
             }};
-            String jwt = jwtUtils.createToken(claims, loginRequest.getUsernameEmail(), userFound.getUserId(), userFound.getPassword());
+            String jwt = jwtUtils.createToken(claims, userFound.getUsername(), userFound.getUserId(), userFound.getPassword());
             response = new AuthResponse(jwt);
         }
         else{
@@ -124,7 +132,7 @@ public class AuthenticationController {
             authDao.updatePassword(userFound.getUserId(), encryptedPassword);
         }
         else{
-            authDao.insertAuthRequest(passwordRequest.getUsername(), passwordRequest.getEmail(), userFound.getUserId(), request.getRemoteAddr(), "updatePassword");
+            authDao.insertAuthRequest(userFound.getUsername(), passwordRequest.getEmail(), userFound.getUserId(), request.getRemoteAddr(), "updatePassword");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,FAILED_LOGIN_MESSAGE);
         }
         return new ResponseEntity<String>("Password Updated.", HttpStatus.OK);
@@ -139,9 +147,10 @@ public class AuthenticationController {
         if(userFound.getUserId() != 0){
             String password =  RandomStringUtils.random( 15, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()-_=+?" );
             String encryptedPassword = encoder.encode(password);
-            // TO DO
-            //authDao.updatePassword(userFound.getUserId(), encryptedPassword);
-            //email user new password
+            String subject = "Password Updated for Quinton's Finance Website";
+            String body = "A request has been made to reset your password.\n\nYour new password is "+password+"\n\nThis email does not check responses.";
+            emailHandler.sendSimpleMessage(userFound.getEmail(), subject, body);
+            authDao.updatePassword(userFound.getUserId(), encryptedPassword);
         }
         return new ResponseEntity<String>("Password Reset.", HttpStatus.OK);
     }

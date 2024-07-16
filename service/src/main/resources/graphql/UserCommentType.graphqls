@@ -15,12 +15,17 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+scalar DateTime
+  @specifiedBy(url: "https://github.com/graphql-java/graphql-java-extended-scalars")
 
-type Query{  
-    companyFilings(input: GenericParameters): [CompanyFiling]
-    companySummaries(input: GenericParameters): [CompanySummary]
-    companyTickers(input: GenericParameters): [CompanyTicker]
-    timeSinceRefresh: Int
-    savedCiks: [String]
-    userComments(input: GenericParameters): [UserComment]
+type UserComment {
+    commentId: Int!
+    userId: Int
+    cik: String
+    created: DateTime
+    minPrice: Float
+    maxPrice: Float
+    comment: String
+    voteTotal: Int
+    userName: String
 }

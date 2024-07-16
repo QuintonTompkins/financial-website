@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,6 +93,7 @@ public class AuthDao extends Dao{
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql);
             statement.setString(1,usernameEmail);
+            statement.setString(2,usernameEmail);
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
@@ -110,7 +112,7 @@ public class AuthDao extends Dao{
 
     public void insertAuthRequest(String userName, String userEmail, int userId, String origin, String authType){
         getConnection(url, user, password);
-        String sql = "insert into wargame.auth_request (user_name, user_email, player_id_found, origin, auth_type) values (?,?,?,?,?)";
+        String sql = "insert into finance.auth_request (user_name, user_email, user_id_found, origin, auth_type) values (?,?,?,?,?)";
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
             statement.setString(1,userName);
@@ -157,6 +159,25 @@ public class AuthDao extends Dao{
             LOGGER.log(Level.SEVERE, "Failed to update password", ex);
             throw new RuntimeException(ex);
         }
+    }
+
+    public ArrayList<String> getUserRoles(int userId) {
+        getConnection(url, user, password);
+        String sql = "SELECT role FROM finance.user_role WHERE user_id = ?";
+        ArrayList<String> roles = new ArrayList<String>();
+        try {
+            PreparedStatement statement = this.connection.prepareStatement(sql);
+            statement.setInt(1,userId);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                roles.add(resultSet.getString("role"));
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Failed to update password", ex);
+            throw new RuntimeException(ex);
+        }
+        return roles;
     }
 
 }

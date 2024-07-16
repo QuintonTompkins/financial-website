@@ -28,4 +28,5 @@ type CompanySummary {
     stateCountry: String
     zipCode: String
     stateCountryDescription: String
+    tickers: [CompanyTicker]
 }

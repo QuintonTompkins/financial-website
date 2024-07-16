@@ -141,12 +141,11 @@ def ingestFileData(fileName):
         companyfactsJson = json.load(companyfactsfile)
         parseCompanyFactsFile(fileName, cik, companyfactsJson)
 
-def completeBulkIngest(startTime, endTime):
-    datetimeFormat = "%d/%m/%y %H:%M:%S.%f"
+def completeBulkIngest(timeDiff):
     dao = Dao()
     try:
         dao.openConnection()
-        dao.completeDataCollector(startTime.strftime(datetimeFormat),endTime.strftime(datetimeFormat))
+        dao.completeDataCollector(timeDiff)
     except Exception as e:
         print(e)
     finally:
@@ -154,7 +153,7 @@ def completeBulkIngest(startTime, endTime):
 
 
 def ingestBulkData():
-    startTime = datetime.datetime.now(timezone('EST'))
+    startTime = datetime.datetime.now()
     folderNames = [COMPANY_NAME,SUBMISSIONS_NAME]
 
     pool = multiprocessing.Pool(processes=4)
@@ -165,5 +164,5 @@ def ingestBulkData():
 
     pool.map(deleteBulkFolder, folderNames)
     
-    endTime = datetime.datetime.now(timezone('EST'))
-    completeBulkIngest(startTime, endTime)
+    timeDiff = datetime.datetime.now() - startTime
+    completeBulkIngest(timeDiff.total_seconds())

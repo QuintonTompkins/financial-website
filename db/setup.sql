@@ -27,6 +27,12 @@ CREATE TABLE finance.user (
     PRIMARY KEY(user_id)
 );
 
+CREATE TABLE finance.user_role (
+    user_id INT REFERENCES finance.user(user_id),
+    role VARCHAR NOT NULL,
+    UNIQUE (user_id, role)
+);
+
 CREATE TABLE finance.auth_request (
     user_name VARCHAR,
     user_email VARCHAR,
@@ -37,11 +43,11 @@ CREATE TABLE finance.auth_request (
 );
 
 CREATE TABLE finance.data_collector (
-    start_time TIMESTAMP,
+    time_taken DECIMAL,
     end_time TIMESTAMP
 );
 
-CREATE TABLE finance.failed_files (
+CREATE TABLE finance.failed_file (
     file_name VARCHAR,
     type VARCHAR,
     exception VARCHAR,
@@ -71,7 +77,7 @@ CREATE TABLE finance.company_exchange (
     UNIQUE (cik, exchange)
 );
 
-CREATE TABLE finance.company_filings (
+CREATE TABLE finance.company_filing (
     cik VARCHAR(10),
     accession_number VARCHAR,
     filing_date DATE,
@@ -81,11 +87,33 @@ CREATE TABLE finance.company_filings (
     UNIQUE (cik, accession_number)
 );
 
+CREATE TABLE finance.user_saved_cik (
+    user_id INT REFERENCES finance.user(user_id),
+    cik VARCHAR(10)
+);
+
+CREATE TABLE finance.user_comment (
+    comment_id INT GENERATED ALWAYS AS IDENTITY,
+    user_id INT REFERENCES finance.user(user_id),
+    cik VARCHAR(10),
+    created TIMESTAMP,
+    min_price NUMERIC(10,4),
+    max_price NUMERIC(10,4),
+    comment VARCHAR(1000),
+    PRIMARY KEY(comment_id)
+);
+
+CREATE TABLE finance.user_comment_vote (
+    comment_id INT REFERENCES finance.user_comment(comment_id),
+    user_id INT REFERENCES finance.user(user_id),
+    vote SMALLINT
+);
+
 -- Materialized views
 
 CREATE MATERIALIZED VIEW finance.recent_company_filings_with_potential_data_view AS 
-    SELECT cf.cik, cf.accession_number, cf.filing_date, cf.report_date, cf.form, cf.data  FROM finance.company_filings cf
-    where filing_date > now() - interval '6' year and cf.form in (select form from finance.company_filings cf  where data::text <> '{}'::text group by form);
+    SELECT cf.cik, cf.accession_number, cf.filing_date, cf.report_date, cf.form, cf.data  FROM finance.company_filing cf
+    where filing_date > now() - interval '6' year and cf.form in (select form from finance.company_filing cf  where data::text <> '{}'::text group by form);
 
 CREATE UNIQUE INDEX recent_company_filings_with_potential_data_view_index ON finance.recent_company_filings_with_potential_data_view (cik, accession_number);
 

@@ -81,7 +81,7 @@ class Dao():
         return fetchResult
     
     def addFailedFile(self, fileName, type, fileData, exception):
-        insertQuery = "INSERT INTO finance.failed_files ( file_name, type, exception, file_data, attempted_date ) VALUES ( %s, %s, %s, %s, now() )"
+        insertQuery = "INSERT INTO finance.failed_file ( file_name, type, exception, file_data, attempted_date ) VALUES ( %s, %s, %s, %s, now() )"
         self.executeQuery(insertQuery, (fileName, type, exception, json.dumps(fileData) ), self.RETURN_TYPE.COMMIT)
     
     def addCompanyExchanges(self, cik, exchangeList):
@@ -156,19 +156,19 @@ class Dao():
                                         companySummary["state_country_description"]), self.RETURN_TYPE.COMMIT)
     
     def addSubmissionFilings(self, filings):
-        insertQuery = """INSERT INTO finance.company_filings (  cik , accession_number , filing_date , report_date , form ) VALUES {0} 
+        insertQuery = """INSERT INTO finance.company_filing (  cik , accession_number , filing_date , report_date , form ) VALUES {0} 
                                 ON CONFLICT ( cik , accession_number ) DO NOTHING""".format(filings)
         self.executeQuery(insertQuery, None, self.RETURN_TYPE.COMMIT)
     
     def getAccessionNumbersForCompanyFacts(self, cik):
-        anQuery = "SELECT accession_number FROM finance.company_filings WHERE cik = %s AND data IS NULL;"
+        anQuery = "SELECT accession_number FROM finance.company_filing WHERE cik = %s AND data IS NULL;"
         anList = self.executeQuery(anQuery, (cik,), self.RETURN_TYPE.FETCH_ALL)
         return [i[0] for i in anList]
     
     def updateCompanyFilings(self, cik, accessionNumber, data):
-        updateQuery = "UPDATE finance.company_filings SET data = %s WHERE cik = %s AND accession_number = %s"
+        updateQuery = "UPDATE finance.company_filing SET data = %s WHERE cik = %s AND accession_number = %s"
         self.executeQuery(updateQuery, (json.dumps(data), cik, accessionNumber), self.RETURN_TYPE.COMMIT)
     
-    def completeDataCollector(self, startTime, endTime):
-        insertQuery = "INSERT INTO finance.data_collector ( start_time, end_time ) VALUES ( %s, %s );"
-        self.executeQuery(insertQuery, (startTime,endTime), self.RETURN_TYPE.COMMIT)
+    def completeDataCollector(self, timeDiff):
+        insertQuery = "INSERT INTO finance.data_collector ( time_taken, end_time ) VALUES ( %s, now() );"
+        self.executeQuery(insertQuery, (timeDiff,), self.RETURN_TYPE.COMMIT)

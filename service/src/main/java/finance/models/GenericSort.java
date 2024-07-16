@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import finance.exceptions.InvalidInputException;
+
 public class GenericSort {
     private String field;
     private Boolean ascending;
@@ -49,13 +51,13 @@ public class GenericSort {
         this.ascending = ascending;
     }
 
-    public String generateSortString(List<String> stringColumnList, List<String> dateColumnList) {
+    public String generateSortString(List<String> stringColumnList, List<String> dateColumnList) throws InvalidInputException {
         String sortString = " ";
         if(stringColumnList.contains(field) || dateColumnList.contains(field)){
             sortString = String.format(" %s %s ", this.field, this.ascending ? " ASC " : " DESC ");
         }
         else{
-            throw new RuntimeException(String.format("Invalid Sort Field (Valid Values: %s)", 
+            throw new InvalidInputException(String.format("Invalid Sort Field (Valid Values: %s)", 
                                             String.join(", ", 
                                                 Stream.of(stringColumnList, dateColumnList).flatMap(List::stream).collect(Collectors.toList()))));
         }

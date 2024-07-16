@@ -33,7 +33,8 @@ import io.jsonwebtoken.io.Decoders;
 @Component
 public class JwtUtils {
 
-    private final int TOKEN_LIFE_MS = 3600000;
+    private final int HOURS_FOR_TOKEN_TO_EXPIRE = 12;
+    private final int TOKEN_LIFE_MS = HOURS_FOR_TOKEN_TO_EXPIRE * 60 * 60 * 1000;
 
     public String createToken(Map<String, Object> claims, String userName, int userId, String encryptedPassword) {
         SecretKey key = getSigningKey(encryptedPassword);
@@ -59,5 +60,10 @@ public class JwtUtils {
             throw new JwtException("invalid ip");
         }
         return claims;
+    }
+
+    public int getUserId(String authToken) {
+        Claims claims = Jwts.parser().keyLocator(new UserIdLocator()).build().parseSignedClaims(authToken).getPayload();
+        return (int) claims.get("userId");
     }
 }

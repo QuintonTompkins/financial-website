@@ -1,4 +1,4 @@
-"""
+/* 
     Finance Website
     Copyright (C) 2024  Quinton Tompkins
 
@@ -14,13 +14,11 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
+*/
+package finance.exceptions;
 
-type Query{  
-    companyFilings(input: GenericParameters): [CompanyFiling]
-    companySummaries(input: GenericParameters): [CompanySummary]
-    companyTickers(input: GenericParameters): [CompanyTicker]
-    timeSinceRefresh: Int
-    savedCiks: [String]
-    userComments(input: GenericParameters): [UserComment]
+public class InvalidInputException extends RuntimeException {
+    public InvalidInputException(String message) {
+        super(message);
+    }
 }
