@@ -40,10 +40,10 @@ import finance.models.GenericParameters;
 public class CompanyFilingDao extends Dao{
     private static final Logger LOGGER = Logger.getLogger( CompanyFilingDao.class.getName() );
     
-    private static final List<String> STRING_COLUMN_LIST = Arrays.asList("cik", "accession_number", "form");
-    private static final List<String> DATE_COLUMN_LIST = Arrays.asList("filing_date", "report_date");
-    private static final List<String> NO_FILTER_COLUMN_LIST = Arrays.asList("data");
-    private static final List<String> COLUMN_LIST = Stream.of(STRING_COLUMN_LIST, DATE_COLUMN_LIST, NO_FILTER_COLUMN_LIST)
+    protected static final List<String> STRING_COLUMN_LIST = Arrays.asList("cik", "accession_number", "form");
+    protected static final List<String> DATE_COLUMN_LIST = Arrays.asList("filing_date", "report_date");
+    protected static final List<String> NO_FILTER_COLUMN_LIST = Arrays.asList("data");
+    protected static final List<String> COLUMN_LIST = Stream.of(STRING_COLUMN_LIST, DATE_COLUMN_LIST, NO_FILTER_COLUMN_LIST)
                                                           .flatMap(List::stream)
                                                           .collect(Collectors.toList());
 
@@ -55,15 +55,15 @@ public class CompanyFilingDao extends Dao{
     }
 
     public List<CompanyFiling> getCompanyFilings(GenericParameters params) {
-        String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
-        String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
+        String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
+        String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
         getConnection(url, user, password);
         String sql = SELECT_ALL_QUERY +filter+sort+QUERY_LIMIT;
         List<CompanyFiling> companyFilings = new ArrayList<CompanyFiling>();
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql);
             if(params != null){
-                params.setValues(statement, 1, STRING_COLUMN_LIST, DATE_COLUMN_LIST);
+                params.setValues(statement, 1, STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
             }
             ResultSet resultSet = statement.executeQuery();
 

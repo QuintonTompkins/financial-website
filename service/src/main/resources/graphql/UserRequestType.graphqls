@@ -16,18 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """ 
 
-input GenericFilter {
-    field: String
-    comparator: String
-    value: Object
-}
-
-input GenericSort {
-    field: String
-    ascending: Boolean
-}
-
-input GenericParameters {
-    filters: [GenericFilter]
-    sort: GenericSort
+type UserRequest {
+    requestId: Int
+    targetId: Int
+    userId: Int
+    type: String
+    reason: String
+    created: DateTime
+    complete: Boolean
 }

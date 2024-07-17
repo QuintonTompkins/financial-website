@@ -35,8 +35,7 @@ import finance.models.GenericParameters;
 public class CompanyTickerDao extends Dao {
     private static final Logger LOGGER = Logger.getLogger( CompanyTickerDao.class.getName() );
     
-    private static final List<String> STRING_COLUMN_LIST = Arrays.asList("cik", "exchange", "ticker");
-    private static final List<String> DATE_COLUMN_LIST = new ArrayList<String>();
+    protected static final List<String> STRING_COLUMN_LIST = Arrays.asList("cik", "exchange", "ticker");
 
     private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", STRING_COLUMN_LIST)+" FROM finance.company_exchange ";
     private static final String QUERY_LIMIT = " LIMIT 500;";
@@ -46,15 +45,15 @@ public class CompanyTickerDao extends Dao {
     }
 
     public List<CompanyTicker> getCompanyTickers(GenericParameters params) {
-        String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
-        String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST);
+        String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
+        String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
         getConnection(url, user, password);
         String sql = SELECT_ALL_QUERY +filter+sort+QUERY_LIMIT;
         List<CompanyTicker> companyTickers = new ArrayList<CompanyTicker>();
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql);
             if(params != null){
-                params.setValues(statement, 1, STRING_COLUMN_LIST, DATE_COLUMN_LIST);
+                params.setValues(statement, 1, STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
             }
             ResultSet resultSet = statement.executeQuery();
 

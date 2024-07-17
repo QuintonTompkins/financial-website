@@ -20,6 +20,8 @@ package finance.dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +33,11 @@ public class Dao {
                                             + System.getenv("POSTGRES_PORT") + "/" + System.getenv("POSTGRES_DB");
     protected static final String user = System.getenv("POSTGRES_USER");
     protected static final String password = System.getenv("POSTGRES_PASSWORD");
+    
+    protected static final List<String> NUMERIC_COLUMN_LIST = Arrays.asList();
+    protected static final List<String> STRING_COLUMN_LIST = Arrays.asList();
+    protected static final List<String> DATE_COLUMN_LIST = Arrays.asList();
+    protected static final List<String> BOOLEAN_COLUMN_LIST = Arrays.asList();
 
     protected Connection connection = null;
 

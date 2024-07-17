@@ -96,10 +96,11 @@ CREATE TABLE finance.user_comment (
     comment_id INT GENERATED ALWAYS AS IDENTITY,
     user_id INT REFERENCES finance.user(user_id),
     cik VARCHAR(10),
-    created TIMESTAMP,
+    created TIMESTAMP DEFAULT NOW(),
     min_price NUMERIC(10,4),
     max_price NUMERIC(10,4),
     comment VARCHAR(1000),
+    hidden BOOLEAN,
     PRIMARY KEY(comment_id)
 );
 
@@ -107,6 +108,23 @@ CREATE TABLE finance.user_comment_vote (
     comment_id INT REFERENCES finance.user_comment(comment_id),
     user_id INT REFERENCES finance.user(user_id),
     vote SMALLINT
+);
+
+CREATE TABLE finance.user_request (
+    request_id INT GENERATED ALWAYS AS IDENTITY,
+    target_id INT,
+    user_id INT REFERENCES finance.user(user_id),
+    type VARCHAR,
+    reason VARCHAR(1000),
+    created TIMESTAMP DEFAULT NOW(),
+    complete BOOLEAN
+);
+
+CREATE TABLE finance.logged_action (
+    user_id INT REFERENCES finance.user(user_id),
+    affected_id INT,
+    action VARCHAR,
+    created TIMESTAMP DEFAULT NOW()
 );
 
 -- Materialized views

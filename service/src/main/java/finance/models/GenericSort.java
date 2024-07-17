@@ -51,9 +51,9 @@ public class GenericSort {
         this.ascending = ascending;
     }
 
-    public String generateSortString(List<String> stringColumnList, List<String> dateColumnList) throws InvalidInputException {
+    public String generateSortString(List<String> stringColumnList, List<String> dateColumnList, List<String> booleanColumnList, List<String> numericColumnList) throws InvalidInputException {
         String sortString = " ";
-        if(stringColumnList.contains(field) || dateColumnList.contains(field)){
+        if(stringColumnList.contains(field) || dateColumnList.contains(field) || booleanColumnList.contains(field) || numericColumnList.contains(field)){
             sortString = String.format(" %s %s ", this.field, this.ascending ? " ASC " : " DESC ");
         }
         else{

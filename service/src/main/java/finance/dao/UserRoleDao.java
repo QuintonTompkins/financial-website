@@ -18,62 +18,41 @@
 package finance.dao;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class SavedCikDao extends Dao {
-    private static final Logger LOGGER = Logger.getLogger( SavedCikDao.class.getName() );
-    private static final String SELECT_QUERY = "SELECT cik FROM finance.user_saved_cik WHERE user_id = ?;";
-    private static final String INSERT_QUERY = "INSERT INTO finance.user_saved_cik (cik, user_id) VALUES (?,?) ;";
-    private static final String DELETE_QUERY = "DELETE FROM finance.user_saved_cik WHERE cik = ? AND user_id = ?;";
-    
-    public SavedCikDao() {
+public class UserRoleDao extends Dao {
+    private static final Logger LOGGER = Logger.getLogger( UserRoleDao.class.getName() );
+
+    private static final String INSERT_QUERY = "INSERT INTO finance.user_role (user_id, role) VALUES (?, ?)";
+    private static final String DELETE_QUERY = "DELETE FROM finance.user_role WHERE user_id = ? AND role = ?;";
+
+    public UserRoleDao() {
         super(); 
     }
 
-    public List<String> getUserSavedCiks(int userId) {
-        getConnection(url, user, password);
-        List<String> savedCiks = new ArrayList<String>();
-        try {
-            PreparedStatement statement = this.connection.prepareStatement(SELECT_QUERY);
-            statement.setInt(1, userId);
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                savedCiks.add(resultSet.getString("cik"));
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
-
-        return savedCiks;
-    }
-
-    public void insertSavedCik(int userId, String cik) {
+    public void insertUserRole(int userId, String role) {
         getConnection(url, user, password);
         try {
             PreparedStatement statement = this.connection.prepareStatement(INSERT_QUERY);
-            statement.setString(1, cik);
-            statement.setInt(2, userId);
+            statement.setInt(1, userId);
+            statement.setString(2, role);
             statement.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
         }
     }
 
-    public void deleteSavedCik(int userId, String cik) {
+    public void deleteUserRole(int userId, String role) {
         getConnection(url, user, password);
         try {
             PreparedStatement statement = this.connection.prepareStatement(DELETE_QUERY);
-            statement.setString(1, cik);
-            statement.setInt(2, userId);
+            statement.setInt(1, userId);
+            statement.setString(2, role);
             statement.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);

@@ -1,0 +1,42 @@
+"""
+    Finance Website
+    Copyright (C) 2024  Quinton Tompkins
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
+type Mutation{  
+    updateUserName(userName: String): String
+    updateUserEmail(userEmail: String): String
+
+    addUserComment(cik: String, minPrice: Float, maxPrice: Float, comment: String): Int
+    upVoteComment(commentId: Int): String
+    downVoteComment(commentId: Int): String
+    deleteVoteComment(commentId: Int): String
+
+    addToSavedCikList(cik: String): String
+    deleteFromSavedCikList(cik: String): String
+
+    reportUserComment(commentId: Int, reason: String): String
+    requestCommentorStatus(reason: String): String
+    reportDataIssue(reason: String): String
+
+    "Admin and Moderator"
+    hideUserComment(commentId: Int): String
+    markUserRequestCompleted(requestId: Int): String
+    grantUserCommentorRole(userId: Int): String
+    revokeUserCommentorRole(userId: Int): String
+    grantUserModeratorRole(userId: Int): String
+    revokeUserModeratorRole(userId: Int): String
+}

@@ -180,4 +180,32 @@ public class AuthDao extends Dao{
         return roles;
     }
 
+    public void updateUserName(int userId, String newUserName){
+        getConnection(url, user, password);
+        String sql = "UPDATE finance.user SET user_name = ? WHERE user_id = ?";
+        try {
+            PreparedStatement statement = this.connection.prepareStatement(sql);
+            statement.setString(1,newUserName);
+            statement.setInt(2,userId);
+            statement.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Failed to update user name", ex);
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public void updateEmail(int userId, String newEmail){
+        getConnection(url, user, password);
+        String sql = "UPDATE finance.user SET user_email = ? WHERE user_id = ?";
+        try {
+            PreparedStatement statement = this.connection.prepareStatement(sql);
+            statement.setString(1,newEmail);
+            statement.setInt(2,userId);
+            statement.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "Failed to update user email", ex);
+            throw new RuntimeException(ex);
+        }
+    }
+
 }

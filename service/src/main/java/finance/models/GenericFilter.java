@@ -30,8 +30,10 @@ public class GenericFilter {
     private String comparator;
     private Object value;
     
+    private static final List<String> VALID_NUMERIC_COMPARATORS =  Arrays.asList("=",">","<");
     private static final List<String> VALID_STRING_COMPARATORS =  Arrays.asList("=","like");
     private static final List<String> VALID_DATE_COMPARATORS =  Arrays.asList("=",">","<");
+    private static final List<String> VALID_BOOLEAN_COMPARATORS =  Arrays.asList("=");
 
     public GenericFilter() {
     }
@@ -66,19 +68,28 @@ public class GenericFilter {
         this.value = value;
     }
 
-    public void validateGenericFilter(List<String> StringColumnList, List<String> DateColumnList) throws InvalidInputException {
-        if( !StringColumnList.contains(getField()) && !DateColumnList.contains(getField())  ){
+    public void validateGenericFilter(List<String> StringColumnList, List<String> DateColumnList, List<String> booleanColumnList, List<String> numericColumnList) throws InvalidInputException {
+        if( !StringColumnList.contains(getField()) && !DateColumnList.contains(getField()) && !booleanColumnList.contains(getField()) && !numericColumnList.contains(getField())  ){
                 throw new InvalidInputException(String.format("Invalid filter Column (Valid Values: %s)", 
                                                 String.join(", ", 
-                                                    Stream.of(StringColumnList, DateColumnList)
+                                                    Stream.of(StringColumnList, DateColumnList, booleanColumnList, numericColumnList)
                                                             .flatMap(List::stream).collect(Collectors.toList()))));
         }
-        if( (StringColumnList.contains(getField()) && !VALID_STRING_COMPARATORS.contains(getComparator())) ||
-            (DateColumnList.contains(getField()) && !VALID_DATE_COMPARATORS.contains(getComparator()))  ){
+        if( (StringColumnList.contains(getField()) && !VALID_STRING_COMPARATORS.contains(getComparator())) ){
                 throw new InvalidInputException(String.format("Invalid filter Comparator (Valid Values: %s)", 
-                                                String.join(", ", 
-                                                    Stream.of(VALID_STRING_COMPARATORS, VALID_DATE_COMPARATORS)
-                                                            .flatMap(List::stream).collect(Collectors.toList()))));
+                                                String.join(", ", VALID_STRING_COMPARATORS)));
+        }
+        if( (DateColumnList.contains(getField()) && !VALID_DATE_COMPARATORS.contains(getComparator())) ){
+                throw new InvalidInputException(String.format("Invalid filter Comparator (Valid Values: %s)", 
+                                                String.join(", ", VALID_DATE_COMPARATORS)));
+        }
+        if( (booleanColumnList.contains(getField()) && !VALID_BOOLEAN_COMPARATORS.contains(getComparator())) ){
+                throw new InvalidInputException(String.format("Invalid filter Comparator (Valid Values: %s)", 
+                                                String.join(", ", VALID_BOOLEAN_COMPARATORS)));
+        }
+        if( (numericColumnList.contains(getField()) && !VALID_NUMERIC_COMPARATORS.contains(getComparator())) ){
+                throw new InvalidInputException(String.format("Invalid filter Comparator (Valid Values: %s)", 
+                                                String.join(", ", VALID_NUMERIC_COMPARATORS)));
         }
     }
 

@@ -18,16 +18,18 @@
 package finance.authorization;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.io.Decoders;
 
 @Component
@@ -55,15 +57,62 @@ public class JwtUtils {
     }
 
     public Claims validateToken(String authToken, String ip) {
-        Claims claims = Jwts.parser().keyLocator(new UserIdLocator()).build().parseSignedClaims(authToken).getPayload();
-        if(!claims.get("ip").equals(ip)){
-            throw new JwtException("invalid ip");
+        try{
+            Claims claims = Jwts.parser().keyLocator(new UserIdLocator()).build().parseSignedClaims(authToken).getPayload();
+            if(!claims.get("ip").equals(ip)){
+                throw new AuthorizationServiceException("invalid ip");
+            }
+            return claims;
         }
-        return claims;
+        catch(ExpiredJwtException e){
+            throw e;
+        }
+        catch(Exception e){
+            throw new AuthorizationServiceException("Invalid authorization header provided.");
+        }
     }
 
     public int getUserId(String authToken) {
-        Claims claims = Jwts.parser().keyLocator(new UserIdLocator()).build().parseSignedClaims(authToken).getPayload();
-        return (int) claims.get("userId");
+        try{
+            Claims claims = Jwts.parser().keyLocator(new UserIdLocator()).build().parseSignedClaims(authToken).getPayload();
+            return (int) claims.get("userId");
+        }
+        catch(ExpiredJwtException e){
+            throw e;
+        }
+        catch(Exception e){
+            throw new AuthorizationServiceException("Invalid authorization header provided.");
+        }
+    }
+
+    public List<String> getUserRoles(String authToken) {
+        try{
+            Claims claims = Jwts.parser().keyLocator(new UserIdLocator()).build().parseSignedClaims(authToken).getPayload();
+            return (List<String>) claims.get("roles");
+        }
+        catch(ExpiredJwtException e){
+            throw e;
+        }
+        catch(Exception e){
+            throw new AuthorizationServiceException("Invalid authorization header provided.");
+        }
+    }
+
+    public void checkForValidRole(String authToken, List<String> rolesToFind) {
+        List<String> roles = getUserRoles(authToken);
+        for (String role : roles) {
+            if (rolesToFind.contains(role)) {
+                return ;
+            }
+        }
+        throw new AuthorizationServiceException("User does not have a valid role for this action.");
+    }
+
+    public void checkForValidRole(String authToken, String roleToFind) {
+        List<String> roles = getUserRoles(authToken);
+        if(roles.contains(roleToFind)){
+            return ;
+        }
+        throw new AuthorizationServiceException("User does not have a valid role for this action.");
     }
 }

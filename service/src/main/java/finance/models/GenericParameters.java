@@ -42,14 +42,14 @@ public class GenericParameters {
         this.sort = sort;
     }
 
-    public void validateGenericParameters(List<String> stringColumnList, List<String> dateColumnList) {
+    public void validateGenericParameters(List<String> stringColumnList, List<String> dateColumnList, List<String> booleanColumnList, List<String> numericColumnList) {
         for (GenericFilter filter : this.filters) {
-            filter.validateGenericFilter(stringColumnList, dateColumnList);
+            filter.validateGenericFilter(stringColumnList, dateColumnList, booleanColumnList, numericColumnList);
         }
     }
 
-    public String generateFilterString(List<String> stringColumnList, List<String> dateColumnList) {
-        validateGenericParameters(stringColumnList, dateColumnList);
+    public String generateFilterString(List<String> stringColumnList, List<String> dateColumnList, List<String> booleanColumnList, List<String> numericColumnList) {
+        validateGenericParameters(stringColumnList, dateColumnList, booleanColumnList, numericColumnList);
         ArrayList<String> filterStringList = new ArrayList<String>();
         for (GenericFilter filter : this.filters) {
             filterStringList.add(String.format(" %s %s ? ", filter.getField(), filter.getComparator()));
@@ -57,19 +57,25 @@ public class GenericParameters {
         return filterStringList.size() == 0 ? " " : " WHERE " + String.join(" AND ", filterStringList);
     }
 
-    public int setValues(PreparedStatement statement, int i, List<String> stringColumnList, List<String> dateColumnList) throws SQLException {
+    public int setValues(PreparedStatement statement, int i, List<String> stringColumnList, List<String> dateColumnList, List<String> booleanColumnList, List<String> numericColumnList) throws SQLException {
         for( int j = 0 ; j < filters.size() ; j++, i++){
             String field = filters.get(j).getField();
             Object value = filters.get(j).getValue();
             if(stringColumnList.contains(field) || dateColumnList.contains(field)){
                 statement.setString(i, (String) value);
             }
+            if(numericColumnList.contains(field)){
+                statement.setInt(i, (int) value );
+            }
+            if(booleanColumnList.contains(field)){
+                statement.setBoolean(i, (boolean) value);
+            }
         }
         return i;
     }
 
-    public String generateSortString(List<String> stringColumnList, List<String> dateColumnList) {
-        String sortString = this.sort == null ? "" : " ORDER BY " + this.sort.generateSortString(stringColumnList, dateColumnList);
+    public String generateSortString(List<String> stringColumnList, List<String> dateColumnList, List<String> booleanColumnList, List<String> numericColumnList) {
+        String sortString = this.sort == null ? "" : " ORDER BY " + this.sort.generateSortString(stringColumnList, dateColumnList, booleanColumnList, numericColumnList);
         return sortString;
     }
 

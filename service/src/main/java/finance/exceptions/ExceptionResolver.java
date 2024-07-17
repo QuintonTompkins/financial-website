@@ -18,21 +18,38 @@
 package finance.exceptions;
 
 import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.stereotype.Component;
 
 import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 
 @Component
-public class InvalidInputExceptionResolver extends DataFetcherExceptionResolverAdapter {
+public class ExceptionResolver extends DataFetcherExceptionResolverAdapter {
 
     @Override
     protected GraphQLError resolveToSingleError(Throwable ex, DataFetchingEnvironment env) {
         if (ex instanceof InvalidInputException) {
             return GraphqlErrorBuilder.newError()
               .errorType(ErrorType.OperationNotSupported)
+              .message(ex.getMessage())
+              .path(env.getExecutionStepInfo().getPath())
+              .location(env.getField().getSourceLocation())
+              .build();
+        } else if (ex instanceof ExpiredJwtException) {
+            return GraphqlErrorBuilder.newError()
+              .errorType(ErrorType.ValidationError)
+              .message(ex.getMessage())
+              .path(env.getExecutionStepInfo().getPath())
+              .location(env.getField().getSourceLocation())
+              .build();
+        } else if (ex instanceof AuthorizationServiceException) {
+            return GraphqlErrorBuilder.newError()
+              .errorType(ErrorType.ValidationError)
               .message(ex.getMessage())
               .path(env.getExecutionStepInfo().getPath())
               .location(env.getField().getSourceLocation())
