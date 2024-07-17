@@ -36,8 +36,6 @@ public class EmailHandler {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        LOGGER.info(email);
-        LOGGER.info(password);
         mailSender.setUsername(email);
         mailSender.setPassword(password);
         
