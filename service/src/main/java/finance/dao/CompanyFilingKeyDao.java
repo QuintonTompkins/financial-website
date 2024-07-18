@@ -29,39 +29,33 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import finance.models.CompanyFiling;
-import finance.models.CompanyFilingDataFilter;
-import finance.models.CompanyFilingDataParameters;
+import finance.models.CompanyFilingKey;
 import finance.models.GenericParameters;
 
 
 @Component
-public class CompanyFilingDao extends Dao{
-    private static final Logger LOGGER = Logger.getLogger( CompanyFilingDao.class.getName() );
+public class CompanyFilingKeyDao extends Dao{
+    private static final Logger LOGGER = Logger.getLogger( CompanyFilingKeyDao.class.getName() );
     
-    protected static final List<String> STRING_COLUMN_LIST = Arrays.asList("cik", "accession_number", "form");
-    protected static final List<String> DATE_COLUMN_LIST = Arrays.asList("filing_date", "report_date");
-    protected static final List<String> NO_FILTER_COLUMN_LIST = Arrays.asList("data");
-    protected static final List<String> COLUMN_LIST = Stream.of(STRING_COLUMN_LIST, DATE_COLUMN_LIST, NO_FILTER_COLUMN_LIST)
+    protected static final List<String> STRING_COLUMN_LIST = Arrays.asList("key");
+    protected static final List<String> NUMERIC_COLUMN_LIST = Arrays.asList("count");
+    protected static final List<String> COLUMN_LIST = Stream.of(STRING_COLUMN_LIST, NUMERIC_COLUMN_LIST)
                                                           .flatMap(List::stream)
                                                           .collect(Collectors.toList());
 
-    private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", COLUMN_LIST)+" FROM finance.recent_company_filings_with_potential_data_view ";
-    private static final String QUERY_LIMIT = " LIMIT 50;";
+    private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", COLUMN_LIST)+" FROM finance.recent_company_filings_data_key ";
+    private static final String QUERY_LIMIT = " LIMIT 500;";
 
-    public CompanyFilingDao() {
+    public CompanyFilingKeyDao() {
         super(); 
     }
 
-    public List<CompanyFiling> getCompanyFilings(CompanyFilingDataParameters params) {
+    public List<CompanyFilingKey> getCompanyFilingKeys(GenericParameters params) {
         String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
         String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
         getConnection(url, user, password);
         String sql = SELECT_ALL_QUERY +filter+sort+QUERY_LIMIT;
-        List<CompanyFiling> companyFilings = new ArrayList<CompanyFiling>();
+        List<CompanyFilingKey> companyFilings = new ArrayList<CompanyFilingKey>();
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql);
             if(params != null){
@@ -69,16 +63,10 @@ public class CompanyFilingDao extends Dao{
             }
             ResultSet resultSet = statement.executeQuery();
 
-            ObjectMapper mapper = new ObjectMapper();
-            JsonFactory factory = mapper.getFactory();
             while (resultSet.next()) {
-                companyFilings.add(new CompanyFiling(
-                    resultSet.getString("cik"),
-                    resultSet.getString("accession_number"),
-                    resultSet.getString("filing_date"),
-                    resultSet.getString("report_date"),
-                    resultSet.getString("form"),
-                    mapper.readTree(factory.createParser(resultSet.getString("data")))
+                companyFilings.add(new CompanyFilingKey(
+                    resultSet.getString("key"),
+                    resultSet.getInt("count")
                 ));
             }
         } catch (Exception ex) {

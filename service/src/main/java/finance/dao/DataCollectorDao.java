@@ -51,6 +51,8 @@ public class DataCollectorDao extends Dao {
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
 
         return timeSinceRefresh;

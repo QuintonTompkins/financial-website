@@ -82,6 +82,8 @@ public class UserRequestDao extends Dao {
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
 
         return userRequests;
@@ -98,6 +100,8 @@ public class UserRequestDao extends Dao {
             statement.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
     }
 
@@ -109,6 +113,8 @@ public class UserRequestDao extends Dao {
             statement.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
     }
 

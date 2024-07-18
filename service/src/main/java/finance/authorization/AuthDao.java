@@ -57,6 +57,8 @@ public class AuthDao extends Dao{
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
+        } finally{
+            closeConnection();
         }
         return userId;
     }
@@ -80,6 +82,8 @@ public class AuthDao extends Dao{
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
+        } finally{
+            closeConnection();
         }
 
         return user;
@@ -105,6 +109,8 @@ public class AuthDao extends Dao{
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
+        } finally{
+            closeConnection();
         }
 
         return user;
@@ -124,6 +130,8 @@ public class AuthDao extends Dao{
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "Failed to record auth request", ex);
             throw new RuntimeException(ex);
+        } finally{
+            closeConnection();
         }
     }
 
@@ -142,6 +150,8 @@ public class AuthDao extends Dao{
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "Failed to record auth attempt", ex);
             throw new RuntimeException(ex);
+        } finally{
+            closeConnection();
         }
 
         return requestCount;
@@ -158,6 +168,8 @@ public class AuthDao extends Dao{
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "Failed to update password", ex);
             throw new RuntimeException(ex);
+        } finally{
+            closeConnection();
         }
     }
 
@@ -176,6 +188,8 @@ public class AuthDao extends Dao{
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "Failed to update password", ex);
             throw new RuntimeException(ex);
+        } finally{
+            closeConnection();
         }
         return roles;
     }
@@ -191,6 +205,8 @@ public class AuthDao extends Dao{
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "Failed to update user name", ex);
             throw new RuntimeException(ex);
+        } finally{
+            closeConnection();
         }
     }
 
@@ -205,6 +221,8 @@ public class AuthDao extends Dao{
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "Failed to update user email", ex);
             throw new RuntimeException(ex);
+        } finally{
+            closeConnection();
         }
     }
 

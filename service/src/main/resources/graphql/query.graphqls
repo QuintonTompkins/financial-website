@@ -26,7 +26,8 @@ scalar Object
 
 
 type Query{  
-    companyFilings(input: GenericParameters): [CompanyFiling]
+    companyFilings(input: CompanyFilingDataParameters): [CompanyFiling]
+    companyFilingKeys(input: GenericParameters): [CompanyFilingKey]
     companySummaries(input: GenericParameters): [CompanySummary]
     companyTickers(input: GenericParameters): [CompanyTicker]
     timeSinceRefresh: Int

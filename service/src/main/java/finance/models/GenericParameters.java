@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GenericParameters {
-    private List<GenericFilter> filters;
+    private List<GenericFilter> filters = new ArrayList<GenericFilter>();
     private GenericSort sort;
 
     public List<GenericFilter> getFilters() {
@@ -54,7 +54,7 @@ public class GenericParameters {
         for (GenericFilter filter : this.filters) {
             filterStringList.add(String.format(" %s %s ? ", filter.getField(), filter.getComparator()));
         }
-        return filterStringList.size() == 0 ? " " : " WHERE " + String.join(" AND ", filterStringList);
+        return filterStringList.size() == 0 ? "" : " WHERE " + String.join(" AND ", filterStringList);
     }
 
     public int setValues(PreparedStatement statement, int i, List<String> stringColumnList, List<String> dateColumnList, List<String> booleanColumnList, List<String> numericColumnList) throws SQLException {

@@ -1,4 +1,4 @@
-"""
+/* 
     Finance Website
     Copyright (C) 2024  Quinton Tompkins
 
@@ -14,33 +14,32 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-""" 
+*/
+package finance.models;
 
-input GenericFilter {
-    field: String
-    comparator: String
-    value: Object
-}
+public class CompanyFilingKey {
+    private String key;
+    private int count;
 
-input CompanyFilingDataFilter {
-    field: String
-    comparator: String
-    valueIsField: Boolean
-    value: Object
-}
+    public CompanyFilingKey(String key, int count) {
+        this.key = key;
+        this.count = count;
+    }
 
-input GenericSort {
-    field: String
-    ascending: Boolean
-}
+    public String getKey() {
+        return key;
+    }
 
-input CompanyFilingDataParameters {
-    filters: [GenericFilter]
-    customFilters: [CompanyFilingDataFilter]
-    sort: GenericSort
-}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-input GenericParameters {
-    filters: [GenericFilter]
-    sort: GenericSort
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
 }

@@ -92,6 +92,8 @@ public class UserCommentDao extends Dao {
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
 
         return userComments;
@@ -110,6 +112,8 @@ public class UserCommentDao extends Dao {
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
 
         return votes;
@@ -132,6 +136,8 @@ public class UserCommentDao extends Dao {
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
 
         return commentId;
@@ -149,6 +155,8 @@ public class UserCommentDao extends Dao {
 
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
     }
 
@@ -160,6 +168,8 @@ public class UserCommentDao extends Dao {
             statement.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
     }
 

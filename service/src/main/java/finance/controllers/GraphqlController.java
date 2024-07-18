@@ -32,6 +32,7 @@ import org.springframework.stereotype.Controller;
 import finance.authorization.AuthDao;
 import finance.authorization.JwtUtils;
 import finance.dao.CompanyFilingDao;
+import finance.dao.CompanyFilingKeyDao;
 import finance.dao.CompanySummaryDao;
 import finance.dao.CompanyTickerDao;
 import finance.dao.DataCollectorDao;
@@ -41,6 +42,9 @@ import finance.dao.UserCommentDao;
 import finance.dao.UserRequestDao;
 import finance.dao.UserRoleDao;
 import finance.models.CompanyFiling;
+import finance.models.CompanyFilingDataFilter;
+import finance.models.CompanyFilingDataParameters;
+import finance.models.CompanyFilingKey;
 import finance.models.CompanySummary;
 import finance.models.CompanyTicker;
 import finance.models.GenericFilter;
@@ -60,6 +64,8 @@ public class GraphqlController {
     
     @Autowired
     CompanyFilingDao companyFilingDao;
+    @Autowired
+    CompanyFilingKeyDao companyFilingKeyDao;
     @Autowired
     CompanySummaryDao companySummaryDao;
     @Autowired
@@ -87,8 +93,18 @@ public class GraphqlController {
 	
     // -------------------- Queries --------------------
 	@QueryMapping
-    public List<CompanyFiling> companyFilings(@Argument GenericParameters input){
+    public List<CompanyFiling> companyFilings(@Argument CompanyFilingDataParameters input){
+        if(input != null && input.getCustomFilters() != null && input.getCustomFilters().size() > 0){
+            for (CompanyFilingDataFilter filter : input.getCustomFilters()) {
+                filter.validateFilter(companyFilingKeyDao);
+            }
+        }
         return companyFilingDao.getCompanyFilings(input);
+    }
+
+	@QueryMapping
+    public List<CompanyFilingKey> companyFilingKeys(@Argument GenericParameters input){
+        return companyFilingKeyDao.getCompanyFilingKeys(input);
     }
 	
 	@QueryMapping

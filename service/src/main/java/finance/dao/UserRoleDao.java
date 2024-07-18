@@ -44,6 +44,8 @@ public class UserRoleDao extends Dao {
             statement.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
     }
 
@@ -56,6 +58,8 @@ public class UserRoleDao extends Dao {
             statement.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
     }
 

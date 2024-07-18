@@ -44,6 +44,8 @@ public class LoggedActionDao extends Dao {
             statement.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
     }
 

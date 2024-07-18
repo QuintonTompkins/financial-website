@@ -51,6 +51,8 @@ public class SavedCikDao extends Dao {
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
 
         return savedCiks;
@@ -65,6 +67,8 @@ public class SavedCikDao extends Dao {
             statement.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
     }
 
@@ -77,6 +81,8 @@ public class SavedCikDao extends Dao {
             statement.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } finally{
+            closeConnection();
         }
     }
 

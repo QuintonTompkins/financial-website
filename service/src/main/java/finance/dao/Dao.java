@@ -38,6 +38,7 @@ public class Dao {
     protected static final List<String> STRING_COLUMN_LIST = Arrays.asList();
     protected static final List<String> DATE_COLUMN_LIST = Arrays.asList();
     protected static final List<String> BOOLEAN_COLUMN_LIST = Arrays.asList();
+    protected static final List<String> JSON_COLUMN_LIST = Arrays.asList();
 
     protected Connection connection = null;
 
@@ -57,6 +58,17 @@ public class Dao {
         }
         catch(Exception ex){
             throw new RuntimeException("DB connection failure");
+        }
+    }
+    
+    public void closeConnection() {
+        try{
+            if (this.connection != null && !this.connection.isClosed()) {
+                this.connection.close();
+            }
+        }
+        catch(Exception ex){
+            LOGGER.log(Level.SEVERE, null, ex);
         }
     }
 
