@@ -17,22 +17,27 @@
 """
 
 type Mutation{  
-    updateUserName(userName: String): String
-    updateUserEmail(userEmail: String): String
-
+    "User Engagement"
     addUserComment(cik: String, minPrice: Float, maxPrice: Float, comment: String): Int
     upVoteComment(commentId: Int): String
     downVoteComment(commentId: Int): String
     deleteVoteComment(commentId: Int): String
-
     addToSavedCikList(cik: String): String
     deleteFromSavedCikList(cik: String): String
 
+
+    "Authorization"
+    login(userNameEmail: String, password: String): String
+    createUser(userName: String, email: String, password: String): String
+    resetPassword(email: String): String
+    updatePassword(email: String, oldPassword: String, newPassword: String): String
+    updateUserName(userName: String): String
+    updateEmail(email: String): String
+
+    "Moderation"
     reportUserComment(commentId: Int, reason: String): String
     requestCommentorStatus(reason: String): String
     reportDataIssue(reason: String): String
-
-    "Admin and Moderator"
     hideUserComment(commentId: Int): String
     markUserRequestCompleted(requestId: Int): String
     grantUserCommentorRole(userId: Int): String

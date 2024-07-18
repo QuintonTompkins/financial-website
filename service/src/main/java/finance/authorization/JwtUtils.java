@@ -115,4 +115,17 @@ public class JwtUtils {
         }
         throw new AuthorizationServiceException("User does not have a valid role for this action.");
     }
+
+    public Claims getClaims(String authToken) {
+        try{
+            Claims claims = Jwts.parser().keyLocator(new UserIdLocator()).build().parseSignedClaims(authToken).getPayload();
+            return claims;
+        }
+        catch(ExpiredJwtException e){
+            throw e;
+        }
+        catch(Exception e){
+            throw new AuthorizationServiceException("Invalid authorization header provided.");
+        }
+    }
 }

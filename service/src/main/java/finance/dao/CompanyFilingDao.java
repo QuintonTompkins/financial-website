@@ -33,9 +33,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import finance.models.CompanyFiling;
-import finance.models.CompanyFilingDataFilter;
 import finance.models.CompanyFilingDataParameters;
-import finance.models.GenericParameters;
 
 
 @Component

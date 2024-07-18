@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package finance.authorization;
+package finance.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 import org.springframework.stereotype.Component;
 
-import finance.dao.Dao;
+import finance.authorization.User;
 
 @Component
 public class AuthDao extends Dao{

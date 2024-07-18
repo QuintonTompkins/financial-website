@@ -19,6 +19,7 @@ package finance.authorization;
 
 import java.security.Key;
 
+import finance.dao.AuthDao;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.LocatorAdapter;
 

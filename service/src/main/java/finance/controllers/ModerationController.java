@@ -18,7 +18,6 @@
 
 package finance.controllers;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -26,54 +25,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
-import finance.authorization.AuthDao;
 import finance.authorization.JwtUtils;
-import finance.dao.CompanyFilingDao;
-import finance.dao.CompanyFilingKeyDao;
-import finance.dao.CompanySummaryDao;
-import finance.dao.CompanyTickerDao;
-import finance.dao.DataCollectorDao;
 import finance.dao.LoggedActionDao;
-import finance.dao.SavedCikDao;
 import finance.dao.UserCommentDao;
 import finance.dao.UserRequestDao;
 import finance.dao.UserRoleDao;
-import finance.models.CompanyFiling;
-import finance.models.CompanyFilingDataFilter;
-import finance.models.CompanyFilingDataParameters;
-import finance.models.CompanyFilingKey;
-import finance.models.CompanySummary;
-import finance.models.CompanyTicker;
-import finance.models.GenericFilter;
 import finance.models.GenericParameters;
-import finance.models.UserComment;
 import finance.models.UserRequest;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
-public class GraphqlController {
-    protected static final Logger LOGGER = Logger.getLogger(GraphqlController.class.getName());
+public class ModerationController {
+    protected static final Logger LOGGER = Logger.getLogger(ModerationController.class.getName());
 
     protected static final String ADMIN_ROLE = "admin";
     protected static final String MODERATOR_ROLE = "moderator";
     protected static final List<String> MANAGING_ROLES = List.of(ADMIN_ROLE,MODERATOR_ROLE);
     protected static final String COMMENTOR_ROLE = "commentor";
     
-    @Autowired
-    CompanyFilingDao companyFilingDao;
-    @Autowired
-    CompanyFilingKeyDao companyFilingKeyDao;
-    @Autowired
-    CompanySummaryDao companySummaryDao;
-    @Autowired
-    CompanyTickerDao companyTickerDao;
-    @Autowired
-    DataCollectorDao dataCollectorDao;
-    @Autowired
-    SavedCikDao savedCikDao;
     @Autowired
     UserCommentDao userCommentDao;
     @Autowired
@@ -82,8 +53,6 @@ public class GraphqlController {
     UserRoleDao userRoleDao;
     @Autowired
     LoggedActionDao loggedActionDao;
-    @Autowired
-    AuthDao authDao;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -92,64 +61,6 @@ public class GraphqlController {
     private HttpServletRequest request;
 	
     // -------------------- Queries --------------------
-	@QueryMapping
-    public List<CompanyFiling> companyFilings(@Argument CompanyFilingDataParameters input){
-        if(input != null && input.getCustomFilters() != null && input.getCustomFilters().size() > 0){
-            for (CompanyFilingDataFilter filter : input.getCustomFilters()) {
-                filter.validateFilter(companyFilingKeyDao);
-            }
-        }
-        return companyFilingDao.getCompanyFilings(input);
-    }
-
-	@QueryMapping
-    public List<CompanyFilingKey> companyFilingKeys(@Argument GenericParameters input){
-        return companyFilingKeyDao.getCompanyFilingKeys(input);
-    }
-	
-	@QueryMapping
-    public List<CompanySummary> companySummaries(@Argument GenericParameters input){
-        return companySummaryDao.getCompanySummaries(input);
-    }
-
-    @SchemaMapping(typeName="CompanySummary", field="tickers")
-    public List<CompanyTicker> getTickers(CompanySummary companySummary) {
-        GenericParameters params = new GenericParameters();
-        GenericFilter filter = new GenericFilter("cik","=",companySummary.getCik());
-        params.setFilters(Arrays.asList(filter));
-        return companyTickerDao.getCompanyTickers(params);
-    }
-	
-	@QueryMapping
-    public List<CompanyTicker> companyTickers(@Argument GenericParameters input){
-        return companyTickerDao.getCompanyTickers(input);
-    }
-	
-	@QueryMapping
-    public int timeSinceRefresh(){
-        return dataCollectorDao.getTimeSinceRefresh();
-    }
-	
-	@QueryMapping
-    public List<String> savedCiks(){
-        return savedCikDao.getUserSavedCiks(jwtUtils.getUserId(request.getHeader("Authorization")));
-    }
-	
-	@QueryMapping
-    public List<UserComment> userComments(@Argument GenericParameters input){
-        return userCommentDao.getUserComments(input);
-    }
-
-    @SchemaMapping(typeName="UserComment", field="voteTotal")
-    public int getVoteTotal(UserComment userComment) {
-        return userCommentDao.getUserCommentVotes(userComment.getCommentId());
-    }
-
-    @SchemaMapping(typeName="UserComment", field="userName")
-    public String getUserCommentName(UserComment userComment) {
-        return authDao.getUser(userComment.getUserId()).getUsername();
-    }
-
     @QueryMapping
     public List<UserRequest> getUserRequests(@Argument GenericParameters input) {
         jwtUtils.checkForValidRole(request.getHeader("Authorization"), MANAGING_ROLES);
@@ -157,64 +68,6 @@ public class GraphqlController {
     }
 
     // -------------------- Mutations --------------------
-    @MutationMapping
-    public String updateUserName(@Argument String userName) {
-        int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
-        authDao.updateUserName(userId, userName);
-        return "User name updated";
-    }
-
-    @MutationMapping
-    public String updateUserEmail(@Argument String userEmail) {
-        int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
-        authDao.updateEmail(userId, userEmail);
-        return "User email updated";
-    }
-
-    @MutationMapping
-    public int addUserComment(@Argument String cik, @Argument float minPrice, @Argument float maxPrice, @Argument String comment) {
-        jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
-        int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
-        return userCommentDao.insertUserComment(userId, cik, minPrice, maxPrice, comment);
-    }
-
-    @MutationMapping
-    public String upVoteComment(@Argument int commentId) {
-        jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
-        int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
-        userCommentDao.updateCommentVote(commentId, userId, 1);
-        return "Comment upvoted";
-    }
-
-    @MutationMapping
-    public String downVoteComment(@Argument int commentId) {
-        jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
-        int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
-        userCommentDao.updateCommentVote(commentId, userId, -1);
-        return "Comment downvoted";
-    }
-
-    @MutationMapping
-    public String deleteVoteComment(@Argument int commentId) {
-        jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
-        int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
-        userCommentDao.updateCommentVote(commentId, userId, 0);
-        return "Vote deleted";
-    }
-
-    @MutationMapping
-    public String addToSavedCikList(@Argument String cik) {
-        int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
-        savedCikDao.insertSavedCik(userId, cik);
-        return "Added to watchlist";
-    }
-
-    @MutationMapping
-    public String deleteFromSavedCikList(@Argument String cik) {
-        int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
-        savedCikDao.deleteSavedCik(userId, cik);
-        return "Deleted from watchlist";
-    }
 
     @MutationMapping
     public String reportUserComment(@Argument int commentId, @Argument String reason) {

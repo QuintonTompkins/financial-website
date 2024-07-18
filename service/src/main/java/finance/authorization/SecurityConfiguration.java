@@ -33,7 +33,6 @@ public class SecurityConfiguration {
                 //.requestMatchers("/graphql/**").access(new FinanceAuthorizationManager())
                 .requestMatchers("/graphql/**").permitAll()
                 .requestMatchers("/graphiql/**").permitAll()
-                .requestMatchers("/auth/**").permitAll()
         );
         http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
