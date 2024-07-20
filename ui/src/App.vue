@@ -28,7 +28,11 @@ import { jwtDecode } from "jwt-decode";
     <router-link to="/search"><button class="toolbar-nav-button">Search</button></router-link>
     <router-link v-if="jwt == ''" to="/account"><button class="toolbar-nav-button">Login</button></router-link>
     <router-link v-if="jwt != ''" to="/account"><button class="toolbar-nav-button">{{ userName }}</button></router-link>
-  </div>
+    <div class="toolbar-disclaimer">Nothing on this site should be considered financial advice. All data is provided 
+      by the SEC and no work is done by this site to validate or verify the quality of data. All links to external sites 
+      are given for convenience and are not financial recommendations. All comments by users on this site are their own 
+      opinions and this site and its owners do not endorse any financial decisions.</div>
+    </div>
   <RouterView @updateJwt="updateJwt" v-slot="{ Component }">
     <component :is="Component" :jwt=jwt />
   </RouterView>
@@ -81,7 +85,7 @@ export default defineComponent({
 <style scoped>
 .toolbar {
   height: 50px; 
-  background: #0f3d3d;
+  background: #252525;
   border-bottom: solid;
   border-color: black;
 }
@@ -92,10 +96,12 @@ export default defineComponent({
   margin: 5px;
 }
 
-.toolbar-username {
+.toolbar-disclaimer {
   height: 35px;
-  width: 100px;
+  width: 1100px;
   margin: 5px;
-  display: inline;
+  display: inline-block;
+  color: red;
+  font-size: 14px;
 }
 </style>

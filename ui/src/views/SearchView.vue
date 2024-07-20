@@ -29,8 +29,11 @@ import type { CompanyFiling } from '@/services/types/CompanyFiling';
         <button @click="searchType='saved'" :disabled="jwt==''">Saved Ciks</button>
     </div>
     <div v-if="searchType == 'recent'">
-        <h3 style="margin-left: 15px;">Recent Filings</h3>
-        <div class="scrollable-list">
+        <h3 style="margin-left: 15px; display: inline;">Recent Filings</h3>
+        <input type="checkbox" v-model="profitOnly" style="display: inline;">Profitable Only</input>
+        <input type="checkbox" v-model="annualOnly" style="display: inline;">10-K Only</input>
+        <div v-if="loading" class="loader"></div> 
+        <div v-if="!loading" class="scrollable-list">
             <div v-for="companyFiling in companyFilings">
                 <v-card class="card" @click="goToCompanyPage(companyFiling.cik)">
                     <div class="list-item" style="height: 25px;">
@@ -70,10 +73,19 @@ export default defineComponent({
             companyFilings: [] as CompanyFiling[],
             savedCiks: [] as String[],
             width: window.innerWidth,
-            height: window.innerHeight
+            height: window.innerHeight,
+            profitOnly: true as Boolean,
+            annualOnly: true as Boolean,
+            loading: false as Boolean
         };
     },
     watch: {
+        profitOnly(newVal, oldVal){
+            this.getCompanyRecentFilings()
+        },
+        annualOnly(newVal, oldVal){
+            this.getCompanyRecentFilings()
+        },
         searchType(newVal, oldVal) {
             switch(newVal){
                 case "recent":
@@ -96,8 +108,29 @@ export default defineComponent({
 
     methods: {
         getCompanyRecentFilings(){
-            FinanceApi.getRecentCompanyFilings().then((response: { data: { data: { companyFilings: CompanyFiling[] } }; status: number; }) => {
+            this.companyFilings = []
+            this.loading = true
+            let recentGenericFilters = [] as GenericFilter[]
+            let recentCompanyFilingDataFilter = [] as CompanyFilingDataFilter[]
+            if(this.annualOnly){
+                recentGenericFilters.push({
+                    field: "form",
+                    comparator: "=",
+                    value: "10-K"
+                })
+            }
+            if(this.profitOnly){
+                recentCompanyFilingDataFilter.push({
+                    field: "us-gaap_GrossProfit",
+                    comparator: ">",
+                    valueIsField: false,
+                    value: 0
+                })
+            }
+            FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter).then((response: { data: { data: { companyFilings: CompanyFiling[] } }; status: number; }) => {
                 this.companyFilings = response.data.data.companyFilings
+            }).finally(() => {
+                this.loading = false
             })
         },
         getSavedCiks(){

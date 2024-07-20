@@ -188,14 +188,14 @@ table {
 
 
 thead {
-  background-color: #0e3b3b;
+  background-color: #1a1a1a;
   position: sticky;
   top: 0;
   z-index: 1;
 }
 
 th, td {
-  border: 1px solid #0e3b3b;
+  border: 3px solid #1a1a1a;
 }
 
 </style>

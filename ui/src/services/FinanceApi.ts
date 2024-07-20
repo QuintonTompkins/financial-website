@@ -43,7 +43,7 @@ export function getCompanySummary(cik: String){
     )
 }
 
-export function getRecentCompanyFilings() {
+export function getRecentCompanyFilings(genericFilters: GenericFilter[], recentCompanyFilingDataFilter: CompanyFilingDataFilter[]) {
     return axios.post<{ data: { companyFilings: CompanyFiling[] } }>(BASE_URL+'graphql',
         {
             "query": `query($input: CompanyFilingDataParameters!) {
@@ -57,6 +57,8 @@ export function getRecentCompanyFilings() {
               }`,
             "variables": {
                 "input":{
+                    "filters": genericFilters,
+                    "customFilters": recentCompanyFilingDataFilter,
                     "sort": {
                         "field": "filing_date",
                         "ascending": false
