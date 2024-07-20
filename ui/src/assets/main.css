@@ -4,3 +4,34 @@ body {
   color:  #eafafa;
   margin: 0;
 }
+
+.card {
+  background: #269b9b;
+  border-style: solid;
+  border-color: black;
+  border-width: 2px;
+  display: inline-block;
+  margin: 10px;
+  box-shadow: 3px 6px 15px black;
+}
+
+.card-title {
+  color:  #eafafa;
+  margin: 5px;
+  font-size: 23px;
+  font-weight: bold;
+}
+
+.card-text-sub-title {
+  color:  #eafafa;
+  margin: 5px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.card-text {
+  color:  #eafafa;
+  margin: 5px;
+  font-size: 16px;
+  font-weight: normal;
+}

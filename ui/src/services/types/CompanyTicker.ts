@@ -1,4 +1,4 @@
-<!--
+/*
     Finance Website
     Copyright (C) 2024  Quinton Tompkins
 
@@ -14,18 +14,8 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
--->
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/icon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Website</title>
-    <script type="module" crossorigin src="/assets/index-Cx7vf60v.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DatC1A-u.css">
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
-</html>
+*/
+export interface CompanyTicker {
+    exchange?: string;
+    ticker?: string;
+}

@@ -47,7 +47,13 @@ export function login(userNameEmail: String, password: String){
 export function updatePassword(email: String, oldPassword: String, newPassword: String){
     return axios.post<{ data: { updatePassword: String } }>(BASE_URL+'graphql',
         {
-            "query": "mutation($email: String!, $oldPassword: String!, $newPassword: String!) { updatePassword(email: $email, oldPassword: $oldPassword, newPassword: $newPassword) }",
+            "query": `mutation ($email: String!, $oldPassword: String!, $newPassword: String!) {
+                            updatePassword(
+                                email: $email
+                                oldPassword: $oldPassword
+                                newPassword: $newPassword
+                            )
+                        }`,
             "variables": {
                 "email": email,
                 "oldPassword": oldPassword,

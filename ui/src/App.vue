@@ -26,7 +26,6 @@ import { jwtDecode } from "jwt-decode";
   <div class="toolbar">
     <router-link to="/"><button class="toolbar-nav-button">Home</button></router-link>
     <router-link to="/search"><button class="toolbar-nav-button">Search</button></router-link>
-    <router-link to="/company"><button class="toolbar-nav-button">Company</button></router-link>
     <router-link v-if="jwt == ''" to="/account"><button class="toolbar-nav-button">Login</button></router-link>
     <router-link v-if="jwt != ''" to="/account"><button class="toolbar-nav-button">{{ userName }}</button></router-link>
   </div>
@@ -49,12 +48,16 @@ export default defineComponent({
     },
     mounted(){
       const self = this; 
+      const savedJwt = localStorage.getItem('jwt');
+      if(savedJwt){
+        this.updateJwt(savedJwt)
+      }
       setInterval(function(){ self.checkForExpiredJwt() }.bind(this), 60000);
     },
     methods: {
       updateJwt(newJwt : string){
-        window.localStorage.setItem('jwt', newJwt)
         this.jwt = newJwt
+        localStorage.setItem('jwt', this.jwt);
         if(this.jwt == ""){
           this.jwt = ""
           this.jwtExpiration = 0
