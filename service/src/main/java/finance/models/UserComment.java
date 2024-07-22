@@ -17,20 +17,18 @@
 */
 package finance.models;
 
-import java.time.LocalDateTime;
-
 public class UserComment {
     private int commentId;
     private Integer userId;
     private String cik;
-    private LocalDateTime created;
+    private String created;
     private Float minPrice;
     private Float maxPrice;
     private String comment;
     private Integer voteTotal;
     private String userName;
 
-    public UserComment(int commentId, Integer userId, String cik, LocalDateTime created, Float minPrice, Float maxPrice, String comment, Integer voteTotal, String userName) {
+    public UserComment(int commentId, Integer userId, String cik, String created, Float minPrice, Float maxPrice, String comment, Integer voteTotal, String userName) {
         this.commentId = commentId;
         this.userId = userId;
         this.cik = cik;
@@ -66,11 +64,11 @@ public class UserComment {
         this.cik = cik;
     }
 
-    public LocalDateTime getCreated() {
+    public String getCreated() {
         return created;
     }
 
-    public void setCreated(LocalDateTime created) {
+    public void setCreated(String created) {
         this.created = created;
     }
 

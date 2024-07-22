@@ -21,7 +21,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +47,7 @@ public class UserCommentDao extends Dao {
                                                           .flatMap(List::stream)
                                                           .collect(Collectors.toList());
 
-    private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", COLUMN_LIST)+" FROM finance.user_comment";
+    private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", COLUMN_LIST)+", created::date as created_date FROM finance.user_comment";
     private static final String SELECT_VOTE_COUNT_QUERY = "SELECT SUM(vote) as total_vote FROM finance.user_comment_vote WHERE comment_id = ? ;";
     private static final String INSERT_COMMENT_QUERY = "INSERT INTO finance.user_comment (user_id, cik, min_price, max_price, comment) VALUES (?, ?, ?, ?, ?)";
     private static final String HIDE_COMMENT_QUERY = "UPDATE finance.user_comment SET hidden = true WHERE comment_id = ?";
@@ -82,7 +81,7 @@ public class UserCommentDao extends Dao {
                     resultSet.getInt("comment_id"),
                     resultSet.getInt("user_id"),
                     resultSet.getString("cik"),
-                    (LocalDateTime) resultSet.getObject("created"),
+                    resultSet.getString("created_date"),
                     resultSet.getFloat("min_price"),
                     resultSet.getFloat("max_price"),
                     resultSet.getString("comment"),
@@ -129,6 +128,7 @@ public class UserCommentDao extends Dao {
             statement.setFloat(3, minPrice);
             statement.setFloat(4, maxPrice);
             statement.setString(5, comment);
+            statement.executeUpdate();
             ResultSet resultSet = statement.getGeneratedKeys();
 
             while (resultSet.next()) {

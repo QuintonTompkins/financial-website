@@ -120,7 +120,7 @@ public class AuthDao extends Dao{
         getConnection(url, user, password);
         String sql = "insert into finance.auth_request (user_name, user_email, user_id_found, origin, auth_type) values (?,?,?,?,?)";
         try {
-            PreparedStatement statement = this.connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement statement = this.connection.prepareStatement(sql);
             statement.setString(1,userName);
             statement.setString(2,userEmail);
             statement.setInt(3,userId);

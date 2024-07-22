@@ -19,7 +19,7 @@ type UserComment {
     commentId: Int!
     userId: Int
     cik: String
-    created: DateTime
+    created: Date
     minPrice: Float
     maxPrice: Float
     comment: String

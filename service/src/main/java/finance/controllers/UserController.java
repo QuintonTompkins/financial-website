@@ -20,6 +20,8 @@ package finance.controllers;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -32,6 +34,7 @@ import finance.authorization.JwtUtils;
 import finance.dao.AuthDao;
 import finance.dao.SavedCikDao;
 import finance.dao.UserCommentDao;
+import finance.exceptions.InvalidInputException;
 import finance.models.GenericParameters;
 import finance.models.UserComment;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +44,11 @@ public class UserController {
     protected static final Logger LOGGER = Logger.getLogger(UserController.class.getName());
 
     protected static final String COMMENTOR_ROLE = "commentor";
+    
+    private static final String COMMENT_REGEX = "^[a-zA-Z0-9.%$ ]*$";
+    private static final Pattern COMMENT_PATTERN = Pattern.compile(COMMENT_REGEX);
+    private static final String CIK_REGEX = "^[0-9]*$";
+    private static final Pattern CIK_PATTERN = Pattern.compile(CIK_REGEX);
     
     @Autowired
     SavedCikDao savedCikDao;
@@ -80,6 +88,10 @@ public class UserController {
     @MutationMapping
     public int addUserComment(@Argument String cik, @Argument float minPrice, @Argument float maxPrice, @Argument String comment) {
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
+        Matcher commentMatcher = COMMENT_PATTERN.matcher(comment);
+        if (!commentMatcher.matches()) {
+            throw new InvalidInputException("Invalid comment provided.");
+        }
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
         return userCommentDao.insertUserComment(userId, cik, minPrice, maxPrice, comment);
     }
@@ -111,6 +123,10 @@ public class UserController {
     @MutationMapping
     public String addToSavedCikList(@Argument String cik) {
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
+        Matcher cikMatcher = CIK_PATTERN.matcher(cik);
+        if (!cikMatcher.matches()) {
+            throw new InvalidInputException("Invalid cik provided.");
+        }
         savedCikDao.insertSavedCik(userId, cik);
         return "Added to watchlist";
     }
@@ -118,6 +134,10 @@ public class UserController {
     @MutationMapping
     public String deleteFromSavedCikList(@Argument String cik) {
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
+        Matcher cikMatcher = CIK_PATTERN.matcher(cik);
+        if (!cikMatcher.matches()) {
+            throw new InvalidInputException("Invalid cik provided.");
+        }
         savedCikDao.deleteSavedCik(userId, cik);
         return "Deleted from watchlist";
     }

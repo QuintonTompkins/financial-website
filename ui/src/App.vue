@@ -23,19 +23,23 @@ import { jwtDecode } from "jwt-decode";
 </script>
 
 <template>
-  <div class="toolbar">
-    <router-link to="/"><button class="toolbar-nav-button">Home</button></router-link>
-    <router-link to="/search"><button class="toolbar-nav-button">Search</button></router-link>
-    <router-link v-if="jwt == ''" to="/account"><button class="toolbar-nav-button">Login</button></router-link>
-    <router-link v-if="jwt != ''" to="/account"><button class="toolbar-nav-button">{{ userName }}</button></router-link>
-    <div class="toolbar-disclaimer">Nothing on this site should be considered financial advice. All data is provided 
-      by the SEC and no work is done by this site to validate or verify the quality of data. All links to external sites 
-      are given for convenience and are not financial recommendations. All comments by users on this site are their own 
-      opinions and this site and its owners do not endorse any financial decisions.</div>
-    </div>
-  <RouterView @updateJwt="updateJwt" v-slot="{ Component }">
-    <component :is="Component" :jwt=jwt />
-  </RouterView>
+  <div v-if="isMobileDevice()">
+    This website is not intended for mobile devices.
+  </div>
+  <div v-if="!isMobileDevice()">
+    <div class="toolbar">
+      <router-link to="/"><button class="toolbar-nav-button">Home</button></router-link>
+      <router-link to="/search"><button class="toolbar-nav-button">Search</button></router-link>
+      <router-link v-if="jwt == ''" to="/account"><button class="toolbar-nav-button">Login</button></router-link>
+      <router-link v-if="jwt != ''" to="/account"><button class="toolbar-nav-button">{{ userName }}</button></router-link>
+      <div class="toolbar-disclaimer">Nothing on this application should be considered financial advice. Data is provided by the SEC 
+        and nothing in the application verifies or validates the information provided. Comments on this application should be assumed
+        to be the opinion of the commentor and not financial advice from the application or its owner.</div>
+      </div>
+    <RouterView @updateJwt="updateJwt" v-slot="{ Component }">
+      <component :is="Component" :jwt=jwt />
+    </RouterView>
+  </div>
 </template>
 
 <script lang="ts">
@@ -77,6 +81,13 @@ export default defineComponent({
         if(this.jwtExpiration != 0 && this.jwtExpiration < Date.now()){
           this.updateJwt("")
         }
+      },
+      isMobileDevice(){
+        var hasTouchScreen = false
+        if ("maxTouchPoints" in navigator) {
+            hasTouchScreen = navigator.maxTouchPoints > 0
+        }
+        return hasTouchScreen
       }
     }
 });

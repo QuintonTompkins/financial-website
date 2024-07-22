@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 import axios from 'axios'
+import type { UserComment } from './types/UserComment'
 
 const BASE_URL = import.meta.env.VITE_FINANCE_API_URL
 
@@ -53,6 +54,57 @@ export function removeSavedCik(cik: String, jwt: any) {
             "variables": {
                 "cik": cik
             }
+        },
+        { headers: { Authorization: jwt } }
+    )
+}
+
+export function addComment(cik: String, minPrice: number, maxPrice: number, comment: String, jwt: any) {
+    return axios.post<{ data: String }>(BASE_URL+'graphql',
+        {
+            "query": `mutation($cik: String!, $minPrice: Float!, $maxPrice: Float!, $comment: String!) {
+                            addUserComment(cik: $cik, minPrice: $minPrice, maxPrice: $maxPrice, comment: $comment)
+                        }`,
+            "variables": {
+                "cik": cik,
+                "minPrice": minPrice,
+                "maxPrice": maxPrice,
+                "comment": comment
+            }
+        },
+        { headers: { Authorization: jwt } }
+    )
+}
+
+export function getCompanyComments(cik: String, jwt: any) {
+    return axios.post<{ data: { userComments: UserComment[] } }>(BASE_URL+'graphql',
+        {
+            "query": `query ($input: GenericParameters!) {
+                            userComments(input: $input) {
+                                commentId,
+                                userName,
+                                comment,
+                                minPrice,
+                                maxPrice,
+                                created,
+                                voteTotal
+                            }
+                        }`,
+            "variables": {
+                "input": {
+                    "filters": [
+                      {
+                        "field": "cik",
+                        "comparator": "=",
+                        "value": cik
+                      }
+                    ],
+                    "sort": {
+                      "field": "created",
+                      "ascending": false
+                    }
+                }
+              }
         },
         { headers: { Authorization: jwt } }
     )

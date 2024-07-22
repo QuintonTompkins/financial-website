@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,7 @@ import finance.authorization.JwtUtils;
 import finance.authorization.User;
 import finance.dao.AuthDao;
 import finance.email.EmailHandler;
+import finance.exceptions.InvalidInputException;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -65,6 +68,10 @@ public class AuthController {
     protected static final List<String> MANAGING_ROLES = List.of(ADMIN_ROLE,MODERATOR_ROLE);
     protected static final String COMMENTOR_ROLE = "commentor";
 
+    private static final String EMAIL_REGEX = "^(.+)@(\\\\S+)$";
+    private static final String USERNAME_REGEX = "^[a-zA-Z0-9]*$";
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
+    private static final Pattern USERNAME_PATTERN = Pattern.compile(USERNAME_REGEX);
     
     @Autowired
     AuthDao authDao;
@@ -114,6 +121,11 @@ public class AuthController {
     @MutationMapping
     public String createUser(@Argument String userName, @Argument String email, @Argument String password) throws InterruptedException {
         callFrequencyCheck(request);
+        Matcher emailMathcer = EMAIL_PATTERN.matcher(email);
+        Matcher usernameMatcher = USERNAME_PATTERN.matcher(userName);
+        if (!emailMathcer.matches() || !usernameMatcher.matches() || userName.length() > 20) {
+            throw new InvalidInputException("Invalid email/username provided.");
+        }
         String encryptedPassword = encoder.encode(password);
         int userId = authDao.addUser(userName, email, encryptedPassword);
         authDao.insertAuthRequest(userName, email, userId, request.getRemoteAddr(), "create");
@@ -160,6 +172,10 @@ public class AuthController {
     @MutationMapping
     public String updateUserName(@Argument String userName) {
         Claims claims = jwtUtils.getClaims(request.getHeader("Authorization"));
+        Matcher usernameMatcher = USERNAME_PATTERN.matcher(userName);
+        if (!usernameMatcher.matches() || userName.length() > 20) {
+            throw new InvalidInputException("Invalid username provided.");
+        }
         int userId = (int) claims.get("userId");
         authDao.updateUserName(userId, userName);
         Map<String, Object> newClaims = new HashMap<String, Object>() {{
@@ -175,6 +191,10 @@ public class AuthController {
     @MutationMapping
     public String updateEmail(@Argument String email) {
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
+        Matcher emailMatcher = EMAIL_PATTERN.matcher(email);
+        if (!emailMatcher.matches()) {
+            throw new InvalidInputException("Invalid username provided.");
+        }
         authDao.updateEmail(userId, email);
         return "User email updated";
     }

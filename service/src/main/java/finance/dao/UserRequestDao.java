@@ -20,7 +20,6 @@ package finance.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +75,7 @@ public class UserRequestDao extends Dao {
                     resultSet.getInt("user_id"),
                     resultSet.getString("type"),
                     resultSet.getString("reason"),
-                    (LocalDateTime) resultSet.getObject("created"),
+                    resultSet.getString("created"),
                     resultSet.getBoolean("handled")
                 ));
             }

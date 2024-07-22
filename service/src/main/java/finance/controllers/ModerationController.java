@@ -20,6 +20,8 @@ package finance.controllers;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -32,6 +34,7 @@ import finance.dao.LoggedActionDao;
 import finance.dao.UserCommentDao;
 import finance.dao.UserRequestDao;
 import finance.dao.UserRoleDao;
+import finance.exceptions.InvalidInputException;
 import finance.models.GenericParameters;
 import finance.models.UserRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +47,9 @@ public class ModerationController {
     protected static final String MODERATOR_ROLE = "moderator";
     protected static final List<String> MANAGING_ROLES = List.of(ADMIN_ROLE,MODERATOR_ROLE);
     protected static final String COMMENTOR_ROLE = "commentor";
+    
+    private static final String REASON_REGEX = "^[a-zA-Z0-9. ]*$";
+    private static final Pattern REASON_PATTERN = Pattern.compile(REASON_REGEX);
     
     @Autowired
     UserCommentDao userCommentDao;
@@ -72,20 +78,32 @@ public class ModerationController {
     @MutationMapping
     public String reportUserComment(@Argument int commentId, @Argument String reason) {
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
+        Matcher reasonMatcher = REASON_PATTERN.matcher(reason);
+        if (!reasonMatcher.matches()) {
+            throw new InvalidInputException("Invalid comment provided.");
+        }
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
-        userRequestDao.insertUserRequest(userId, commentId, "comment_report", reason);
+        userRequestDao.insertUserRequest(userId, commentId, "REASON_report", reason);
         return "User comment reported";
     }
 
     @MutationMapping
     public String requestCommentorStatus(@Argument String reason) {
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
+        Matcher reasonMatcher = REASON_PATTERN.matcher(reason);
+        if (!reasonMatcher.matches()) {
+            throw new InvalidInputException("Invalid comment provided.");
+        }
         userRequestDao.insertUserRequest(userId, -1, "commentor_request", reason);
         return "Commentor status requested";
     }
 
     @MutationMapping
     public String reportDataIssue(@Argument String reason) {
+        Matcher reasonMatcher = REASON_PATTERN.matcher(reason);
+        if (!reasonMatcher.matches()) {
+            throw new InvalidInputException("Invalid comment provided.");
+        }
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
         userRequestDao.insertUserRequest(userId, -1, "data_issue", reason);
         return "Data issue reported";

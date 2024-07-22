@@ -1,4 +1,4 @@
-"""
+/*
     Finance Website
     Copyright (C) 2024  Quinton Tompkins
 
@@ -14,14 +14,16 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-""" 
+*/
 
-type UserRequest {
-    requestId: Int
-    targetId: Int
-    userId: Int
-    type: String
-    reason: String
-    created: Date
-    complete: Boolean
-}
+export interface UserComment {
+    commentId: number;
+    userId?: number;
+    cik?: string;
+    created?: Date;
+    minPrice?: number;
+    maxPrice?: number;
+    comment?: string;
+    voteTotal?: number;
+    userName?: string;
+  }

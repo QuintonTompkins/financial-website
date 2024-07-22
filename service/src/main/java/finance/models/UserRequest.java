@@ -17,22 +17,20 @@
 */
 package finance.models;
 
-import java.time.LocalDateTime;
-
 public class UserRequest {
     private int requestId;
     private int targetId;
     private int userId;
     private String type;
     private String reason;
-    private LocalDateTime created;
+    private String created;
     private boolean complete;
 
     public UserRequest() {
         
     }
 
-    public UserRequest(int requestId, int targetId, int userId, String type, String reason, LocalDateTime created, boolean complete) {
+    public UserRequest(int requestId, int targetId, int userId, String type, String reason, String created, boolean complete) {
         this.requestId = requestId;
         this.targetId = targetId;
         this.userId = userId;
@@ -82,11 +80,11 @@ public class UserRequest {
         this.reason = reason;
     }
 
-    public LocalDateTime getActionTimestamp() {
+    public String getActionTimestamp() {
         return created;
     }
 
-    public void setActionTimestamp(LocalDateTime created) {
+    public void setActionTimestamp(String created) {
         this.created = created;
     }
 

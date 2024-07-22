@@ -21,6 +21,7 @@ import { defineComponent } from 'vue'
 import * as FinanceApi from '@/services/FinanceApi.js'
 import * as UserApi from '@/services/UserApi.js'
 import type { CompanySummary } from '@/services/types/CompanySummary'
+import type { UserComment } from '@/services/types/UserComment'
 import type { CompanyFiling } from '@/services/types/CompanyFiling';
 import type { CompanyFilingKey } from '@/services/types/CompanyFilingKey'
 </script>
@@ -85,7 +86,34 @@ import type { CompanyFilingKey } from '@/services/types/CompanyFilingKey'
         <div class="right-column" >
             <v-card class="card">
                 <div class="analysis-height-width">
-                    <v-card-title class="card-title">Company Analysis</v-card-title><br>
+                    <v-card-title class="card-title">Company Analysis</v-card-title>
+                    <button @click="setCompanyAnalysisView('summary')" >Summary</button>
+                    <button @click="setCompanyAnalysisView('comment')" >Comments</button>
+                    <br>
+                    <div v-if="companyView=='summary'">
+                        TO DO
+                    </div>
+                    <div v-if="companyView=='comment'"  style="margin: 10px;">
+                        <div class="scrollable-comment-list">
+                            <div v-for="userComment in userComments">
+                                <v-card class="card">
+                                    <div class="list-item">
+                                        <v-card-text class="card-text-sub-title">{{ userComment.userName }}</v-card-text>
+                                        <v-card-text class="card-text-sub-title">Min Price: {{ userComment.minPrice }}</v-card-text>
+                                        <v-card-text class="card-text-sub-title">Max Price: {{ userComment.maxPrice }}</v-card-text>
+                                        <br>
+                                        <v-card-text class="card-text">{{ userComment.comment }}</v-card-text>
+                                    </div>
+                                </v-card>
+                            </div>
+                        </div>
+                        <div>
+                            <textarea v-model="newComment.minPrice" placeholder="Min Price"></textarea>
+                            <textarea v-model="newComment.maxPrice" placeholder="Max Price"></textarea>
+                            <textarea v-model="newComment.commentText" placeholder="Comment"></textarea>
+                            <button @click="submitComment">Submit</button>
+                        </div>
+                    </div>
                 </div>
             </v-card>
         </div>
@@ -103,10 +131,17 @@ export default defineComponent({
             cik: this.$route.params.cik as String,
             companySummary: {} as CompanySummary,
             companyFilings: [] as CompanyFiling[],
+            userComments: [] as UserComment[],
             companyFilingKeys: [] as String[],
             width: window.innerWidth,
             height: window.innerHeight,
-            cikIsSaved: false as Boolean
+            cikIsSaved: false as Boolean,
+            companyView: "summary" as String,
+            newComment: {
+                minPrice: -1 as number,
+                maxPrice: -1 as number,
+                commentText: "" as string
+            }
         };
     },
     mounted() {
@@ -148,6 +183,23 @@ export default defineComponent({
         getSavedCiks(){
             UserApi.getSavedCiks(this.jwt).then((response: { data: { data: { savedCiks: String[] } }; status: number; }) => {
                 this.cikIsSaved = response.data.data.savedCiks.includes(this.cik)
+            })
+        },
+        setCompanyAnalysisView(view: String){
+            this.companyView = view;
+            if(view == 'comment')
+                this.getComments()
+        },
+        submitComment(){
+            UserApi.addComment(this.cik, this.newComment.minPrice, this.newComment.maxPrice, this.newComment.commentText,  this.jwt)
+                .then((response: { data: { data: String }; status: number; }) => {
+                    
+            })
+        },
+        getComments(){
+            UserApi.getCompanyComments(this.cik, this.jwt)
+                .then((response: { data: { data: { userComments: UserComment[] } }; status: number; }) => {
+                    this.userComments = response.data.data.userComments
             })
         }
     }
@@ -198,4 +250,12 @@ th, td {
   border: 3px solid #1a1a1a;
 }
 
+.scrollable-comment-list {
+  height: v-bind((height-200) + 'px');
+  overflow-y: auto;
+}
+.list-item{
+    width: v-bind((width-525) + 'px');
+    margin: 5px;
+}
 </style>

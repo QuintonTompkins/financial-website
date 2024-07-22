@@ -100,7 +100,7 @@ CREATE TABLE finance.user_comment (
     min_price NUMERIC(10,4),
     max_price NUMERIC(10,4),
     comment VARCHAR(1000),
-    hidden BOOLEAN,
+    hidden BOOLEAN DEFAULT FALSE,
     PRIMARY KEY(comment_id)
 );
 
