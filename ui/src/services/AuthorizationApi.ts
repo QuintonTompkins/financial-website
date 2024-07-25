@@ -97,3 +97,32 @@ export function updateEmail(email: String, jwt: any){
         { headers: { Authorization: jwt } }
     )
 }
+
+export function requestCommentorStatus(reason: String, jwt: any) {
+    return axios.post<{ }>(BASE_URL+'graphql',
+        {
+            "query": `mutation($reason: String!) {
+                            requestCommentorStatus(reason: $reason)
+                        }`,
+            "variables": {
+                "reason": reason
+            }
+        },
+        { headers: { Authorization: jwt } }
+    )
+}
+
+export function reportIssue(reason: string, jwt: any) {
+    return axios.post<{ }>(BASE_URL+'graphql',
+        {
+            "query": `mutation($reason: String!) {
+                            reportDataIssue(reason: $reason)
+                        }`,
+            "variables": {
+                "reason": reason
+            }
+        },
+        { headers: { Authorization: jwt } }
+    )
+}
+

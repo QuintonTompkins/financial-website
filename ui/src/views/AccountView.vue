@@ -21,7 +21,7 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
 </script>
 
 <template>
-    <div style="margin: 15px;">
+    <div class="scrollable-list" style="margin: 15px;">
         <div v-if="jwt == ''">
             <h4>Login</h4>
             <input type="text" placeholder="Username/Email" v-model="usernameEmail"></input><br>
@@ -49,6 +49,12 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
             <h4>Update Email</h4>
             <input type="text" placeholder="Email" v-model="newEmail"></input><br>
             <button @click="updateEmail">update email</button>
+            <h4>Request Commentor Status</h4>
+            <input type="text" placeholder="Reason" v-model="reason" style="width: 500px; height: 50px;"></input><br>
+            <button @click="requestCommentor">request commentor status</button>
+            <h4>Report Data/Website Issue</h4>
+            <input type="text" placeholder="Reason" v-model="reason" style="width: 500px; height: 50px;"></input><br>
+            <button @click="reportIssue">report issue</button>
             <h4>Logout</h4>
             <button @click="logout">Logout</button>
         </div>
@@ -76,8 +82,17 @@ export default defineComponent({
             newPassword1: "" as string,
             newPassword2: "" as string,
             newUsername: "" as string,
-            newEmail: "" as string
+            newEmail: "" as string,
+            reason: "" as string,
+            width: window.innerWidth,
+            height: window.innerHeight
         };
+    },
+    mounted() {
+        window.addEventListener('resize', () => {
+            this.width = window.innerWidth
+            this.height = window.innerHeight
+        })  
     },
     methods: {
         createUser(){
@@ -125,9 +140,24 @@ export default defineComponent({
             AuthorizationApi.updateEmail(this.newEmail,this.jwt).then((response: { status: number; }) => {})
             this.newEmail = ""
         },
+        requestCommentor(){
+            AuthorizationApi.requestCommentorStatus(this.reason,this.jwt).then((response: { status: number; }) => {})
+            this.reason = ""
+        },
+        reportIssue(){
+            AuthorizationApi.reportIssue(this.reason,this.jwt).then((response: { status: number; }) => {})
+            this.reason = ""
+        },
         logout(){
             this.$emit('updateJwt',"")
         }
     }
 });
 </script>
+
+<style scoped>
+.scrollable-list {
+  height: v-bind((height-75) + 'px');
+  overflow-y: auto;
+}
+</style>

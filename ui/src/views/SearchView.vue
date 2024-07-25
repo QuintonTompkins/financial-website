@@ -21,6 +21,8 @@ import { defineComponent } from 'vue'
 import * as FinanceApi from '@/services/FinanceApi.js'
 import * as UserApi from '@/services/UserApi.js'
 import type { CompanyFiling } from '@/services/types/CompanyFiling';
+import type { CompanyFilingWithName } from '@/services/types/CompanyFilingExtensions';
+import type { CompanySummary } from '@/services/types/CompanySummary';
 </script>
 
 <template>
@@ -38,6 +40,7 @@ import type { CompanyFiling } from '@/services/types/CompanyFiling';
                 <v-card class="card" @click="goToCompanyPage(companyFiling.cik)">
                     <div class="list-item" style="height: 25px;">
                         <v-card-text class="card-text-sub-title">CIK:</v-card-text><v-card-text class="card-text">{{ companyFiling.cik }}</v-card-text>
+                        <v-card-text class="card-text-sub-title">Name:</v-card-text><v-card-text class="card-text">{{ companyFiling.name }}</v-card-text>
                         <v-card-text class="card-text-sub-title">Accession Number:</v-card-text><v-card-text class="card-text">{{ companyFiling.accessionNumber }}</v-card-text>
                         <v-card-text class="card-text-sub-title">Filing Date:</v-card-text><v-card-text class="card-text">{{ companyFiling.filingDate }}</v-card-text>
                         <v-card-text class="card-text-sub-title">Report Date:</v-card-text><v-card-text class="card-text">{{ companyFiling.reportDate }}</v-card-text>
@@ -70,7 +73,7 @@ export default defineComponent({
     data() {
         return {
             searchType: "recent" as String,
-            companyFilings: [] as CompanyFiling[],
+            companyFilings: [] as CompanyFilingWithName[],
             savedCiks: [] as String[],
             width: window.innerWidth,
             height: window.innerHeight,
@@ -103,11 +106,10 @@ export default defineComponent({
             this.height = window.innerHeight
         })
         this.getCompanyRecentFilings()
-        this.getSavedCiks()
     },
 
     methods: {
-        getCompanyRecentFilings(){
+        async getCompanyRecentFilings(){
             this.companyFilings = []
             this.loading = true
             let recentGenericFilters = [] as GenericFilter[]
@@ -127,11 +129,13 @@ export default defineComponent({
                     value: 0
                 })
             }
-            FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter).then((response: { data: { data: { companyFilings: CompanyFiling[] } }; status: number; }) => {
-                this.companyFilings = response.data.data.companyFilings
-            }).finally(() => {
-                this.loading = false
-            })
+            const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter)
+            this.companyFilings = responseFilings.data.data.companyFilings
+            for(let filing of this.companyFilings){
+                const nameResponse = await FinanceApi.getCompanyName(filing.cik)
+                filing.name = nameResponse.data.data.companySummaries[0].name
+            }
+            this.loading = false
         },
         getSavedCiks(){
             UserApi.getSavedCiks(this.jwt).then((response: { data: { data: { savedCiks: String[] } }; status: number; }) => {

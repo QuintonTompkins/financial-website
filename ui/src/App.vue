@@ -30,8 +30,7 @@ import { jwtDecode } from "jwt-decode";
     <div class="toolbar">
       <router-link to="/"><button class="toolbar-nav-button">Home</button></router-link>
       <router-link to="/search"><button class="toolbar-nav-button">Search</button></router-link>
-      <router-link v-if="jwt == ''" to="/account"><button class="toolbar-nav-button">Login</button></router-link>
-      <router-link v-if="jwt != ''" to="/account"><button class="toolbar-nav-button">{{ userName }}</button></router-link>
+      <router-link to="/account"><button class="toolbar-nav-button">{{jwt != '' ? userName : 'Login'}}</button></router-link>
       <div class="toolbar-disclaimer">Nothing on this application should be considered financial advice. Data is provided by the SEC 
         and nothing in the application verifies or validates the information provided. Comments on this application should be assumed
         to be the opinion of the commentor and not financial advice from the application or its owner.</div>
@@ -51,7 +50,9 @@ export default defineComponent({
       return {
           jwt: "" as string,
           jwtExpiration: 0 as number,
-          userName: "" as string
+          userName: "" as string,
+          width: window.innerWidth,
+          height: window.innerHeight,
       };
     },
     mounted(){
@@ -61,6 +62,10 @@ export default defineComponent({
         this.updateJwt(savedJwt)
       }
       setInterval(function(){ self.checkForExpiredJwt() }.bind(this), 60000);
+      window.addEventListener('resize', () => {
+            this.width = window.innerWidth
+            this.height = window.innerHeight
+        })
     },
     methods: {
       updateJwt(newJwt : string){
@@ -108,8 +113,7 @@ export default defineComponent({
 }
 
 .toolbar-disclaimer {
-  height: 35px;
-  width: 1100px;
+  width: v-bind((width-350) + 'px');
   margin: 5px;
   display: inline-block;
   color: red;

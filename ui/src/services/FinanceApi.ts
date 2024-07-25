@@ -118,3 +118,19 @@ export function getCompanyFilingKeys(keyFilter: String) {
         }
     )
 }
+
+
+export function getCompanyName(cik: any) {
+    return axios.post<{ data: { companySummaries: CompanySummary[] } }>(BASE_URL+'graphql',
+        {
+            "query": `query ($input: GenericParameters!) {
+                            companySummaries(input: $input) {
+                                name
+                            }
+                        }`,
+            "variables": {
+                "input":{ "filters": [ { "field": "cik" , "comparator": "=", "value": cik } ] }
+            }
+        }
+    )
+}

@@ -24,13 +24,14 @@ import type { CompanySummary } from '@/services/types/CompanySummary'
 import type { UserComment } from '@/services/types/UserComment'
 import type { CompanyFiling } from '@/services/types/CompanyFiling';
 import type { CompanyFilingKey } from '@/services/types/CompanyFilingKey'
+import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtensions'
 </script>
 
 <template>
     <div class="view" >
         <div class="left-column" >
             <v-card class="card">
-                <div style="height: 175px; width: 400px;">
+                <div style="height: 175px; width: 460px;">
                     <v-card-title class="card-title">Company Details</v-card-title>
                     <button v-if="!cikIsSaved" @click="addToSavedCik" :disabled="jwt==''">add to saved ciks</button>
                     <button v-if="cikIsSaved" @click="removeSavedCik" :disabled="jwt==''">remove from saved ciks</button>
@@ -58,7 +59,7 @@ import type { CompanyFilingKey } from '@/services/types/CompanyFilingKey'
                 </div>
             </v-card>
             <v-card class="card">
-                <div class="filing-height" style="width: 400px;">
+                <div class="filing-height" style="width: 460px;">
                     <v-card-title class="card-title">Company Filings</v-card-title><br>
                     <div class="scrollable-tbody">
                         <table>
@@ -68,6 +69,7 @@ import type { CompanyFilingKey } from '@/services/types/CompanyFilingKey'
                                     <th>Report Date</th>
                                     <th>Filing Date</th>
                                     <th>Form</th>
+                                    <th>Selected</th>
                                 </tr>
                             </thead>
                                 <tbody>
@@ -76,6 +78,7 @@ import type { CompanyFilingKey } from '@/services/types/CompanyFilingKey'
                                     <td>{{ companyFiling.reportDate }}</td>
                                     <td>{{ companyFiling.filingDate }}</td>
                                     <td>{{ companyFiling.form }}</td>
+                                    <td><input type="checkbox" v-model="companyFiling.selected" true-value="yes" false-value="no" /></td>
                                 </tr>
                                 </tbody>
                         </table>
@@ -130,7 +133,7 @@ export default defineComponent({
         return {
             cik: this.$route.params.cik as String,
             companySummary: {} as CompanySummary,
-            companyFilings: [] as CompanyFiling[],
+            companyFilings: [] as CompanyFilingSelected[],
             userComments: [] as UserComment[],
             companyFilingKeys: [] as String[],
             width: window.innerWidth,
@@ -212,11 +215,11 @@ export default defineComponent({
 }
 
 .left-column {
-    width: 425px;
+    width: 485px;
 }
 
 .right-column {
-    width: v-bind((width-490) + 'px');
+    width: v-bind((width-510) + 'px');
 }
 
 .filing-height {
@@ -224,7 +227,7 @@ export default defineComponent({
 }
 
 .analysis-height-width {
-    width: v-bind((width-460) + 'px');
+    width: v-bind((width-510) + 'px');
     height: v-bind((height-97) + 'px');
 }
 
