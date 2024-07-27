@@ -110,3 +110,33 @@ export function getCompanyComments(cik: String, jwt: any) {
     )
 }
 
+
+
+export function getRecentComments(jwt: any) {
+    return axios.post<{ data: { userComments: UserComment[] } }>(BASE_URL+'graphql',
+        {
+            "query": `query ($input: GenericParameters!) {
+                            userComments(input: $input) {
+                                cik,
+                                commentId,
+                                userId,
+                                userName,
+                                comment,
+                                minPrice,
+                                maxPrice,
+                                created,
+                                voteTotal
+                            }
+                        }`,
+            "variables": {
+                "input": {
+                    "sort": {
+                      "field": "created",
+                      "ascending": false
+                    }
+                }
+              }
+        },
+        { headers: { Authorization: jwt } }
+    )
+}

@@ -20,15 +20,15 @@ import { defineComponent } from 'vue'
 
 import * as FinanceApi from '@/services/FinanceApi.js'
 import * as UserApi from '@/services/UserApi.js'
-import type { CompanyFiling } from '@/services/types/CompanyFiling';
 import type { CompanyFilingWithName } from '@/services/types/CompanyFilingExtensions';
-import type { CompanySummary } from '@/services/types/CompanySummary';
+import type { UserComment } from '@/services/types/UserComment';
 </script>
 
 <template>
     <div style="margin:15px;">
         <button @click="searchType='recent'">Recent Filings</button>
         <button @click="searchType='saved'" :disabled="jwt==''">Saved Ciks</button>
+        <button @click="searchType='comments'" :disabled="jwt==''">Recent Comments</button>
     </div>
     <div v-if="searchType == 'recent'">
         <h3 style="margin-left: 15px; display: inline;">Recent Filings</h3>
@@ -62,6 +62,21 @@ import type { CompanySummary } from '@/services/types/CompanySummary';
             </div>
         </div>
     </div>
+    <div v-if="searchType == 'comments'">
+        <h3 style="margin-left: 15px">Recent Comments</h3>
+        <div class="scrollable-list">
+            <div v-for="comment in comments">
+                <v-card class="card">
+                    <div class="list-item" style="height: 25px;">
+                        <v-card-text class="card-text-sub-title">CIK:</v-card-text><v-card-text class="card-text" @click="goToCompanyPage(comment.cik)">{{ comment.cik }}</v-card-text>
+                        <v-card-text class="card-text-sub-title">Username:</v-card-text><v-card-text class="card-text" @click="goToUserPage(comment.userId)">{{ comment.userName }}</v-card-text>
+                        <v-card-text class="card-text-sub-title">Created:</v-card-text><v-card-text class="card-text">{{ comment.created }}</v-card-text>
+                        <v-card-text class="card-text-sub-title">Comment:</v-card-text><v-card-text class="card-text">{{ comment.comment }}</v-card-text>
+                    </div>
+                </v-card>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -72,9 +87,10 @@ export default defineComponent({
     },
     data() {
         return {
-            searchType: "recent" as String,
+            searchType: "" as String,
             companyFilings: [] as CompanyFilingWithName[],
             savedCiks: [] as String[],
+            comments: [] as UserComment[],
             width: window.innerWidth,
             height: window.innerHeight,
             profitOnly: true as Boolean,
@@ -96,6 +112,9 @@ export default defineComponent({
                     break;
                 case "saved":
                     this.getSavedCiks()
+                    break;
+                case "comments":
+                    this.getComments()
                     break;
             }
         }
@@ -131,19 +150,32 @@ export default defineComponent({
             }
             const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter)
             this.companyFilings = responseFilings.data.data.companyFilings
+            await this.getCompanyNames()
+            this.loading = false
+        },
+        async getCompanyNames(){
             for(let filing of this.companyFilings){
                 const nameResponse = await FinanceApi.getCompanyName(filing.cik)
                 filing.name = nameResponse.data.data.companySummaries[0].name
             }
-            this.loading = false
         },
         getSavedCiks(){
             UserApi.getSavedCiks(this.jwt).then((response: { data: { data: { savedCiks: String[] } }; status: number; }) => {
                 this.savedCiks = response.data.data.savedCiks
             })
         },
-        goToCompanyPage(cik: String){
-            this.$router.push(`/company/${cik}`)
+        getComments(){
+            UserApi.getRecentComments(this.jwt).then((response: { data: { data: { userComments: UserComment[] } }; status: number; }) => {
+                this.comments = response.data.data.userComments
+            })
+        },
+        goToCompanyPage(cik?: String){
+            if(cik != null)
+                this.$router.push(`/company/${cik}`)
+        },
+        goToUserPage(userId?: number){
+            if(userId != null)
+                this.$router.push(`/user/${userId}`)
         }
     }
 });

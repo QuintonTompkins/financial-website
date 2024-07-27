@@ -19,7 +19,7 @@
 export interface UserComment {
     commentId: number;
     userId?: number;
-    cik?: string;
+    cik?: String;
     created?: Date;
     minPrice?: number;
     maxPrice?: number;
