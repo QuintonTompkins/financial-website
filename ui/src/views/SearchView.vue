@@ -17,6 +17,7 @@
 -->
 <script setup lang="ts">
 import { defineComponent } from 'vue'
+import { jwtDecode } from "jwt-decode";
 
 import * as FinanceApi from '@/services/FinanceApi.js'
 import * as UserApi from '@/services/UserApi.js'
@@ -28,7 +29,7 @@ import type { UserComment } from '@/services/types/UserComment';
     <div style="margin:15px;">
         <button @click="searchType='recent'">Recent Filings</button>
         <button @click="searchType='saved'" :disabled="jwt==''">Saved Ciks</button>
-        <button @click="searchType='comments'" :disabled="jwt==''">Recent Comments</button>
+        <button @click="searchType='comments'" :disabled="!hasCommentorRole">Recent Comments</button>
     </div>
     <div v-if="searchType == 'recent'">
         <h3 style="margin-left: 15px; display: inline;">Recent Filings</h3>
@@ -95,7 +96,8 @@ export default defineComponent({
             height: window.innerHeight,
             profitOnly: true as Boolean,
             annualOnly: true as Boolean,
-            loading: false as Boolean
+            loading: false as Boolean,
+            hasCommentorRole: false as Boolean
         };
     },
     watch: {
@@ -117,6 +119,18 @@ export default defineComponent({
                     this.getComments()
                     break;
             }
+        },
+        jwt: {
+            immediate: true, 
+            handler (newVal, oldVal) {
+                if(newVal != ""){
+                    const claims: {exp: number, sub: string, roles: String[]} = jwtDecode(newVal)
+                    this.hasCommentorRole = claims.roles.includes('commentor')
+                }
+                else{
+                    this.hasCommentorRole = false
+                }
+            }
         }
     },
     mounted() {
@@ -124,7 +138,6 @@ export default defineComponent({
             this.width = window.innerWidth
             this.height = window.innerHeight
         })
-        this.getCompanyRecentFilings()
     },
 
     methods: {

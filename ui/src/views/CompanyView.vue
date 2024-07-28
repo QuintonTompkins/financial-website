@@ -17,6 +17,7 @@
 -->
 <script setup lang="ts">
 import { defineComponent } from 'vue'
+import { jwtDecode } from "jwt-decode";
 
 import * as FinanceApi from '@/services/FinanceApi.js'
 import * as UserApi from '@/services/UserApi.js'
@@ -91,7 +92,7 @@ import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtens
                 <div class="analysis-height-width">
                     <v-card-title class="card-title">Company Analysis</v-card-title>
                     <button @click="setCompanyAnalysisView('summary')" >Summary</button>
-                    <button @click="setCompanyAnalysisView('comment')" >Comments</button>
+                    <button @click="setCompanyAnalysisView('comment')" :disabled="!hasCommentorRole">Comments</button>
                     <br>
                     <div v-if="companyView=='summary'">
                         TO DO
@@ -144,7 +145,8 @@ export default defineComponent({
                 minPrice: -1 as number,
                 maxPrice: -1 as number,
                 commentText: "" as string
-            }
+            },
+            hasCommentorRole: false as boolean
         };
     },
     mounted() {
@@ -156,7 +158,20 @@ export default defineComponent({
         this.getCompanyFilings()
         this.getSavedCiks()
     },
-
+    watch: {
+        jwt: {
+            immediate: true, 
+            handler (newVal, oldVal) {
+                if(newVal != ""){
+                    const claims: {exp: number, sub: string, roles: String[]} = jwtDecode(newVal)
+                    this.hasCommentorRole = claims.roles.includes('commentor')
+                }
+                else{
+                    this.hasCommentorRole = false
+                }
+            }
+        }
+    },
     methods: {
         getCompanySummary(){
             FinanceApi.getCompanySummary(this.cik).then((response: { data: { data: { companySummaries: CompanySummary[] } }; status: number; }) => {
