@@ -43,49 +43,27 @@ export function getCompanySummary(cik: String){
     )
 }
 
-export function getRecentCompanyFilings(genericFilters: GenericFilter[], recentCompanyFilingDataFilter: CompanyFilingDataFilter[]) {
+export function getRecentCompanyFilings(genericFilters: GenericFilter[], recentCompanyFilingDataFilter: CompanyFilingDataFilter[], withData: boolean) {
+    let query = `query($input: CompanyFilingDataParameters!) {
+        companyFilings(input: $input){
+          cik,
+          accessionNumber,
+          form,
+          filingDate,
+          reportDate,
+          data
+        }
+      }`
+    if(withData){
+        query = query.replace("reportDate","reportDate,data")
+    }
     return axios.post<{ data: { companyFilings: CompanyFiling[] } }>(BASE_URL+'graphql',
         {
-            "query": `query($input: CompanyFilingDataParameters!) {
-                companyFilings(input: $input){
-                  cik,
-                  accessionNumber,
-                  form,
-                  filingDate,
-                  reportDate
-                }
-              }`,
+            "query": query,
             "variables": {
                 "input":{
                     "filters": genericFilters,
                     "customFilters": recentCompanyFilingDataFilter,
-                    "sort": {
-                        "field": "filing_date",
-                        "ascending": false
-                    }
-                }
-            }
-        }
-    )
-}
-
-export function getCompanyFilings(cik: String) {
-    return axios.post<{ data: { companyFilings: CompanyFiling[] } }>(BASE_URL+'graphql',
-        {
-            "query": `query($input: CompanyFilingDataParameters!) {
-                companyFilings(input: $input){
-                  accessionNumber,
-                  form,
-                  filingDate,
-                  reportDate,
-                  data
-                }
-              }`,
-            "variables": {
-                "input":{
-                    "filters": [ 
-                        { "field": "cik" , "comparator": "=", "value": cik } 
-                    ],
                     "sort": {
                         "field": "filing_date",
                         "ascending": false

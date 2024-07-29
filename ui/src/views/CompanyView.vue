@@ -61,8 +61,10 @@ import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtens
             </v-card>
             <v-card class="card">
                 <div class="filing-height" style="width: 460px;">
-                    <v-card-title class="card-title">Company Filings</v-card-title><br>
-                    <div class="scrollable-tbody">
+                    <v-card-title class="card-title">Company Filings</v-card-title>
+                    <input type="checkbox" v-model="tenOnly" style="display: inline;">10-K/10-Q Only</input>
+                    <br>
+                    <div class="scrollable-tbody filing-list">
                         <table>
                             <thead>
                                 <tr>
@@ -73,15 +75,15 @@ import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtens
                                     <th>Selected</th>
                                 </tr>
                             </thead>
-                                <tbody>
+                            <tbody>
                                 <tr v-for="companyFiling in companyFilings" :key="companyFiling.accessionNumber">
                                     <td>{{ companyFiling.accessionNumber }}</td>
                                     <td>{{ companyFiling.reportDate }}</td>
                                     <td>{{ companyFiling.filingDate }}</td>
                                     <td>{{ companyFiling.form }}</td>
-                                    <td><input type="checkbox" v-model="companyFiling.selected" true-value="yes" false-value="no" /></td>
+                                    <td><input type="checkbox" v-model="companyFiling.selected" /></td>
                                 </tr>
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -95,7 +97,26 @@ import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtens
                     <button @click="setCompanyAnalysisView('comment')" :disabled="!hasCommentorRole">Comments</button>
                     <br>
                     <div v-if="companyView=='summary'">
-                        TO DO
+                        <div class="scrollable-tbody analysis">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th v-for="companyFiling in companyFilings.filter((cf)=>{return cf.selected})" :key="companyFiling.accessionNumber">
+                                            {{ companyFiling.filingDate }}<br>{{ companyFiling.form }}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="filingKey in selectedCompanyFilingKeys">
+                                        <td>{{ filingKey }}</td>
+                                        <td v-for="companyFiling in companyFilings.filter((cf)=>{return cf.selected})" :key="companyFiling.accessionNumber">
+                                            {{convertUnit(companyFiling.data[filingKey]?.unit) + addCommas(companyFiling.data[filingKey]?.value) }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div v-if="companyView=='comment'"  style="margin: 10px;">
                         <div class="scrollable-comment-list">
@@ -137,6 +158,16 @@ export default defineComponent({
             companyFilings: [] as CompanyFilingSelected[],
             userComments: [] as UserComment[],
             companyFilingKeys: [] as String[],
+            selectedCompanyFilingKeys: [
+                "us-gaap_GrossProfit",
+                "us-gaap_NetIncomeLoss",
+                "us-gaap_Assets",
+                "us-gaap_Liabilities",
+                "us-gaap_NetCashProvidedByUsedInOperatingActivities",
+                "us-gaap_NetCashProvidedByUsedInFinancingActivities",
+                "us-gaap_NetCashProvidedByUsedInInvestingActivities",
+                "dei_EntityCommonStockSharesOutstanding"
+            ] as string[],
             width: window.innerWidth,
             height: window.innerHeight,
             cikIsSaved: false as Boolean,
@@ -146,7 +177,8 @@ export default defineComponent({
                 maxPrice: -1 as number,
                 commentText: "" as string
             },
-            hasCommentorRole: false as boolean
+            hasCommentorRole: false as boolean,
+            tenOnly: true as boolean
         };
     },
     mounted() {
@@ -156,9 +188,14 @@ export default defineComponent({
         })
         this.getCompanySummary()
         this.getCompanyFilings()
-        this.getSavedCiks()
+        if(this.jwt != ""){
+            this.getSavedCiks()
+        }
     },
     watch: {
+        tenOnly(newVal, oldVal){
+            this.getCompanyFilings()
+        },
         jwt: {
             immediate: true, 
             handler (newVal, oldVal) {
@@ -173,14 +210,47 @@ export default defineComponent({
         }
     },
     methods: {
+        convertUnit(unit: String){
+            switch(unit){
+                case "USD":
+                    return "$"
+                default:
+                    return " "
+            }
+        },
+        addCommas(value: String){
+            if(value){
+                return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            }
+            else{
+                return ""
+            }
+        },
         getCompanySummary(){
             FinanceApi.getCompanySummary(this.cik).then((response: { data: { data: { companySummaries: CompanySummary[] } }; status: number; }) => {
                 this.companySummary = response.data.data.companySummaries[0]
             })
         },
         getCompanyFilings(){
-            FinanceApi.getCompanyFilings(this.cik).then((response: { data: { data: { companyFilings: CompanyFiling[] } }; status: number; }) => {
+            let recentGenericFilters = [] as GenericFilter[]
+            recentGenericFilters.push({
+                field: "cik",
+                comparator: "=",
+                value: this.cik
+            })
+            if(this.tenOnly){
+                recentGenericFilters.push({
+                    field: "form",
+                    comparator: "like",
+                    value: "10-%"
+                })
+            }
+            FinanceApi.getRecentCompanyFilings(recentGenericFilters, [], true).then((response: { data: { data: { companyFilings: CompanyFiling[] } }; status: number; }) => {
                 this.companyFilings = response.data.data.companyFilings
+                for(let filing of this.companyFilings){
+                    if(filing.form === "10-K")
+                        filing.selected = true
+                }
             })
         },
         getCompanyFilingKeys(keyFilter: String){
@@ -190,12 +260,14 @@ export default defineComponent({
         },
         addToSavedCik(){
             UserApi.addToSavedCik(this.cik, this.jwt).then((response: { data: { data: String }; status: number; }) => {
-                console.log(response.data.data)
+                if(response.status == 200)
+                    this.cikIsSaved = true
              })
         },
         removeSavedCik(){
             UserApi.removeSavedCik(this.cik, this.jwt).then((response: { data: { data: String }; status: number; }) => {
-                console.log(response.data.data)
+                if(response.status == 200)
+                    this.cikIsSaved = false
              })
         },
         getSavedCiks(){
@@ -246,8 +318,16 @@ export default defineComponent({
     height: v-bind((height-97) + 'px');
 }
 
-.scrollable-tbody {
+.analysis {
+  height: v-bind((height-95) + 'px');
+}
+
+.filing-list {
   height: v-bind((height-330) + 'px');
+}
+
+
+.scrollable-tbody {
   overflow-y: auto;
 }
 

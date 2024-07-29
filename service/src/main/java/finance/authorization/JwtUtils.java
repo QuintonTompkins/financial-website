@@ -35,7 +35,7 @@ import io.jsonwebtoken.io.Decoders;
 @Component
 public class JwtUtils {
 
-    private final int HOURS_FOR_TOKEN_TO_EXPIRE = 12;
+    private final int HOURS_FOR_TOKEN_TO_EXPIRE = 168;
     private final int TOKEN_LIFE_MS = HOURS_FOR_TOKEN_TO_EXPIRE * 60 * 60 * 1000;
 
     public String createToken(Map<String, Object> claims, String userName, int userId, String encryptedPassword) {

@@ -161,7 +161,7 @@ export default defineComponent({
                     value: 0
                 })
             }
-            const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter)
+            const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter, false)
             this.companyFilings = responseFilings.data.data.companyFilings
             await this.getCompanyNames()
             this.loading = false
