@@ -122,12 +122,12 @@ import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtens
                         <div class="scrollable-comment-list">
                             <div v-for="userComment in userComments">
                                 <v-card class="card">
-                                    <div class="list-item">
+                                    <div class="comment-list-item">
                                         <v-card-text class="card-text-sub-title">{{ userComment.userName }}</v-card-text>
                                         <v-card-text class="card-text-sub-title">Min Price: {{ userComment.minPrice }}</v-card-text>
                                         <v-card-text class="card-text-sub-title">Max Price: {{ userComment.maxPrice }}</v-card-text>
                                         <br>
-                                        <v-card-text class="card-text">{{ userComment.comment }}</v-card-text>
+                                        <v-card-text class="card-text" style="white-space: pre-line">{{ userComment.comment }}</v-card-text>
                                     </div>
                                 </v-card>
                             </div>
@@ -283,7 +283,7 @@ export default defineComponent({
         submitComment(){
             UserApi.addComment(this.cik, this.newComment.minPrice, this.newComment.maxPrice, this.newComment.commentText,  this.jwt)
                 .then((response: { data: { data: String }; status: number; }) => {
-                    
+                    this.getComments()
             })
         },
         getComments(){
@@ -352,8 +352,8 @@ th, td {
   height: v-bind((height-200) + 'px');
   overflow-y: auto;
 }
-.list-item{
-    width: v-bind((width-525) + 'px');
+.comment-list-item{
+    width: v-bind((width-555) + 'px');
     margin: 5px;
 }
 </style>

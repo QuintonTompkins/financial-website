@@ -45,8 +45,6 @@ public class UserController {
 
     protected static final String COMMENTOR_ROLE = "commentor";
     
-    private static final String COMMENT_REGEX = "^[a-zA-Z0-9.%$ ]*$";
-    private static final Pattern COMMENT_PATTERN = Pattern.compile(COMMENT_REGEX);
     private static final String CIK_REGEX = "^[0-9]*$";
     private static final Pattern CIK_PATTERN = Pattern.compile(CIK_REGEX);
     
@@ -88,10 +86,6 @@ public class UserController {
     @MutationMapping
     public int addUserComment(@Argument String cik, @Argument float minPrice, @Argument float maxPrice, @Argument String comment) {
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
-        Matcher commentMatcher = COMMENT_PATTERN.matcher(comment);
-        if (!commentMatcher.matches()) {
-            throw new InvalidInputException("Invalid comment provided.");
-        }
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
         return userCommentDao.insertUserComment(userId, cik, minPrice, maxPrice, comment);
     }

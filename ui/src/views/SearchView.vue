@@ -68,11 +68,12 @@ import type { UserComment } from '@/services/types/UserComment';
         <div class="scrollable-list">
             <div v-for="comment in comments">
                 <v-card class="card">
-                    <div class="list-item" style="height: 25px;">
+                    <div class="list-item">
                         <v-card-text class="card-text-sub-title">CIK:</v-card-text><v-card-text class="card-text" @click="goToCompanyPage(comment.cik)">{{ comment.cik }}</v-card-text>
                         <v-card-text class="card-text-sub-title">Username:</v-card-text><v-card-text class="card-text" @click="goToUserPage(comment.userId)">{{ comment.userName }}</v-card-text>
                         <v-card-text class="card-text-sub-title">Created:</v-card-text><v-card-text class="card-text">{{ comment.created }}</v-card-text>
-                        <v-card-text class="card-text-sub-title">Comment:</v-card-text><v-card-text class="card-text">{{ comment.comment }}</v-card-text>
+                        <br>
+                        <v-card-text class="card-text" style="white-space: pre-line">{{comment.comment}}</v-card-text>
                     </div>
                 </v-card>
             </div>
