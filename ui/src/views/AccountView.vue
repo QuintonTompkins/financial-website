@@ -97,7 +97,7 @@ export default defineComponent({
     methods: {
         createUser(){
             AuthorizationApi.createUser(this.username, this.email, this.passwordCreate).then((response: { data: { data: { createUser: String } }; status: number; }) => {
-                if(response.status == 200)
+                if(response.data.data.createUser != null)
                     this.$emit('updateJwt',response.data.data.createUser)
             })
             this.username = ""
@@ -106,7 +106,7 @@ export default defineComponent({
         },
         login(){
             AuthorizationApi.login(this.usernameEmail, this.passwordLogin).then((response: { data: { data: { login: String } }; status: number; }) => {
-                if(response.status == 200)
+                if(response.data.data.login != null)
                     this.$emit('updateJwt',response.data.data.login)
             })
             this.usernameEmail = ""
@@ -114,7 +114,7 @@ export default defineComponent({
         },
         updatePassword(){
             AuthorizationApi.updatePassword(this.emailPassword, this.oldPassword, this.newPassword1).then((response: { data: { data: { updatePassword: String } }; status: number; }) => {
-                if(response.status == 200)
+                if(response.data.data.updatePassword != null)
                     this.$emit('updateJwt',"")
             })
             this.emailPassword = ""
@@ -124,14 +124,14 @@ export default defineComponent({
         },
         resetPassword(){
             AuthorizationApi.resetPassword(this.emailReset).then((response: { data: { data: { resetPassword: String } }; status: number; }) => {
-                if(response.status == 200)
+                if(response.data.data.resetPassword != null)
                     this.$emit('updateJwt',"")
             })
             this.emailReset = ""
         },
         updateUsername(){
             AuthorizationApi.updateUsername(this.newUsername,this.jwt).then((response: { data: { data: { updateUserName: String } }; status: number; }) => {
-                if(response.status == 200)
+                if(response.data.data.updateUserName != null)
                     this.$emit('updateJwt',response.data.data.updateUserName)
             })
             this.newUsername = ""

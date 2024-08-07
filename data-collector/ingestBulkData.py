@@ -46,8 +46,7 @@ def downloadBulkFolder(name):
     path = 'bulkdata' if name == 'submissions' else 'xbrl'
     downloadLink = "https://www.sec.gov/Archives/edgar/daily-index/"+path+"/"+name+".zip"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0",
-        "Host": "www.sec.gov"
+        "User-Agent": os.environ.get('SEC_IDENTIFIER')
     }
     r = requests.get(downloadLink, headers=headers)
     with open(zipFileName, "wb") as outfile:
