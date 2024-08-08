@@ -99,7 +99,7 @@ CREATE TABLE finance.user_comment (
     created TIMESTAMP DEFAULT NOW(),
     min_price NUMERIC(10,4),
     max_price NUMERIC(10,4),
-    comment VARCHAR(1000),
+    comment VARCHAR(10000),
     hidden BOOLEAN DEFAULT FALSE,
     PRIMARY KEY(comment_id)
 );

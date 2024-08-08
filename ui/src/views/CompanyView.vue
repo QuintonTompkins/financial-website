@@ -135,7 +135,7 @@ import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtens
                         <div>
                             <textarea v-model="newComment.minPrice" placeholder="Min Price"></textarea>
                             <textarea v-model="newComment.maxPrice" placeholder="Max Price"></textarea>
-                            <textarea v-model="newComment.commentText" placeholder="Comment"></textarea>
+                            <textarea v-model="newComment.commentText" placeholder="Comment" style="width: 500px;"></textarea>
                             <button @click="submitComment">Submit</button>
                         </div>
                     </div>
@@ -353,7 +353,7 @@ th, td {
   overflow-y: auto;
 }
 .comment-list-item{
-    width: v-bind((width-555) + 'px');
+    width: v-bind((width-565) + 'px');
     margin: 5px;
 }
 </style>
