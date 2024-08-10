@@ -17,12 +17,13 @@
 -->
 <script setup lang="ts">
 import { defineComponent } from 'vue'
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode"
 
 import * as FinanceApi from '@/services/FinanceApi.js'
 import * as UserApi from '@/services/UserApi.js'
-import type { CompanyFilingWithName } from '@/services/types/CompanyFilingExtensions';
-import type { UserComment } from '@/services/types/UserComment';
+import type { CompanyFilingWithName } from '@/services/types/CompanyFilingExtensions'
+import type { UserCommentWithName } from '@/services/types/UserCommentExtensions'
+import UserComment from '@/components/UserComment.vue'
 </script>
 
 <template>
@@ -31,51 +32,62 @@ import type { UserComment } from '@/services/types/UserComment';
         <button @click="searchType='saved'" :disabled="jwt==''">Saved Ciks</button>
         <button @click="searchType='comments'" :disabled="!hasCommentorRole">Recent Comments</button>
     </div>
-    <div v-if="searchType == 'recent'">
-        <h3 style="margin-left: 15px; display: inline;">Recent Filings</h3>
-        <input type="checkbox" v-model="profitOnly" style="display: inline;">Profitable Only</input>
-        <input type="checkbox" v-model="annualOnly" style="display: inline;">10-K Only</input>
-        <div v-if="loading" class="loader"></div> 
-        <div v-if="!loading" class="scrollable-list">
-            <div v-for="companyFiling in companyFilings">
-                <v-card class="card" @click="goToCompanyPage(companyFiling.cik)">
-                    <div class="list-item" style="height: 25px;">
-                        <v-card-text class="card-text-sub-title">CIK:</v-card-text><v-card-text class="card-text">{{ companyFiling.cik }}</v-card-text>
-                        <v-card-text class="card-text-sub-title">Name:</v-card-text><v-card-text class="card-text">{{ companyFiling.name }}</v-card-text>
-                        <v-card-text class="card-text-sub-title">Accession Number:</v-card-text><v-card-text class="card-text">{{ companyFiling.accessionNumber }}</v-card-text>
-                        <v-card-text class="card-text-sub-title">Filing Date:</v-card-text><v-card-text class="card-text">{{ companyFiling.filingDate }}</v-card-text>
-                        <v-card-text class="card-text-sub-title">Report Date:</v-card-text><v-card-text class="card-text">{{ companyFiling.reportDate }}</v-card-text>
-                        <v-card-text class="card-text-sub-title">Form:</v-card-text><v-card-text class="card-text">{{ companyFiling.form }}</v-card-text>
+    <div style="margin-left: 15px">
+        <div v-if="searchType == 'recent'">
+            <h3 style="display: inline">Recent Filings</h3>
+            <input type="checkbox" v-model="profitOnly" style="display: inline;">Profitable Only</input>
+            <input type="checkbox" v-model="annualOnly" style="display: inline;">10-K Only</input>
+        </div>
+        <div v-if="searchType == 'saved'">
+            <h3>Saved Ciks</h3>
+        </div>
+        <div v-if="searchType == 'comments'">
+            <h3>Recent Comments</h3>
+        </div>
+        <div v-if="loading" class="loader"  style="margin: 15px"></div>
+    </div>
+    <div v-if="!loading">
+        <div v-if="searchType == 'recent'">
+            <div class="scrollable-list">
+                <div v-for="companyFiling in companyFilings">
+                    <div class="card">
+                        <a class="a-hidden" :href="'/company/'+companyFiling.cik">
+                            <div class="list-item" style="height: 25px;">
+                                <div class="card-text-sub-title">CIK:</div><div class="card-text">{{ companyFiling.cik }}</div>
+                                <div class="card-text-sub-title">Name:</div><div class="card-text">{{ companyFiling.name }}</div>
+                                <div class="card-text-sub-title">Accession Number:</div><div class="card-text">{{ companyFiling.accessionNumber }}</div>
+                                <div class="card-text-sub-title">Filing Date:</div><div class="card-text">{{ companyFiling.filingDate }}</div>
+                                <div class="card-text-sub-title">Report Date:</div><div class="card-text">{{ companyFiling.reportDate }}</div>
+                                <div class="card-text-sub-title">Form:</div><div class="card-text">{{ companyFiling.form }}</div>
+                            </div>
+                        </a>
                     </div>
-                </v-card>
+                </div>
             </div>
         </div>
-    </div>
-    <div v-if="searchType == 'saved'">
-        <h3 style="margin-left: 15px">Saved Ciks</h3>
-        <div class="scrollable-list">
-            <div v-for="savedCik in savedCiks">
-                <v-card class="card" @click="goToCompanyPage(savedCik)">
-                    <div class="list-item" style="height: 25px;">
-                        <v-card-text class="card-text-sub-title">CIK:</v-card-text><v-card-text class="card-text">{{ savedCik }}</v-card-text>
+        <div v-if="searchType == 'saved'">
+            <div class="scrollable-list">
+                <div v-for="savedCik in savedCiks">
+                    <div class="card">
+                        <a class="a-hidden" :href="'/company/'+savedCik.cik">
+                            <div class="list-item" style="height: 25px;">
+                                <div class="card-text-sub-title">CIK:</div><div class="card-text">{{ savedCik.cik }}</div>
+                                <div class="card-text-sub-title">Name:</div><div class="card-text">{{ savedCik.name }}</div>
+                            </div>
+                        </a>
                     </div>
-                </v-card>
+                </div>
             </div>
         </div>
-    </div>
-    <div v-if="searchType == 'comments'">
-        <h3 style="margin-left: 15px">Recent Comments</h3>
-        <div class="scrollable-list">
-            <div v-for="comment in comments">
-                <v-card class="card">
-                    <div class="list-item">
-                        <v-card-text class="card-text-sub-title">CIK:</v-card-text><v-card-text class="card-text" @click="goToCompanyPage(comment.cik)">{{ comment.cik }}</v-card-text>
-                        <v-card-text class="card-text-sub-title">Username:</v-card-text><v-card-text class="card-text" @click="goToUserPage(comment.userId)">{{ comment.userName }}</v-card-text>
-                        <v-card-text class="card-text-sub-title">Created:</v-card-text><v-card-text class="card-text">{{ comment.created }}</v-card-text>
-                        <br>
-                        <v-card-text class="card-text" style="white-space: pre-line">{{comment.comment}}</v-card-text>
+        <div v-if="searchType == 'comments'">
+            <div class="scrollable-list">
+                <div v-for="comment in comments">
+                    <div class="card">
+                        <div class="list-item">
+                            <UserComment :comment="comment" :jwt="jwt" />
+                        </div>
                     </div>
-                </v-card>
+                </div>
             </div>
         </div>
     </div>
@@ -84,6 +96,7 @@ import type { UserComment } from '@/services/types/UserComment';
 <script lang="ts">
 export default defineComponent({
     name: 'SearchView',
+    emits: ['updateJwt'],
     props: ["jwt"],
     components: {
     },
@@ -91,8 +104,8 @@ export default defineComponent({
         return {
             searchType: "" as String,
             companyFilings: [] as CompanyFilingWithName[],
-            savedCiks: [] as String[],
-            comments: [] as UserComment[],
+            savedCiks: [] as {cik: String, name: String}[],
+            comments: [] as UserCommentWithName[],
             width: window.innerWidth,
             height: window.innerHeight,
             profitOnly: true as Boolean,
@@ -164,24 +177,30 @@ export default defineComponent({
             }
             const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter, false)
             this.companyFilings = responseFilings.data.data.companyFilings
-            await this.getCompanyNames()
+            await this.getCompanyNames(this.companyFilings)
             this.loading = false
         },
-        async getCompanyNames(){
-            for(let filing of this.companyFilings){
-                const nameResponse = await FinanceApi.getCompanyName(filing.cik)
-                filing.name = nameResponse.data.data.companySummaries[0].name
+        async getSavedCiks(){
+            this.savedCiks = []
+            this.loading = true
+            const responseFilings = await UserApi.getSavedCiks(this.jwt)
+            this.savedCiks = responseFilings.data.data.savedCiks.map(function(cik) { return {cik: cik, name: ""} })
+            await this.getCompanyNames(this.savedCiks)
+            this.loading = false
+        },
+        async getComments(){
+            this.comments = []
+            this.loading = true
+            const responseFilings = await UserApi.getRecentComments(this.jwt)
+            this.comments = responseFilings.data.data.userComments
+            await this.getCompanyNames(this.comments)
+            this.loading = false
+        },
+        async getCompanyNames(records: any[]){
+            for(let record of records){
+                const nameResponse = await FinanceApi.getCompanyName(record.cik)
+                record.name = nameResponse.data.data.companySummaries[0].name
             }
-        },
-        getSavedCiks(){
-            UserApi.getSavedCiks(this.jwt).then((response: { data: { data: { savedCiks: String[] } }; status: number; }) => {
-                this.savedCiks = response.data.data.savedCiks
-            })
-        },
-        getComments(){
-            UserApi.getRecentComments(this.jwt).then((response: { data: { data: { userComments: UserComment[] } }; status: number; }) => {
-                this.comments = response.data.data.userComments
-            })
         },
         goToCompanyPage(cik?: String){
             if(cik != null)

@@ -20,6 +20,7 @@ body {
   margin: 5px;
   font-size: 23px;
   font-weight: bold;
+  display: inline-block;
 }
 
 .card-text-sub-title {
@@ -27,6 +28,7 @@ body {
   margin: 5px;
   font-size: 16px;
   font-weight: bold;
+  display: inline-block;
 }
 
 .card-text {
@@ -34,6 +36,7 @@ body {
   margin: 5px;
   font-size: 16px;
   font-weight: normal;
+  display: inline-block;
 }
 
 .loader {
@@ -50,4 +53,13 @@ body {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+a { 
+  color: rgb(125, 162, 255);
+}
+
+.a-hidden {
+  color: inherit;
+  text-decoration: inherit;
 }

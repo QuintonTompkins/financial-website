@@ -107,7 +107,8 @@ CREATE TABLE finance.user_comment (
 CREATE TABLE finance.user_comment_vote (
     comment_id INT REFERENCES finance.user_comment(comment_id),
     user_id INT REFERENCES finance.user(user_id),
-    vote SMALLINT
+    vote SMALLINT,
+    UNIQUE (comment_id, user_id)
 );
 
 CREATE TABLE finance.user_request (

@@ -110,8 +110,6 @@ export function getCompanyComments(cik: String, jwt: any) {
     )
 }
 
-
-
 export function getRecentComments(jwt: any) {
     return axios.post<{ data: { userComments: UserComment[] } }>(BASE_URL+'graphql',
         {
@@ -134,6 +132,58 @@ export function getRecentComments(jwt: any) {
                       "field": "created",
                       "ascending": false
                     }
+                }
+              }
+        },
+        { headers: { Authorization: jwt } }
+    )
+}
+
+export function upVoteComment(jwt: any, commentId: number) {
+    return axios.post<{ data: String }>(BASE_URL+'graphql',
+        {
+            "query": `mutation($commentId: Int!) {
+                            upVoteComment(commentId: $commentId)
+                        }`,
+            "variables": {
+                "commentId": commentId
+              }
+        },
+        { headers: { Authorization: jwt } }
+    )
+}
+
+export function downVoteComment(jwt: any, commentId: number) {
+    return axios.post<{ data: String }>(BASE_URL+'graphql',
+        {
+            "query": `mutation($commentId: Int!) {
+                            downVoteComment(commentId: $commentId)
+                        }`,
+            "variables": {
+                "commentId": commentId
+              }
+        },
+        { headers: { Authorization: jwt } }
+    )
+}
+
+export function getCommentVotes(jwt: any, commentId: number) {
+    return axios.post<{ data: { userComments: UserComment[] } }>(BASE_URL+'graphql',
+        {
+            "query": `query ($input: GenericParameters!) {
+                            userComments(input: $input) {
+                                voteTotal
+                            }
+                        }`,
+            "variables": {
+                "input": {
+                    "filters": [
+                      {
+                        "field": "comment_id",
+                        "comparator": "=",
+                        "value": commentId
+                      }
+                    ]
                 }
               }
         },

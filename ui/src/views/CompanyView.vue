@@ -26,42 +26,43 @@ import type { UserComment } from '@/services/types/UserComment'
 import type { CompanyFiling } from '@/services/types/CompanyFiling';
 import type { CompanyFilingKey } from '@/services/types/CompanyFilingKey'
 import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtensions'
+import UserCommentComp from '@/components/UserComment.vue'
 </script>
 
 <template>
     <div class="view" >
         <div class="left-column" >
-            <v-card class="card">
-                <div style="height: 175px; width: 460px;">
-                    <v-card-title class="card-title">Company Details</v-card-title>
+            <div class="card">
+                <div style="height: 195px; width: 460px;">
+                    <div class="card-title">Company Details</div>
                     <button v-if="!cikIsSaved" @click="addToSavedCik" :disabled="jwt==''">add to saved ciks</button>
                     <button v-if="cikIsSaved" @click="removeSavedCik" :disabled="jwt==''">remove from saved ciks</button>
                     <br>
-                    <v-card-text class="card-text-sub-title">Company Cik:</v-card-text>
+                    <div class="card-text-sub-title company-details">Company Cik:</div>
                         <a :href="`https://www.sec.gov/edgar/browse/?CIK=${cik}`">{{ cik }}</a>
                         <br>
-                    <v-card-text class="card-text-sub-title">Company Name:</v-card-text>
-                        <v-card-text class="card-text">{{ companySummary.name }}</v-card-text>
+                    <div class="card-text-sub-title company-details">Company Name:</div>
+                        <div class="card-text company-details">{{ companySummary.name }}</div>
                         <br>
-                    <v-card-text class="card-text-sub-title">Company Description:</v-card-text>
-                        <v-card-text class="card-text">{{ companySummary.sicDescription }}</v-card-text>
+                    <div class="card-text-sub-title company-details">Company Description:</div>
+                        <div class="card-text company-details">{{ companySummary.sicDescription }}</div>
                         <br>
-                    <v-card-text class="card-text-sub-title">Company State/Country:</v-card-text>
-                        <v-card-text class="card-text">{{ companySummary.stateCountry }}</v-card-text>
+                    <div class="card-text-sub-title company-details">Company State/Country:</div>
+                        <div class="card-text company-details">{{ companySummary.stateCountry }}</div>
                         <br>
-                    <v-card-text class="card-text-sub-title">Company Exchange/Tickers:</v-card-text>
-                        <v-card-text class="card-text"><br>
-                            <div  class="card-text" style="display: inline;" v-for="ticker in companySummary.tickers" :key="ticker.exchange">
+                    <div class="card-text-sub-title company-details">Company Exchange/Tickers:</div>
+                        <div class="card-text company-details">
+                            <div  class="card-text company-details" v-for="ticker in companySummary.tickers" :key="ticker.exchange">
                                 <a v-if="ticker.exchange=='NYSE' || ticker.exchange=='Nasdaq'"
                                     :href="`https://finviz.com/quote.ashx?t=${ticker.ticker}`">({{ ticker.exchange }}:{{ ticker.ticker }})</a>
                                 <div v-if="!(ticker.exchange=='NYSE' || ticker.exchange=='Nasdaq')">({{ ticker.exchange }}:{{ ticker.ticker }})</div>
                             </div>
-                        </v-card-text>
+                        </div>
                 </div>
-            </v-card>
-            <v-card class="card">
+            </div>
+            <div class="card">
                 <div class="filing-height" style="width: 460px;">
-                    <v-card-title class="card-title">Company Filings</v-card-title>
+                    <div class="card-title">Company Filings</div>
                     <input type="checkbox" v-model="tenOnly" style="display: inline;">10-K/10-Q Only</input>
                     <br>
                     <div class="scrollable-tbody filing-list">
@@ -87,12 +88,12 @@ import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtens
                         </table>
                     </div>
                 </div>
-            </v-card>
+            </div>
         </div>
         <div class="right-column" >
-            <v-card class="card">
+            <div class="card">
                 <div class="analysis-height-width">
-                    <v-card-title class="card-title">Company Analysis</v-card-title>
+                    <div class="card-title">Company Analysis</div>
                     <button @click="setCompanyAnalysisView('summary')" >Summary</button>
                     <button @click="setCompanyAnalysisView('comment')" :disabled="!hasCommentorRole">Comments</button>
                     <br>
@@ -121,15 +122,11 @@ import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtens
                     <div v-if="companyView=='comment'"  style="margin: 10px;">
                         <div class="scrollable-comment-list">
                             <div v-for="userComment in userComments">
-                                <v-card class="card">
+                                <div class="card">
                                     <div class="comment-list-item">
-                                        <v-card-text class="card-text-sub-title">{{ userComment.userName }}</v-card-text>
-                                        <v-card-text class="card-text-sub-title">Min Price: {{ userComment.minPrice }}</v-card-text>
-                                        <v-card-text class="card-text-sub-title">Max Price: {{ userComment.maxPrice }}</v-card-text>
-                                        <br>
-                                        <v-card-text class="card-text" style="white-space: pre-line">{{ userComment.comment }}</v-card-text>
+                                        <UserCommentComp :comment="userComment" :jwt="jwt"/>
                                     </div>
-                                </v-card>
+                                </div>
                             </div>
                         </div>
                         <div>
@@ -140,7 +137,7 @@ import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtens
                         </div>
                     </div>
                 </div>
-            </v-card>
+            </div>
         </div>
     </div>
 </template>
@@ -297,6 +294,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.company-details{
+    margin-left: 5px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
 .view {
     display: flex;
 }
@@ -310,7 +313,7 @@ export default defineComponent({
 }
 
 .filing-height {
-    height: v-bind((height-295) + 'px');
+    height: v-bind((height-315) + 'px');
 }
 
 .analysis-height-width {
@@ -319,11 +322,11 @@ export default defineComponent({
 }
 
 .analysis {
-  height: v-bind((height-95) + 'px');
+  height: v-bind((height-145) + 'px');
 }
 
 .filing-list {
-  height: v-bind((height-330) + 'px');
+  height: v-bind((height-355) + 'px');
 }
 
 

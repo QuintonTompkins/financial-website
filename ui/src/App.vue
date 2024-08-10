@@ -113,7 +113,7 @@ export default defineComponent({
 }
 
 .toolbar-disclaimer {
-  width: v-bind((width-350) + 'px');
+  width: v-bind((width-450) + 'px');
   margin: 5px;
   display: inline-block;
   color: red;
