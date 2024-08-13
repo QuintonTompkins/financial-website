@@ -139,6 +139,42 @@ export function getRecentComments(jwt: any) {
     )
 }
 
+export function getUserComments(jwt: any, userId: number) {
+    return axios.post<{ data: { userComments: UserComment[] } }>(BASE_URL+'graphql',
+        {
+            "query": `query ($input: GenericParameters!) {
+                            userComments(input: $input) {
+                                cik,
+                                commentId,
+                                userId,
+                                userName,
+                                comment,
+                                minPrice,
+                                maxPrice,
+                                created,
+                                voteTotal
+                            }
+                        }`,
+            "variables": {
+                "input": {
+                    "filters": [
+                      {
+                        "field": "user_id",
+                        "comparator": "=",
+                        "value": userId
+                      }
+                    ],
+                    "sort": {
+                      "field": "created",
+                      "ascending": false
+                    }
+                }
+              }
+        },
+        { headers: { Authorization: jwt } }
+    )
+}
+
 export function upVoteComment(jwt: any, commentId: number) {
     return axios.post<{ data: String }>(BASE_URL+'graphql',
         {

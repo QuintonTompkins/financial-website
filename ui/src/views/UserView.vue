@@ -19,11 +19,20 @@
 import { defineComponent } from 'vue'
 
 import * as UserApi from '@/services/UserApi.js'
-import type { UserComment } from '@/services/types/UserComment'
+import * as FinanceApi from '@/services/FinanceApi.js'
+import type { UserCommentWithName } from '@/services/types/UserCommentExtensions';
+import UserComment from '@/components/UserComment.vue'
 </script>
 
 <template>
-    <div> TO DO
+    <div class="scrollable-list">
+        <div v-for="comment in comments">
+            <div class="card card-width">
+                <div class="list-item">
+                    <UserComment :comment="comment" :jwt="jwt" />
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -35,9 +44,10 @@ export default defineComponent({
     },
     data() {
         return {
-            userId: this.$route.params.userId as String,
+            userId: +this.$route.params.userId as number,
             width: window.innerWidth,
             height: window.innerHeight,
+            comments: [] as UserCommentWithName[],
         };
     },
     mounted() {
@@ -45,12 +55,31 @@ export default defineComponent({
             this.width = window.innerWidth
             this.height = window.innerHeight
         })
+        this.getComments()
     },
     methods: {
+        async getComments(){
+            this.comments = []
+            const responseFilings = await UserApi.getUserComments(this.jwt, this.userId)
+            this.comments = responseFilings.data.data.userComments
+            await this.getCompanyNames(this.comments)
+        },
+        async getCompanyNames(records: any[]){
+            for(let record of records){
+                const nameResponse = await FinanceApi.getCompanyName(record.cik)
+                record.name = nameResponse.data.data.companySummaries[0].name
+            }
+        },
     }
 });
 </script>
 
 <style scoped>
-
+.scrollable-list {
+  height: v-bind((height-60) + 'px');
+  overflow-y: auto;
+}
+.card-width{
+    width: v-bind((width-30) + 'px');
+}
 </style>

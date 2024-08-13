@@ -2,9 +2,8 @@
 
 The goal of this application is to provide the following.
 
-1. The application should support value investing goals and evaluation of company fundamentals
-2. The application should support user engagement on value investing
-3. The application should not allow low effort user engagement
+1. The application should support value investing goals and the evaluation of company fundamentals.
+2. The application should encourage user engagement in value investing while avoiding low-effort interactions.
 
 # Disclaimer
 

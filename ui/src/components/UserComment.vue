@@ -24,20 +24,16 @@ import type { UserComment } from '@/services/types/UserComment';
 
 <template>
     <div>
-        <a v-if="comment.cik" class="a-hidden" :href="'/company/'+comment.cik" style="display: inline-block;">
-            <div class="card-text-sub-title">CIK:</div>
-            <div class="card-text">{{ comment.cik }}</div>
-        </a>
-        <div v-if="comment.name" class="a-hidden" style="display: inline-block;">
-            <div class="card-text-sub-title">Name:</div>
-            <div class="card-text">{{ comment.name }}</div>
-        </div>
-        <a class="a-hidden" :href="'/user/'+comment.userId" style="display: inline-block;">
-            <div class="card-text-sub-title">Username:</div>
-            <div class="card-text">{{ comment.userName }}</div>
-        </a>
+        <div v-if="comment.cik"class="card-text-sub-title">CIK:</div>
+        <a v-if="comment.cik" :href="'/company/'+comment.cik" style="display: inline-block;">{{ comment.cik }}</a>
+        <div v-if="comment.cik && comment.name" class="card-text-sub-title">Name:</div>
+        <div v-if="comment.cik && comment.name" class="card-text" style="display: inline-block;">{{ comment.name }}</div>
+        <div class="card-text-sub-title">Username:</div>
+        <a :href="'/user/'+comment.userId" style="display: inline-block;">{{ comment.userName }}</a>
         <div class="card-text-sub-title">Created:</div>
         <div class="card-text">{{ comment.created }}</div>
+        <div class="card-text-sub-title">Price Range:</div>
+        <div class="card-text">${{ comment.minPrice }} to ${{ comment.maxPrice }}</div>
         
         <div class="vote-block">
             <img src="/arrow-sm-up-svgrepo-com.svg" alt="up vote" @click="upVote()"/>
