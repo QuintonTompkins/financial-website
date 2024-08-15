@@ -28,9 +28,13 @@ import UserComment from '@/components/UserComment.vue'
 
 <template>
     <div style="margin:15px;">
-        <button @click="searchType='recent'">Recent Filings</button>
-        <button @click="searchType='saved'" :disabled="jwt==''">Saved Ciks</button>
-        <button @click="searchType='comments'" :disabled="!hasCommentorRole">Recent Comments</button>
+        <v-card style="width: 387px;">
+            <v-btn-toggle color="primary" v-model="searchType" borderless variant="outlined">
+                <v-btn color="primary" size="small" value="recent" :disabled="loading == true">Recent Filings</v-btn>
+                <v-btn color="primary" size="small" value="saved" :disabled="jwt=='' || loading == true">Saved Ciks</v-btn>
+                <v-btn color="primary" size="small" value="comments" :disabled="!hasCommentorRole || loading == true">Recent Comments</v-btn>
+            </v-btn-toggle>
+        </v-card>
     </div>
     <div style="margin-left: 15px">
         <div v-if="searchType == 'recent'">
@@ -44,15 +48,15 @@ import UserComment from '@/components/UserComment.vue'
         <div v-if="searchType == 'comments'">
             <h3>Recent Comments</h3>
         </div>
-        <div v-if="loading" class="loader"  style="margin: 15px"></div>
+        <v-progress-linear v-if="loading" color="primary" indeterminate class="loader"></v-progress-linear>
     </div>
     <div v-if="!loading">
         <div v-if="searchType == 'recent'">
             <div class="scrollable-list">
                 <div v-for="companyFiling in companyFilings">
-                    <div class="card">
+                    <v-card style="margin: 10px;" variant="elevated">
                         <a class="a-hidden" :href="'/company/'+companyFiling.cik">
-                            <div class="list-item" style="height: 25px;">
+                            <div class="list-item" style="height: 30px;">
                                 <div class="card-text-sub-title">CIK:</div><div class="card-text">{{ companyFiling.cik }}</div>
                                 <div class="card-text-sub-title">Name:</div><div class="card-text">{{ companyFiling.name }}</div>
                                 <div class="card-text-sub-title">Accession Number:</div><div class="card-text">{{ companyFiling.accessionNumber }}</div>
@@ -61,32 +65,32 @@ import UserComment from '@/components/UserComment.vue'
                                 <div class="card-text-sub-title">Form:</div><div class="card-text">{{ companyFiling.form }}</div>
                             </div>
                         </a>
-                    </div>
+                    </v-card>
                 </div>
             </div>
         </div>
         <div v-if="searchType == 'saved'">
             <div class="scrollable-list">
                 <div v-for="savedCik in savedCiks">
-                    <div class="card">
+                    <v-card style="margin: 10px;" variant="elevated">
                         <a class="a-hidden" :href="'/company/'+savedCik.cik">
-                            <div class="list-item" style="height: 25px;">
+                            <div class="list-item" style="height: 30px;">
                                 <div class="card-text-sub-title">CIK:</div><div class="card-text">{{ savedCik.cik }}</div>
                                 <div class="card-text-sub-title">Name:</div><div class="card-text">{{ savedCik.name }}</div>
                             </div>
                         </a>
-                    </div>
+                    </v-card>
                 </div>
             </div>
         </div>
         <div v-if="searchType == 'comments'">
             <div class="scrollable-list">
                 <div v-for="comment in comments">
-                    <div class="card">
+                    <v-card>
                         <div class="list-item">
                             <UserComment :comment="comment" :jwt="jwt" />
                         </div>
-                    </div>
+                    </v-card>
                 </div>
             </div>
         </div>
@@ -221,5 +225,9 @@ export default defineComponent({
 }
 .list-item{
     width: v-bind((width-50) + 'px');
+}
+.loader{
+    width: v-bind((width-50) + 'px');
+    margin: 15px;
 }
 </style>

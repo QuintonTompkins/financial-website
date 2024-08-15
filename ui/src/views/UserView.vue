@@ -27,11 +27,11 @@ import UserComment from '@/components/UserComment.vue'
 <template>
     <div class="scrollable-list">
         <div v-for="comment in comments">
-            <div class="card card-width">
+            <v-card class="card-width">
                 <div class="list-item">
                     <UserComment :comment="comment" :jwt="jwt" />
                 </div>
-            </div>
+            </v-card>
         </div>
     </div>
 </template>

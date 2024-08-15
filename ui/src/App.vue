@@ -23,14 +23,27 @@ import { jwtDecode } from "jwt-decode";
 </script>
 
 <template>
-  <div v-if="isMobileDevice()">
-    This website is not intended for mobile devices.
-  </div>
-  <div v-if="!isMobileDevice()">
-    <div class="toolbar">
-      <router-link to="/"><button class="toolbar-nav-button">Home</button></router-link>
-      <router-link to="/search"><button class="toolbar-nav-button">Search</button></router-link>
-      <router-link to="/account"><button class="toolbar-nav-button">{{jwt != '' ? userName : 'Login'}}</button></router-link>
+  <v-app>
+    <div v-if="isMobileDevice()">
+      This website is not intended for mobile devices.
+    </div>
+    <div v-if="!isMobileDevice()">
+      <v-menu>
+        <template v-slot:activator="{ props }">
+          <v-btn color="primary" icon="mdi-menu" size="small" class="toolbar-menu-button" v-bind="props" variant="outlined"></v-btn>
+        </template>
+        <v-list>
+          <v-list-item>
+            <router-link to="/"><v-btn color="primary" class="nav-button" variant="outlined">Home</v-btn></router-link>
+          </v-list-item>
+          <v-list-item>
+            <router-link to="/search"><v-btn color="primary" class="nav-button" variant="outlined">Search</v-btn></router-link>
+          </v-list-item>
+          <v-list-item>
+            <router-link to="/account"><v-btn color="primary" class="nav-button" variant="outlined">{{jwt != '' ? userName : 'Login'}}</v-btn></router-link>
+          </v-list-item>
+        </v-list>
+      </v-menu>
       <div class="toolbar-disclaimer">Nothing on this application should be considered financial advice. Data is provided by the SEC 
         and nothing in the application verifies or validates the information provided. Comments on this application should be assumed
         to be the opinion of the commentor and not financial advice from the application or its owner.</div>
@@ -38,7 +51,7 @@ import { jwtDecode } from "jwt-decode";
     <RouterView @updateJwt="updateJwt" v-slot="{ Component }">
       <component :is="Component" :jwt=jwt />
     </RouterView>
-  </div>
+  </v-app>
 </template>
 
 <script lang="ts">
@@ -106,15 +119,20 @@ export default defineComponent({
   border-color: black;
 }
 
-.toolbar-nav-button {
+.nav-button {
   height: 35px;
   width: 100px;
-  margin: 5px;
+}
+
+.toolbar-menu-button {
+  vertical-align: top;
+  margin-right: 15px;
+  margin-top: 5px;
+  margin-left: 5px;
 }
 
 .toolbar-disclaimer {
-  width: v-bind((width-450) + 'px');
-  margin: 5px;
+  width: v-bind((width-150) + 'px');
   display: inline-block;
   color: red;
   font-size: 14px;

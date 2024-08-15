@@ -15,16 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-import { registerPlugins } from '@/plugins'
-import { createApp } from 'vue'
 
-import './assets/main.css'
-import App from './App.vue'
-import router from './router'
+/// <reference types="vite/client" />
 
-const app = createApp(App)
-
-app.use(router)
-registerPlugins(app)
-
-app.mount('#app')
+declare module '*.vue' {
+  import type { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}

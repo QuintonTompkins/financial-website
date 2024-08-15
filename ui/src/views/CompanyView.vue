@@ -32,11 +32,11 @@ import UserCommentComp from '@/components/UserComment.vue'
 <template>
     <div class="view" >
         <div class="left-column" >
-            <div class="card">
-                <div style="height: 195px; width: 460px;">
+            <v-card style="margin: 10px;">
+                <div style="height: 195px; width: 480px;">
                     <div class="card-title">Company Details</div>
-                    <button v-if="!cikIsSaved" @click="addToSavedCik" :disabled="jwt==''">add to saved ciks</button>
-                    <button v-if="cikIsSaved" @click="removeSavedCik" :disabled="jwt==''">remove from saved ciks</button>
+                    <v-icon color="green" icon="mdi-bookmark-plus" size="large" v-if="!cikIsSaved" @click="addToSavedCik" :disabled="jwt==''"></v-icon>
+                    <v-icon color="red" icon="mdi-bookmark-remove" size="large" v-if="cikIsSaved" @click="removeSavedCik" :disabled="jwt==''"></v-icon>
                     <br>
                     <div class="card-text-sub-title company-details">Company Cik:</div>
                         <a :href="`https://www.sec.gov/edgar/browse/?CIK=${cik}`">{{ cik }}</a>
@@ -59,9 +59,9 @@ import UserCommentComp from '@/components/UserComment.vue'
                             </div>
                         </div>
                 </div>
-            </div>
-            <div class="card">
-                <div class="filing-height" style="width: 460px;">
+            </v-card>
+            <v-card style="margin: 10px; margin-top: 23px;">
+                <div class="filing-height" style="width: 480px;">
                     <div class="card-title">Company Filings</div>
                     <input type="checkbox" v-model="tenOnly" style="display: inline;">10-K/10-Q Only</input>
                     <br>
@@ -88,14 +88,18 @@ import UserCommentComp from '@/components/UserComment.vue'
                         </table>
                     </div>
                 </div>
-            </div>
+            </v-card>
         </div>
         <div class="right-column" >
-            <div class="card">
+            <v-card style="margin: 10px;">
                 <div class="analysis-height-width">
-                    <div class="card-title">Company Analysis</div>
-                    <button @click="setCompanyAnalysisView('summary')" >Summary</button>
-                    <button @click="setCompanyAnalysisView('comment')" :disabled="!hasCommentorRole">Comments</button>
+                    <div class="card-title" style="margin-left: 10px;">Company Analysis</div>
+                    <v-card class="analysis-toggle" variant="tonal">
+                        <v-btn-toggle v-model="companyView" color="primary" variant="outlined">
+                            <v-btn size="small" value="summary" >Summary</v-btn>
+                            <v-btn size="small" value="comment" :disabled="!hasCommentorRole">Comments</v-btn>
+                        </v-btn-toggle>
+                    </v-card>
                     <br>
                     <div v-if="companyView=='summary'">
                         <div class="scrollable-tbody analysis">
@@ -119,25 +123,23 @@ import UserCommentComp from '@/components/UserComment.vue'
                             </table>
                         </div>
                     </div>
-                    <div v-if="companyView=='comment'"  style="margin: 10px;">
+                    <div v-if="companyView=='comment'" style="margin-right: 20px;">
                         <div class="scrollable-comment-list">
-                            <div v-for="userComment in userComments">
-                                <div class="card">
-                                    <div class="comment-list-item">
-                                        <UserCommentComp :comment="userComment" :jwt="jwt"/>
-                                    </div>
+                            <v-card style="margin: 10px;" variant="tonal" v-for="userComment in userComments">
+                                <div class="comment-list-item">
+                                    <UserCommentComp :comment="userComment" :jwt="jwt"/>
                                 </div>
-                            </div>
+                            </v-card>
                         </div>
-                        <div>
-                            <textarea v-model="newComment.minPrice" placeholder="Min Price"></textarea>
-                            <textarea v-model="newComment.maxPrice" placeholder="Max Price"></textarea>
-                            <textarea v-model="newComment.commentText" placeholder="Comment" style="width: 500px;"></textarea>
-                            <button @click="submitComment">Submit</button>
+                        <div style="margin-top: 15px;">
+                            <v-text-field v-model="newComment.minPrice" placeholder="Min Price" style="margin-left: 5px; width: 120px; display: inline-block;"></v-text-field>
+                            <v-text-field v-model="newComment.maxPrice" placeholder="Max Price" style="margin-left: 5px; width: 120px; display: inline-block;"></v-text-field>
+                            <v-text-field v-model="newComment.commentText" placeholder="Comment" style="margin-left: 5px; width: 500px; display: inline-block;" maxlength="10000"></v-text-field>
+                            <v-btn color="primary" @click="submitComment" style="margin-left: 5px; display: inline-block; vertical-align: top;">Submit</v-btn>
                         </div>
                     </div>
                 </div>
-            </div>
+            </v-card>
         </div>
     </div>
 </template>
@@ -192,6 +194,10 @@ export default defineComponent({
     watch: {
         tenOnly(newVal, oldVal){
             this.getCompanyFilings()
+        },
+        companyView(newVal, oldVal){
+            if(newVal == 'comment')
+                this.getComments()
         },
         jwt: {
             immediate: true, 
@@ -272,11 +278,6 @@ export default defineComponent({
                 this.cikIsSaved = response.data.data.savedCiks.includes(this.cik)
             })
         },
-        setCompanyAnalysisView(view: String){
-            this.companyView = view;
-            if(view == 'comment')
-                this.getComments()
-        },
         submitComment(){
             UserApi.addComment(this.cik, this.newComment.minPrice, this.newComment.maxPrice, this.newComment.commentText,  this.jwt)
                 .then((response: { data: { data: String }; status: number; }) => {
@@ -305,19 +306,19 @@ export default defineComponent({
 }
 
 .left-column {
-    width: 485px;
+    width: 505px;
 }
 
 .right-column {
-    width: v-bind((width-510) + 'px');
+    width: v-bind((width-530) + 'px');
 }
 
 .filing-height {
-    height: v-bind((height-315) + 'px');
+    height: v-bind((height-319) + 'px');
 }
 
 .analysis-height-width {
-    width: v-bind((width-510) + 'px');
+    width: v-bind((width-530) + 'px');
     height: v-bind((height-97) + 'px');
 }
 
@@ -328,7 +329,6 @@ export default defineComponent({
 .filing-list {
   height: v-bind((height-355) + 'px');
 }
-
 
 .scrollable-tbody {
   overflow-y: auto;
@@ -352,11 +352,19 @@ th, td {
 }
 
 .scrollable-comment-list {
-  height: v-bind((height-200) + 'px');
+  height: v-bind((height-250) + 'px');
   overflow-y: auto;
 }
 .comment-list-item{
-    width: v-bind((width-565) + 'px');
+    width: v-bind((width-605) + 'px');
     margin: 5px;
+}
+
+.analysis-toggle {
+    width: 190px;
+    display: inline-block;
+    margin-left: 25px;
+    margin-top: 5px;
+    vertical-align: bottom;
 }
 </style>

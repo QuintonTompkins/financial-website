@@ -15,16 +15,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-import { registerPlugins } from '@/plugins'
-import { createApp } from 'vue'
+import type { App } from 'vue'
 
-import './assets/main.css'
-import App from './App.vue'
-import router from './router'
+import vuetify from './vuetify'
 
-const app = createApp(App)
-
-app.use(router)
-registerPlugins(app)
-
-app.mount('#app')
+export function registerPlugins (app: App) {
+  app.use(vuetify)
+}

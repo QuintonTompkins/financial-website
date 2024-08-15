@@ -24,39 +24,39 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
     <div class="scrollable-list" style="margin: 15px;">
         <div v-if="jwt == ''">
             <h4>Login</h4>
-            <input type="text" placeholder="Username/Email" v-model="usernameEmail"></input><br>
-            <input type="text" placeholder="Password" v-model="passwordLogin"></input><br>
-            <button @click="login">login</button><br>
+            <v-text-field type="text" placeholder="Username/Email" v-model="usernameEmail"></v-text-field><br>
+            <v-text-field type="text" placeholder="Password" v-model="passwordLogin"></v-text-field><br>
+            <v-btn color="primary" @click="login">login</v-btn><br>
             <h4>Create User</h4>
-            <input type="text" placeholder="Username" v-model="username"></input><br>
-            <input type="text" placeholder="Email" v-model="email"></input><br>
-            <input type="text" placeholder="Password" v-model="passwordCreate"></input><br>
-            <button @click="createUser">create user</button><br>
+            <v-text-field type="text" placeholder="Username" v-model="username"></v-text-field><br>
+            <v-text-field type="text" placeholder="Email" v-model="email"></v-text-field><br>
+            <v-text-field type="text" placeholder="Password" v-model="passwordCreate"></v-text-field><br>
+            <v-btn color="primary" @click="createUser">create user</v-btn><br>
             <h4>Reset Password</h4>
-            <input type="text" placeholder="Email" v-model="emailReset"></input><br>
-            <button @click="resetPassword">reset password</button>
+            <v-text-field type="text" placeholder="Email" v-model="emailReset"></v-text-field><br>
+            <v-btn color="primary" @click="resetPassword">reset password</v-btn>
         </div>
         <div v-if="jwt != ''">
             <h4>Update Password</h4>
-            <input type="text" placeholder="Email" v-model="emailPassword"></input><br>
-            <input type="text" placeholder="Old Password" v-model="oldPassword"></input><br>
-            <input type="text" placeholder="New Password" v-model="newPassword1"></input><br>
-            <input type="text" placeholder="New Password again" v-model="newPassword2"></input><br>
-            <button :disabled="newPassword1 != newPassword2" @click="updatePassword">update password</button><br>
+            <v-text-field type="text" placeholder="Email" v-model="emailPassword"></v-text-field><br>
+            <v-text-field type="text" placeholder="Old Password" v-model="oldPassword"></v-text-field><br>
+            <v-text-field type="text" placeholder="New Password" v-model="newPassword1"></v-text-field><br>
+            <v-text-field type="text" placeholder="New Password again" v-model="newPassword2"></v-text-field><br>
+            <v-btn color="primary" :disabled="newPassword1 != newPassword2" @click="updatePassword">update password</v-btn><br>
             <h4>Update Username</h4>
-            <input type="text" placeholder="Username" v-model="newUsername"></input><br>
-            <button @click="updateUsername">update username</button>
+            <v-text-field type="text" placeholder="Username" v-model="newUsername"></v-text-field><br>
+            <v-btn color="primary" @click="updateUsername">update username</v-btn>
             <h4>Update Email</h4>
-            <input type="text" placeholder="Email" v-model="newEmail"></input><br>
-            <button @click="updateEmail">update email</button>
+            <v-text-field type="text" placeholder="Email" v-model="newEmail"></v-text-field><br>
+            <v-btn color="primary" @click="updateEmail">update email</v-btn>
             <h4>Request Commentor Status</h4>
-            <input type="text" placeholder="Reason" v-model="reason" style="width: 500px; height: 50px;"></input><br>
-            <button @click="requestCommentor">request commentor status</button>
+            <v-text-field type="text" placeholder="Reason" v-model="reasonStatus"></v-text-field><br>
+            <v-btn color="primary" @click="requestCommentor">request commentor status</v-btn>
             <h4>Report Data/Website Issue</h4>
-            <input type="text" placeholder="Reason" v-model="reason" style="width: 500px; height: 50px;"></input><br>
-            <button @click="reportIssue">report issue</button>
+            <v-text-field type="text" placeholder="Reason" v-model="reasonIssue"></v-text-field><br>
+            <v-btn color="primary" @click="reportIssue">report issue</v-btn>
             <h4>Logout</h4>
-            <button @click="logout">Logout</button>
+            <v-btn color="primary" @click="logout">Logout</v-btn>
         </div>
     </div>
 </template>
@@ -83,7 +83,8 @@ export default defineComponent({
             newPassword2: "" as string,
             newUsername: "" as string,
             newEmail: "" as string,
-            reason: "" as string,
+            reasonStatus: "" as string,
+            reasonIssue: "" as string,
             width: window.innerWidth,
             height: window.innerHeight
         };
@@ -141,12 +142,12 @@ export default defineComponent({
             this.newEmail = ""
         },
         requestCommentor(){
-            AuthorizationApi.requestCommentorStatus(this.reason,this.jwt).then((response: { status: number; }) => {})
-            this.reason = ""
+            AuthorizationApi.requestCommentorStatus(this.reasonStatus,this.jwt).then((response: { status: number; }) => {})
+            this.reasonStatus = ""
         },
         reportIssue(){
-            AuthorizationApi.reportIssue(this.reason,this.jwt).then((response: { status: number; }) => {})
-            this.reason = ""
+            AuthorizationApi.reportIssue(this.reasonIssue,this.jwt).then((response: { status: number; }) => {})
+            this.reasonIssue = ""
         },
         logout(){
             this.$emit('updateJwt',"")

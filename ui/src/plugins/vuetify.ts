@@ -15,16 +15,28 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-import { registerPlugins } from '@/plugins'
-import { createApp } from 'vue'
+import '@mdi/font/css/materialdesignicons.css'
+import 'vuetify/styles'
 
-import './assets/main.css'
-import App from './App.vue'
-import router from './router'
+import { createVuetify } from 'vuetify'
 
-const app = createApp(App)
+const customTheme = {
+  dark: true,
+  colors: {
+    primary: '#03a9f4',
+    secondary: '#00bcd4',
+    surface: '#353535',
+    background: '#494949',
+  },
+  variables: {
+  }
+}
 
-app.use(router)
-registerPlugins(app)
-
-app.mount('#app')
+export default createVuetify({
+  theme: {
+    defaultTheme: 'customTheme',
+    themes: {
+      customTheme,
+    },
+  },
+})
