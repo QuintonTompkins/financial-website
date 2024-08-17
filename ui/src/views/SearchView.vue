@@ -230,7 +230,7 @@ export default defineComponent({
 
 <style scoped>
 .scrollable-list {
-  height: v-bind((height-160) + 'px');
+  height: v-bind((height-175) + 'px');
   overflow-y: auto;
 }
 .list-item{
