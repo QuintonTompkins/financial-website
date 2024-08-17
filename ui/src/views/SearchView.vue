@@ -164,6 +164,16 @@ export default defineComponent({
             this.loading = true
             let recentGenericFilters = [] as GenericFilter[]
             let recentCompanyFilingDataFilter = [] as CompanyFilingDataFilter[]
+            
+            let date = new Date();
+            date.setDate(date.getDate() - 14);
+            let filterDate: String = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' +  date.getDate()
+            recentGenericFilters.push({
+                field: "filing_date",
+                comparator: ">",
+                value: filterDate
+            })
+
             if(this.annualOnly){
                 recentGenericFilters.push({
                     field: "form",

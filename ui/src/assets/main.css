@@ -16,19 +16,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 .v-overlay__content {
-  border-top: 2px solid black !important;
-  border-bottom: 2px solid black !important;
-  border-left: 2px solid black !important;
-  border-right: 2px solid black !important;
+  border: 2px solid black !important;
   box-shadow: 3px 6px 10px black !important;
 }
 
 .v-card {
-  border-style: solid;
-  border-top: 2px solid black !important;
-  border-bottom: 2px solid black !important;
-  border-left: 2px solid black !important;
-  border-right: 2px solid black !important;
+  border: 2px solid black !important;
   margin: 10px;
   box-shadow: 3px 6px 10px black !important;
 }

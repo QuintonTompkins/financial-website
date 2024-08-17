@@ -17,6 +17,7 @@
 */
 package finance.models;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -61,8 +62,11 @@ public class GenericParameters {
         for( int j = 0 ; j < filters.size() ; j++, i++){
             String field = filters.get(j).getField();
             Object value = filters.get(j).getValue();
-            if(stringColumnList.contains(field) || dateColumnList.contains(field)){
+            if(stringColumnList.contains(field)){
                 statement.setString(i, (String) value);
+            }
+            if(dateColumnList.contains(field)){
+                statement.setDate(i, Date.valueOf((String)value));
             }
             if(numericColumnList.contains(field)){
                 statement.setInt(i, (int) value );

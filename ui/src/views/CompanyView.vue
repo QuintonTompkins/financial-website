@@ -93,7 +93,7 @@ import UserCommentComp from '@/components/UserComment.vue'
         <div class="right-column" >
             <v-card style="margin: 10px;">
                 <div class="analysis-height-width">
-                    <div class="card-title" style="margin-left: 10px;">Company Analysis</div>
+                    <div class="card-title" style="margin-left: 10px; vertical-align: top;">Company Analysis</div>
                     <v-card class="analysis-toggle" variant="tonal">
                         <v-btn-toggle v-model="companyView" color="primary" variant="outlined">
                             <v-btn size="small" value="summary" >Summary</v-btn>
