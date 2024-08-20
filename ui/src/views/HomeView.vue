@@ -23,8 +23,9 @@ import { defineComponent } from 'vue'
     <div class="scrollable-list" style="margin: 15px;">
         <v-card style="margin: 20px;">
             <div style="margin: 15px;">
-                <h1>Welcome to Quinton's Financial Website!</h1>
-                <div>
+                <div v-if="isMobileDevice()">This website is not intended for mobile devices or touch screens. Please switch devices to view.</div>
+                <h1 v-if="!isMobileDevice()">Welcome to Quinton's Financial Website!</h1>
+                <div v-if="!isMobileDevice()">
                     Besides having one of the most creative website names ever, you may also find some useful utilities on this site. This website was created with the following goals in mind:
                     <br>
                     <br>
@@ -90,6 +91,13 @@ export default defineComponent({
         })
     },
     methods: {
+      isMobileDevice(){
+        var hasTouchScreen = false
+        if ("maxTouchPoints" in navigator) {
+            hasTouchScreen = navigator.maxTouchPoints > 0
+        }
+        return hasTouchScreen
+      }
     }
 });
 </script>

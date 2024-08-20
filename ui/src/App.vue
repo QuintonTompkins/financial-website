@@ -24,9 +24,6 @@ import { jwtDecode } from "jwt-decode";
 
 <template>
   <v-app>
-    <div v-if="isMobileDevice()">
-      This website is not intended for mobile devices.
-    </div>
     <div v-if="!isMobileDevice()">
       <v-menu>
         <template v-slot:activator="{ props }">
