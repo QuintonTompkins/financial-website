@@ -26,6 +26,14 @@
   box-shadow: 3px 6px 10px black !important;
 }
 
+.v-expansion-panel {
+  border: 2px solid black !important;
+}
+
+.v-expansion-panel-title {
+  border-bottom: 2px solid black !important;
+}
+
 .card-title {
   margin: 5px;
   font-size: 23px;
