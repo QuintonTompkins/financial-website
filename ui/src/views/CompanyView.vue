@@ -208,6 +208,7 @@ export default defineComponent({
                 }
                 else{
                     this.hasCommentorRole = false
+                    this.companyView = 'summary'
                 }
             }
         }

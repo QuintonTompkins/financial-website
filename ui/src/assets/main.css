@@ -59,3 +59,20 @@
   color: inherit;
   text-decoration: inherit;
 }
+
+.v-table__wrapper {
+  box-shadow: 3px 6px 10px black !important;
+}
+
+.v-data-table__th {
+  background-color: #252525 !important;
+  border: 2px solid black !important;
+}
+
+.v-data-table__td {
+  border: 1px solid black;
+}
+
+tr:nth-child(even) {
+  background-color: #4d4d4d;
+}

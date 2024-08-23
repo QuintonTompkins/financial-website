@@ -82,7 +82,6 @@ export default defineComponent({
         this.jwt = newJwt
         localStorage.setItem('jwt', this.jwt);
         if(this.jwt == ""){
-          this.jwt = ""
           this.jwtExpiration = 0
           this.userName = ""
         }
@@ -93,7 +92,7 @@ export default defineComponent({
         }
       },
       checkForExpiredJwt(){
-        if(this.jwtExpiration != 0 && this.jwtExpiration < Date.now()){
+        if(this.jwt != "" && this.jwtExpiration != 0 && this.jwtExpiration < Date.now()){
           this.updateJwt("")
         }
       },
@@ -131,7 +130,7 @@ export default defineComponent({
 .toolbar-disclaimer {
   width: v-bind((width-150) + 'px');
   display: inline-block;
-  color: red;
+  color: #ff0000;
   font-size: 14px;
 }
 </style>

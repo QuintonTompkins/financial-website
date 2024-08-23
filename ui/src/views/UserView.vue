@@ -50,6 +50,16 @@ export default defineComponent({
             comments: [] as UserCommentWithName[],
         };
     },
+    watch: {
+        jwt: {
+            immediate: true, 
+            handler (newVal, oldVal) {
+                if(newVal == ""){
+                    this.$router.push(`/`)
+                }
+            }
+        }
+    },
     mounted() {
         window.addEventListener('resize', () => {
             this.width = window.innerWidth

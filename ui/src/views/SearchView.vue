@@ -51,23 +51,18 @@ import UserComment from '@/components/UserComment.vue'
         <v-progress-linear v-if="loading" color="primary" indeterminate class="loader"></v-progress-linear>
     </div>
     <div v-if="!loading">
-        <div v-if="searchType == 'recent'">
-            <div class="scrollable-list">
-                <div v-for="companyFiling in companyFilings">
-                    <v-card style="margin: 10px;" variant="elevated">
-                        <a class="a-hidden" :href="'/company/'+companyFiling.cik">
-                            <div class="list-item" style="height: 30px;">
-                                <div class="card-text-sub-title">CIK:</div><div class="card-text">{{ companyFiling.cik }}</div>
-                                <div class="card-text-sub-title">Name:</div><div class="card-text">{{ companyFiling.name }}</div>
-                                <div class="card-text-sub-title">Accession Number:</div><div class="card-text">{{ companyFiling.accessionNumber }}</div>
-                                <div class="card-text-sub-title">Filing Date:</div><div class="card-text">{{ companyFiling.filingDate }}</div>
-                                <div class="card-text-sub-title">Report Date:</div><div class="card-text">{{ companyFiling.reportDate }}</div>
-                                <div class="card-text-sub-title">Form:</div><div class="card-text">{{ companyFiling.form }}</div>
-                            </div>
-                        </a>
-                    </v-card>
-                </div>
-            </div>
+        <div v-if="searchType == 'recent'" class="scrollable-tbody">
+            <v-data-table-virtual
+                :headers="companyFilingsHeaders"
+                :items="companyFilings"
+                class="recent-table"
+                fixed-header>
+                <template #item.cik="{ item }">
+                    <a :href="'/company/'+item.cik">
+                        {{ item.cik }}
+                    </a>
+                </template>
+            </v-data-table-virtual>
         </div>
         <div v-if="searchType == 'saved'">
             <div class="scrollable-list">
@@ -107,6 +102,14 @@ export default defineComponent({
     data() {
         return {
             searchType: "" as String,
+            companyFilingsHeaders: [
+                {title: 'CIK', key: 'cik'},
+                {title: 'Name', key: 'name'},
+                {title: 'Accession Number', key: 'accessionNumber'},
+                {title: 'Filing Date', key: 'filingDate'},
+                {title: 'Report Date', key: 'reportDate'},
+                {title: 'Form', key: 'form'}
+            ],
             companyFilings: [] as CompanyFilingWithName[],
             savedCiks: [] as {cik: String, name: String}[],
             comments: [] as UserCommentWithName[],
@@ -147,6 +150,7 @@ export default defineComponent({
                 }
                 else{
                     this.hasCommentorRole = false
+                    this.searchType = ''
                 }
             }
         }
@@ -240,4 +244,11 @@ export default defineComponent({
     width: v-bind((width-50) + 'px');
     margin: 15px;
 }
+.recent-table {
+    width: v-bind((width-50) + 'px');
+    height: v-bind((height-195) + 'px');
+    margin-left: 25px;
+    margin-top: 15px;
+}
+
 </style>
