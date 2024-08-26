@@ -39,8 +39,12 @@ import UserComment from '@/components/UserComment.vue'
     <div style="margin-left: 15px">
         <div v-if="searchType == 'recent'">
             <h3 style="display: inline">Recent Filings</h3>
-            <input type="checkbox" v-model="profitOnly" style="display: inline;">Profitable Only</input>
-            <input type="checkbox" v-model="annualOnly" style="display: inline;">10-K Only</input>
+            <div style="display: inline-block; vertical-align: bottom;">
+                <v-checkbox-btn label="Profitable Only" v-model="profitOnly" color="primary"/>
+            </div>
+            <div style="display: inline-block; vertical-align: bottom;">
+                <v-checkbox-btn label="10-K Only" v-model="annualOnly" color="primary"/>
+            </div>
         </div>
         <div v-if="searchType == 'saved'">
             <h3>Saved Ciks</h3>
@@ -55,28 +59,27 @@ import UserComment from '@/components/UserComment.vue'
             <v-data-table-virtual
                 :headers="companyFilingsHeaders"
                 :items="companyFilings"
-                class="recent-table"
+                class="search-table"
                 fixed-header>
                 <template #item.cik="{ item }">
                     <a :href="'/company/'+item.cik">
-                        {{ item.cik }}
+                        <v-btn color="primary">{{item.cik}}</v-btn>
                     </a>
                 </template>
             </v-data-table-virtual>
         </div>
-        <div v-if="searchType == 'saved'">
-            <div class="scrollable-list">
-                <div v-for="savedCik in savedCiks">
-                    <v-card style="margin: 10px;" variant="elevated">
-                        <a class="a-hidden" :href="'/company/'+savedCik.cik">
-                            <div class="list-item" style="height: 30px;">
-                                <div class="card-text-sub-title">CIK:</div><div class="card-text">{{ savedCik.cik }}</div>
-                                <div class="card-text-sub-title">Name:</div><div class="card-text">{{ savedCik.name }}</div>
-                            </div>
-                        </a>
-                    </v-card>
-                </div>
-            </div>
+        <div v-if="searchType == 'saved'" class="scrollable-tbody">
+            <v-data-table-virtual
+                :headers="savedHeaders"
+                :items="savedCiks"
+                class="search-table"
+                fixed-header>
+                <template #item.cik="{ item }">
+                    <a :href="'/company/'+item.cik">
+                        <v-btn color="primary">{{item.cik}}</v-btn>
+                    </a>
+                </template>
+            </v-data-table-virtual>
         </div>
         <div v-if="searchType == 'comments'">
             <div class="scrollable-list">
@@ -103,14 +106,18 @@ export default defineComponent({
         return {
             searchType: "" as String,
             companyFilingsHeaders: [
-                {title: 'CIK', key: 'cik'},
-                {title: 'Name', key: 'name'},
+                {title: 'CIK', key: 'cik', width: '150px'},
+                {title: 'Name', key: 'name', width: '800px'},
                 {title: 'Accession Number', key: 'accessionNumber'},
                 {title: 'Filing Date', key: 'filingDate'},
                 {title: 'Report Date', key: 'reportDate'},
                 {title: 'Form', key: 'form'}
             ],
             companyFilings: [] as CompanyFilingWithName[],
+            savedHeaders: [
+                {title: 'CIK', key: 'cik', width: '150px'},
+                {title: 'Name', key: 'name'}
+            ],
             savedCiks: [] as {cik: String, name: String}[],
             comments: [] as UserCommentWithName[],
             width: window.innerWidth,
@@ -170,7 +177,7 @@ export default defineComponent({
             let recentCompanyFilingDataFilter = [] as CompanyFilingDataFilter[]
             
             let date = new Date();
-            date.setDate(date.getDate() - 14);
+            date.setDate(date.getDate() - 30);
             let filterDate: String = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' +  date.getDate()
             recentGenericFilters.push({
                 field: "filing_date",
@@ -244,9 +251,9 @@ export default defineComponent({
     width: v-bind((width-50) + 'px');
     margin: 15px;
 }
-.recent-table {
+.search-table {
     width: v-bind((width-50) + 'px');
-    height: v-bind((height-195) + 'px');
+    height: v-bind((height-215) + 'px');
     margin-left: 25px;
     margin-top: 15px;
 }

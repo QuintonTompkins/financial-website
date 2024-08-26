@@ -61,31 +61,32 @@ import UserCommentComp from '@/components/UserComment.vue'
                 </div>
             </v-card>
             <v-card style="margin: 10px; margin-top: 23px;">
-                <div class="filing-height" style="width: 480px;">
+                <div class="filing-card">
                     <div class="card-title">Company Filings</div>
-                    <input type="checkbox" v-model="tenOnly" style="display: inline;">10-K/10-Q Only</input>
+                    <div style="display: inline-block; vertical-align: bottom;">
+                        <v-checkbox-btn label="10-K/10-Q Only" v-model="tenOnly" color="primary"/>
+                    </div>
                     <br>
                     <div class="scrollable-tbody filing-list">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Accession Number</th>
-                                    <th>Report Date</th>
-                                    <th>Filing Date</th>
-                                    <th>Form</th>
-                                    <th>Selected</th>
+                        <v-data-table-virtual
+                            :headers="selectionHeaders"
+                            :items="companyFilings"
+                            class="selection-table"
+                            fixed-header>
+                            <template #item="{ item }">
+                                <tr class="v-data-table__tr">
+                                    <td class="v-data-table__td v-data-table-column--align-start">
+                                        <v-checkbox-btn
+                                            v-model="item.selected"
+                                            color="primary"/>
+                                    </td>
+                                    <td class="v-data-table__td v-data-table-column--align-start">{{ item.accessionNumber }}</td>
+                                    <td class="v-data-table__td v-data-table-column--align-start">{{ item.reportDate }}</td>
+                                    <td class="v-data-table__td v-data-table-column--align-start">{{ item.filingDate }}</td>
+                                    <td class="v-data-table__td v-data-table-column--align-start">{{ item.form }}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="companyFiling in companyFilings" :key="companyFiling.accessionNumber">
-                                    <td>{{ companyFiling.accessionNumber }}</td>
-                                    <td>{{ companyFiling.reportDate }}</td>
-                                    <td>{{ companyFiling.filingDate }}</td>
-                                    <td>{{ companyFiling.form }}</td>
-                                    <td><input type="checkbox" v-model="companyFiling.selected" /></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            </template>
+                        </v-data-table-virtual>
                     </div>
                 </div>
             </v-card>
@@ -103,24 +104,31 @@ import UserCommentComp from '@/components/UserComment.vue'
                     <br>
                     <div v-if="companyView=='summary'">
                         <div class="scrollable-tbody analysis">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th v-for="companyFiling in companyFilings.filter((cf)=>{return cf.selected})" :key="companyFiling.accessionNumber">
-                                            {{ companyFiling.filingDate }}<br>{{ companyFiling.form }}
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="filingKey in selectedCompanyFilingKeys">
-                                        <td>{{ filingKey }}</td>
-                                        <td v-for="companyFiling in companyFilings.filter((cf)=>{return cf.selected})" :key="companyFiling.accessionNumber">
-                                            {{convertUnit(companyFiling.data[filingKey]?.unit) + addCommas(companyFiling.data[filingKey]?.value) }}
+                            <v-data-table-virtual
+                                :headers="summaryHeaders"
+                                :items="companyFilings.filter((cf)=>{return cf.selected})"
+                                class="analysis-table"
+                                fixed-header
+                                disable-sort>
+                                <template #item="{ item }">
+                                    <tr class="v-data-table__tr">
+                                        <v-tooltip>
+                                            <template v-slot:activator="{ props }">
+                                                <td v-bind="props" class="v-data-table__td v-data-table-column--align-start">
+                                                    {{ item.filingDate }}
+                                                    <br>
+                                                    {{ item.form }}
+                                                </td>
+                                            </template>
+                                            <span>{{ item.accessionNumber }}</span>
+                                        </v-tooltip>
+                                        <td class="v-data-table__td v-data-table-column--align-start analysis-value"
+                                                v-for="field in summaryHeadersFields">
+                                                    {{ convertValueObj(item.data[field.key]) }}
                                         </td>
                                     </tr>
-                                </tbody>
-                            </table>
+                                </template>
+                            </v-data-table-virtual>
                         </div>
                     </div>
                     <div v-if="companyView=='comment'" style="margin-right: 20px;">
@@ -157,16 +165,34 @@ export default defineComponent({
             companyFilings: [] as CompanyFilingSelected[],
             userComments: [] as UserComment[],
             companyFilingKeys: [] as String[],
-            selectedCompanyFilingKeys: [
-                "us-gaap_GrossProfit",
-                "us-gaap_NetIncomeLoss",
-                "us-gaap_Assets",
-                "us-gaap_Liabilities",
-                "us-gaap_NetCashProvidedByUsedInOperatingActivities",
-                "us-gaap_NetCashProvidedByUsedInFinancingActivities",
-                "us-gaap_NetCashProvidedByUsedInInvestingActivities",
-                "dei_EntityCommonStockSharesOutstanding"
-            ] as string[],
+            selectionHeaders: [
+                {key: 'selected'},
+                {title: 'Accession Number', key: 'accessionNumber'},
+                {title: 'Report Date', key: 'reportDate'},
+                {title: 'Filing Date', key: 'filingDate'},
+                {title: 'Form', key: 'form'}
+            ],
+            summaryHeaders: [
+                {key: 'filingDate'},
+                {title: "Gross Profit", key: 'us-gaap_GrossProfit'},
+                {title: "Net Income", key: 'us-gaap_NetIncomeLoss'},
+                {title: "Assets", key: 'us-gaap_Assets'},
+                {title: "Liabilities", key: 'us-gaap_Liabilities'},
+                {title: "Operating CF", key: 'us-gaap_NetCashProvidedByUsedInOperatingActivities'},
+                {title: "Financing CF", key: 'us-gaap_NetCashProvidedByUsedInFinancingActivities'},
+                {title: "Investing CF", key: 'us-gaap_NetCashProvidedByUsedInInvestingActivities'},
+                {title: "Outstanding Shares", key: 'dei_EntityCommonStockSharesOutstanding'}
+            ],
+            summaryHeadersFields: [
+                {title: "Gross Profit", key: 'us-gaap_GrossProfit'},
+                {title: "Net Income", key: 'us-gaap_NetIncomeLoss'},
+                {title: "Assets", key: 'us-gaap_Assets'},
+                {title: "Liabilities", key: 'us-gaap_Liabilities'},
+                {title: "Operating CF", key: 'us-gaap_NetCashProvidedByUsedInOperatingActivities'},
+                {title: "Financing CF", key: 'us-gaap_NetCashProvidedByUsedInFinancingActivities'},
+                {title: "Investing CF", key: 'us-gaap_NetCashProvidedByUsedInInvestingActivities'},
+                {title: "Outstanding Shares", key: 'dei_EntityCommonStockSharesOutstanding'}
+            ],
             width: window.innerWidth,
             height: window.innerHeight,
             cikIsSaved: false as Boolean,
@@ -214,12 +240,14 @@ export default defineComponent({
         }
     },
     methods: {
-        convertUnit(unit: String){
-            switch(unit){
+        convertValueObj(valueObj: {unit: string, value: number}){
+            if(!valueObj)
+                return ""
+            switch(valueObj.unit){
                 case "USD":
-                    return "$"
+                    return ("$" + valueObj.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")).replace("$-","-$");
                 default:
-                    return " "
+                    return valueObj.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
         },
         addCommas(value: String){
@@ -236,6 +264,7 @@ export default defineComponent({
             })
         },
         getCompanyFilings(){
+            this.companyFilings = []
             let recentGenericFilters = [] as GenericFilter[]
             recentGenericFilters.push({
                 field: "cik",
@@ -314,7 +343,8 @@ export default defineComponent({
     width: v-bind((width-530) + 'px');
 }
 
-.filing-height {
+.filing-card {
+    width: 480px;
     height: v-bind((height-319) + 'px');
 }
 
@@ -324,37 +354,23 @@ export default defineComponent({
 }
 
 .analysis {
-  height: v-bind((height-145) + 'px');
+    height: v-bind((height-145) + 'px');
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .filing-list {
-  height: v-bind((height-355) + 'px');
+    height: v-bind((height-355) + 'px');
 }
 
 .scrollable-tbody {
-  overflow-y: auto;
-}
-
-table {
-  margin: 5px;
-  border-collapse: collapse;
-}
-
-
-thead {
-  background-color: #1a1a1a;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-th, td {
-  border: 3px solid #1a1a1a;
+    overflow-y: auto;
 }
 
 .scrollable-comment-list {
-  height: v-bind((height-250) + 'px');
-  overflow-y: auto;
+    height: v-bind((height-250) + 'px');
+    overflow-y: auto;
 }
 .comment-list-item{
     width: v-bind((width-605) + 'px');
@@ -367,5 +383,22 @@ th, td {
     margin-left: 25px;
     margin-top: 5px;
     vertical-align: bottom;
+}
+
+.selection-table {
+    width: 460px;
+    height: v-bind((height-370) + 'px');
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.analysis-table {
+    width: v-bind((width-575) + 'px');
+    height: v-bind((height-190) + 'px');
+}
+
+.analysis-value{
+    text-align: right;
 }
 </style>
