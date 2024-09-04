@@ -130,7 +130,7 @@ export default defineComponent({
 .toolbar-disclaimer {
   width: v-bind((width-150) + 'px');
   display: inline-block;
-  color: #ff0000;
+  color: #ee0000;
   font-size: 14px;
 }
 </style>

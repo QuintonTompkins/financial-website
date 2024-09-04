@@ -105,26 +105,37 @@ import UserCommentComp from '@/components/UserComment.vue'
                     <div v-if="companyView=='summary'">
                         <div class="scrollable-tbody analysis">
                             <v-data-table-virtual
-                                :headers="summaryHeaders"
-                                :items="companyFilings.filter((cf)=>{return cf.selected})"
+                                :items="summaryHeaders"
                                 class="analysis-table"
                                 fixed-header
                                 disable-sort>
+                                <template #headers="{ headers }">
+                                    <tr class="v-data-table__tr">
+                                        <th class="v-data-table__td v-data-table-column--align-start v-data-table__th v-data-table__th--sticky"></th>
+                                        <v-tooltip v-for="header in companyFilings.filter((cf)=>{return cf.selected})">
+                                            <template v-slot:activator="{ props }">
+                                                <th v-bind="props"
+                                                    class="v-data-table__td v-data-table-column--align-start v-data-table__th v-data-table__th--sticky"
+                                                    scope="col"
+                                                    >
+                                                    {{ header.filingDate }}
+                                                    <br>
+                                                    {{ header.form }}
+                                                </th>
+                                            </template>
+                                            <span>{{ header.accessionNumber }}</span>
+                                        </v-tooltip>
+                                        
+                                    </tr>
+                                </template>
                                 <template #item="{ item }">
                                     <tr class="v-data-table__tr">
-                                        <v-tooltip>
-                                            <template v-slot:activator="{ props }">
-                                                <td v-bind="props" class="v-data-table__td v-data-table-column--align-start">
-                                                    {{ item.filingDate }}
-                                                    <br>
-                                                    {{ item.form }}
-                                                </td>
-                                            </template>
-                                            <span>{{ item.accessionNumber }}</span>
-                                        </v-tooltip>
+                                        <td class="v-data-table__td v-data-table-column--align-start analysis-value">{{ item.title }}</td>
                                         <td class="v-data-table__td v-data-table-column--align-start analysis-value"
-                                                v-for="field in summaryHeadersFields">
-                                                    {{ convertValueObj(item.data[field.key]) }}
+                                                v-for="filing in companyFilings.filter((cf)=>{return cf.selected})">
+                                            <div :style="getSummaryValueStyle(filing.data[item.key])">
+                                                {{ convertValueObj(filing.data[item.key]) }}
+                                            </div>
                                         </td>
                                     </tr>
                                 </template>
@@ -173,17 +184,6 @@ export default defineComponent({
                 {title: 'Form', key: 'form'}
             ],
             summaryHeaders: [
-                {key: 'filingDate'},
-                {title: "Gross Profit", key: 'us-gaap_GrossProfit'},
-                {title: "Net Income", key: 'us-gaap_NetIncomeLoss'},
-                {title: "Assets", key: 'us-gaap_Assets'},
-                {title: "Liabilities", key: 'us-gaap_Liabilities'},
-                {title: "Operating CF", key: 'us-gaap_NetCashProvidedByUsedInOperatingActivities'},
-                {title: "Financing CF", key: 'us-gaap_NetCashProvidedByUsedInFinancingActivities'},
-                {title: "Investing CF", key: 'us-gaap_NetCashProvidedByUsedInInvestingActivities'},
-                {title: "Outstanding Shares", key: 'dei_EntityCommonStockSharesOutstanding'}
-            ],
-            summaryHeadersFields: [
                 {title: "Gross Profit", key: 'us-gaap_GrossProfit'},
                 {title: "Net Income", key: 'us-gaap_NetIncomeLoss'},
                 {title: "Assets", key: 'us-gaap_Assets'},
@@ -240,12 +240,22 @@ export default defineComponent({
         }
     },
     methods: {
+        getSummaryValueStyle(valueObj: {unit: string, value: number}){
+            if(!valueObj)
+                return null
+            switch(valueObj.unit){
+                case "USD":
+                    return (valueObj.value < 0 ? {color: '#ee0000' } : null);
+                default:
+                    return null;
+            }
+        },
         convertValueObj(valueObj: {unit: string, value: number}){
             if(!valueObj)
                 return ""
             switch(valueObj.unit){
                 case "USD":
-                    return ("$" + valueObj.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")).replace("$-","-$");
+                    return ("$" + valueObj.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")).replace("-","");
                 default:
                     return valueObj.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
@@ -400,5 +410,9 @@ export default defineComponent({
 
 .analysis-value{
     text-align: right;
+}
+
+.v-data-table__td{
+    height: 25px !important;
 }
 </style>
