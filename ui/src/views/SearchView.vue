@@ -19,32 +19,48 @@
 import { defineComponent } from 'vue'
 import { jwtDecode } from "jwt-decode"
 
+import * as stateCountryCodesJson from '@/assets/stateCountryCodes.json'
 import * as FinanceApi from '@/services/FinanceApi.js'
 import * as UserApi from '@/services/UserApi.js'
 import type { CompanyFilingWithName } from '@/services/types/CompanyFilingExtensions'
 import type { UserCommentWithName } from '@/services/types/UserCommentExtensions'
+import type { CompanySummary } from '@/services/types/CompanySummary'
+import type { SicDetails } from '@/services/types/SicDetails'
+import type { LocationDataLatLng } from '@/services/types/LocationDataExtensions'
 import UserComment from '@/components/UserComment.vue'
+import Map from '@/components/Map.vue'
+import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
 </script>
 
 <template>
     <div style="margin:15px;">
-        <v-card style="width: 387px;">
+        <v-card style="width: 600px;">
             <v-btn-toggle color="primary" v-model="searchType" borderless variant="outlined">
+                <v-btn color="primary" size="small" value="name" :disabled="loading == true">Search Name</v-btn>
                 <v-btn color="primary" size="small" value="recent" :disabled="loading == true">Recent Filings</v-btn>
+                <v-btn color="primary" size="small" value="map" :disabled="loading == true">Map View</v-btn>
                 <v-btn color="primary" size="small" value="saved" :disabled="jwt=='' || loading == true">Saved Ciks</v-btn>
                 <v-btn color="primary" size="small" value="comments" :disabled="!hasCommentorRole || loading == true">Recent Comments</v-btn>
             </v-btn-toggle>
         </v-card>
     </div>
     <div style="margin-left: 15px">
+        <div v-if="searchType == 'name'" style="height: 40px;">
+            <h3 style="display: inline; vertical-align: top;">Search Name</h3>
+            <v-text-field placeholder="Search for company name" v-model="companyName" density="compact" style="display: inline-block; width: 500px; margin-left: 14px;"></v-text-field>
+            <v-btn color="primary" @click="getCompanyByName" style="display: inline-block; vertical-align: top; margin-left: 14px;">Search</v-btn>
+        </div>
         <div v-if="searchType == 'recent'">
-            <h3 style="display: inline">Recent Filings</h3>
+            <h3 style="display: inline;">Recent Filings</h3>
             <div style="display: inline-block; vertical-align: bottom;">
                 <v-checkbox-btn label="Profitable Only" v-model="profitOnly" color="primary"/>
             </div>
             <div style="display: inline-block; vertical-align: bottom;">
                 <v-checkbox-btn label="10-K Only" v-model="annualOnly" color="primary"/>
             </div>
+        </div>
+        <div v-if="searchType == 'map'" style="height: 40px;">
+            <h3>Map View</h3>
         </div>
         <div v-if="searchType == 'saved'">
             <h3>Saved Ciks</h3>
@@ -55,6 +71,19 @@ import UserComment from '@/components/UserComment.vue'
         <v-progress-linear v-if="loading" color="primary" indeterminate class="loader"></v-progress-linear>
     </div>
     <div v-if="!loading">
+        <div v-if="searchType == 'name'" class="scrollable-tbody">
+            <v-data-table-virtual
+                :headers="companyHeaders"
+                :items="companies"
+                class="search-table"
+                fixed-header>
+                <template #item.cik="{ item }">
+                    <a :href="'/company/'+item.cik">
+                        <v-btn color="primary">{{item.cik}}</v-btn>
+                    </a>
+                </template>
+            </v-data-table-virtual>
+        </div>
         <div v-if="searchType == 'recent'" class="scrollable-tbody">
             <v-data-table-virtual
                 :headers="companyFilingsHeaders"
@@ -67,6 +96,41 @@ import UserComment from '@/components/UserComment.vue'
                     </a>
                 </template>
             </v-data-table-virtual>
+        </div>
+        <div v-if="searchType == 'map'">
+            <div class="scrollable-tbody" style="display: inline-block; width: 400px; vertical-align: top;">
+                <v-data-table-virtual
+                    v-if="sicDescSelected !== ''"
+                    :headers="companyHeaders"
+                    :items="companies"
+                    class="search-table"
+                    fixed-header>
+                    <template #item.cik="{ item }">
+                        <a :href="'/company/'+item.cik">
+                            <v-btn color="primary" density="compact">{{item.cik}}</v-btn>
+                        </a>
+                    </template>
+                </v-data-table-virtual>
+                <v-data-table-virtual
+                    v-if="sicDescSelected === ''"
+                    :headers="sicDetailsHeaders"
+                    :items="sicDetails"
+                    class="search-table"
+                    fixed-header>
+                    <template #item.sicDescription="{ item }">
+                        <v-tooltip>
+                            <template v-slot:activator="{ props }">
+                                <v-btn  v-bind="props" color="primary" density="compact" style="width: 275px" @click="selectSicDetails">
+                                    {{item.sicDescription === "" ? "N/A" : item.sicDescription?.substring(0, 25)}}</v-btn>
+                            </template>
+                            <span>{{ item.sicDescription }}</span>
+                        </v-tooltip>
+                    </template>
+                </v-data-table-virtual>
+            </div>
+            <div class="map">
+                <Map :locations="locations" :jwt="jwt" :selectLocationCallback="selectLocationCallback"></Map>
+            </div>
         </div>
         <div v-if="searchType == 'saved'" class="scrollable-tbody">
             <v-data-table-virtual
@@ -104,7 +168,19 @@ export default defineComponent({
     },
     data() {
         return {
-            searchType: "" as String,
+            searchType: "name" as String,
+            companyHeaders: [
+                {title: 'CIK', key: 'cik', width: '150px'},
+                {title: 'Name', key: 'name', width: '800px'}
+            ],
+            companies: [] as CompanySummary[],
+            sicDetailsHeaders: [
+                {title: 'SIC Description', key: 'sicDescription', width: '200px'},
+                {title: 'Quantity', key: 'totalRecentlyActive', width: '50px'}
+            ],
+            stateCountryCodes: stateCountryCodesJson as StateCountryCodes,
+            locations: [] as LocationDataLatLng[],
+            sicDetails: [] as SicDetails[],
             companyFilingsHeaders: [
                 {title: 'CIK', key: 'cik', width: '150px'},
                 {title: 'Name', key: 'name', width: '800px'},
@@ -125,7 +201,9 @@ export default defineComponent({
             profitOnly: true as Boolean,
             annualOnly: true as Boolean,
             loading: false as Boolean,
-            hasCommentorRole: false as Boolean
+            hasCommentorRole: false as Boolean,
+            companyName: "" as String,
+            sicDescSelected: "" as String
         };
     },
     watch: {
@@ -139,6 +217,9 @@ export default defineComponent({
             switch(newVal){
                 case "recent":
                     this.getCompanyRecentFilings()
+                    break;
+                case "map":
+                    this.getLocationData()
                     break;
                 case "saved":
                     this.getSavedCiks()
@@ -157,7 +238,7 @@ export default defineComponent({
                 }
                 else{
                     this.hasCommentorRole = false
-                    this.searchType = ''
+                    this.searchType = "name"
                 }
             }
         }
@@ -170,6 +251,39 @@ export default defineComponent({
     },
 
     methods: {
+        selectLocationCallback(location: LocationDataLatLng){
+            this.sicDetails = location.sicDetails
+        },
+        selectSicDetails(){
+            // TO DO
+        },
+        async getCompanyByName(){
+            this.companies = []
+            this.loading = true
+            const responseFilings = await FinanceApi.getCompanySummaryByName(this.companyName)
+            this.companies = responseFilings.data.data.companySummaries
+            await this.getCompanyNames(this.companyFilings)
+            this.loading = false
+        },
+        async getLocationData(){
+            this.locations = []
+            this.loading = true
+            const responseFilings = await FinanceApi.getLocationData()
+            this.locations = responseFilings.data.data.locationData
+            this.locations.forEach(location => {
+                if(this.stateCountryCodes.data[location.code]){
+                    location.name = this.stateCountryCodes.data[location.code].name
+                    location.latitude = this.stateCountryCodes.data[location.code].latitude
+                    location.longitude = this.stateCountryCodes.data[location.code].longitude
+                }
+                else{
+                    location.name = this.stateCountryCodes.data["XX"].name
+                    location.latitude = this.stateCountryCodes.data["XX"].latitude
+                    location.longitude = this.stateCountryCodes.data["XX"].longitude
+                }
+            });
+            this.loading = false
+        },
         async getCompanyRecentFilings(){
             this.companyFilings = []
             this.loading = true
@@ -241,8 +355,8 @@ export default defineComponent({
 
 <style scoped>
 .scrollable-list {
-  height: v-bind((height-175) + 'px');
-  overflow-y: auto;
+    height: v-bind((height-175) + 'px');
+    overflow-y: auto;
 }
 .list-item{
     width: v-bind((width-50) + 'px');
@@ -256,6 +370,13 @@ export default defineComponent({
     height: v-bind((height-215) + 'px');
     margin-left: 25px;
     margin-top: 15px;
+}
+.map {
+    width: v-bind((width-480) + 'px');
+    height: v-bind((height-215) + 'px');
+    display: inline-block;
+    margin-left: 50px;
+    margin-top: 18px;
 }
 
 </style>

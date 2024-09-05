@@ -53,7 +53,12 @@ public class GenericParameters {
         validateGenericParameters(stringColumnList, dateColumnList, booleanColumnList, numericColumnList);
         ArrayList<String> filterStringList = new ArrayList<String>();
         for (GenericFilter filter : this.filters) {
-            filterStringList.add(String.format(" %s %s ? ", filter.getField(), filter.getComparator()));
+            if(filter.getComparator().equals("like")){
+                filterStringList.add(String.format(" LOWER(%s) %s LOWER(?) ", filter.getField(), filter.getComparator()));
+            }
+            else{
+                filterStringList.add(String.format(" %s %s ? ", filter.getField(), filter.getComparator()));
+            }
         }
         return filterStringList.size() == 0 ? "" : " WHERE " + String.join(" AND ", filterStringList);
     }

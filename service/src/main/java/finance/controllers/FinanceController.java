@@ -33,6 +33,7 @@ import finance.dao.CompanyFilingKeyDao;
 import finance.dao.CompanySummaryDao;
 import finance.dao.CompanyTickerDao;
 import finance.dao.DataCollectorDao;
+import finance.dao.LocationDataDao;
 import finance.models.CompanyFiling;
 import finance.models.CompanyFilingDataFilter;
 import finance.models.CompanyFilingDataParameters;
@@ -41,6 +42,8 @@ import finance.models.CompanySummary;
 import finance.models.CompanyTicker;
 import finance.models.GenericFilter;
 import finance.models.GenericParameters;
+import finance.models.LocationData;
+import finance.models.SicDetails;
 
 @Controller
 public class FinanceController {
@@ -56,6 +59,8 @@ public class FinanceController {
     CompanyTickerDao companyTickerDao;
     @Autowired
     DataCollectorDao dataCollectorDao;
+    @Autowired
+    LocationDataDao locationDataDao;
 	
     // -------------------- Queries --------------------
 	@QueryMapping
@@ -90,6 +95,17 @@ public class FinanceController {
     public List<CompanyTicker> companyTickers(@Argument GenericParameters input){
         return companyTickerDao.getCompanyTickers(input);
     }
+	
+	@QueryMapping
+    public List<LocationData> locationData(){
+        return locationDataDao.getLocationData();
+    }
+
+    @SchemaMapping(typeName="LocationData", field="sicDetails")
+    public List<SicDetails> getSicDetails(LocationData locationData) {
+        return locationDataDao.getSicDetails(locationData.getCode());
+    }
+	
 	
 	@QueryMapping
     public int timeSinceRefresh(){

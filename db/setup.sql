@@ -142,12 +142,20 @@ CREATE MATERIALIZED VIEW finance.recent_company_filings_data_key AS
 
 CREATE UNIQUE INDEX recent_company_filings_data_key_index ON finance.recent_company_filings_data_key (key);
 
+CREATE MATERIALIZED VIEW finance.location_data AS 
+    SELECT UPPER(state_country) as state_country, sic_description, count(*) AS total_recently_active FROM finance.company_summary 
+        WHERE cik IN (SELECT cik FROM finance.recent_company_filings_with_potential_data_view WHERE filing_date > NOW() - INTERVAL '1 year' GROUP BY cik) 
+        GROUP BY UPPER(state_country), sic_description;
+
+CREATE UNIQUE INDEX location_data_index ON finance.location_data (state_country, sic_description);
+
 CREATE OR REPLACE FUNCTION refresh_materialized_views()
 RETURNS trigger LANGUAGE plpgsql
 AS $$
 BEGIN
     REFRESH MATERIALIZED VIEW finance.recent_company_filings_with_potential_data_view;
     REFRESH MATERIALIZED VIEW finance.recent_company_filings_data_key;
+    REFRESH MATERIALIZED VIEW finance.location_data;
     RETURN NULL;
 END $$;
 

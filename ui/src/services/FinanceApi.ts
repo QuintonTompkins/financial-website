@@ -19,6 +19,7 @@ import axios from 'axios'
 import type { CompanySummary } from '@/services/types/CompanySummary'
 import type { CompanyFiling } from '@/services/types/CompanyFiling'
 import type { CompanyFilingKey } from '@/services/types/CompanyFilingKey'
+import type { LocationData } from '@/services/types/LocationData'
 
 const BASE_URL = import.meta.env.VITE_FINANCE_API_URL
 
@@ -39,6 +40,39 @@ export function getCompanySummary(cik: String){
             "variables": {
                 "input":{ "filters": [ { "field": "cik" , "comparator": "=", "value": cik } ] }
             }
+        }
+    )
+}
+
+export function getCompanySummaryByName(name: String){
+    return axios.post<{ data: { companySummaries: CompanySummary[] } }>(BASE_URL+'graphql',
+        {
+            "query": `query ($input: GenericParameters!) {
+                            companySummaries(input: $input) {
+                                cik,
+                                name
+                            }
+                        }`,
+            "variables": {
+                "input":{ "filters": [ { "field": "name" , "comparator": "like", "value": "%"+name+"%" } ] }
+            }
+        }
+    )
+}
+
+export function getLocationData(){
+    return axios.post<{ data: { locationData: LocationData[] } }>(BASE_URL+'graphql',
+        {
+            "query": `query {
+                            locationData {
+                                code,
+                                totalRecentlyActive,
+                                sicDetails{
+                                    sicDescription,
+                                    totalRecentlyActive
+                                }
+                            }
+                        }`
         }
     )
 }

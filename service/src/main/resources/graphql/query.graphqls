@@ -28,7 +28,9 @@ type Query{
     companyFilingKeys(input: GenericParameters): [CompanyFilingKey]
     companySummaries(input: GenericParameters): [CompanySummary]
     companyTickers(input: GenericParameters): [CompanyTicker]
+    locationData: [LocationData]
     timeSinceRefresh: Int
+    "User"
     savedCiks: [String]
     userComments(input: GenericParameters): [UserComment]
     "Admin and Moderator"
