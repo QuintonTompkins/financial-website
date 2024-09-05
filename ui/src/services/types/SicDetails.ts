@@ -16,6 +16,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 export interface SicDetails {
-    sicDescription?: string; 
-    totalRecentlyActive?: number;
+    sicDescription: string; 
+    totalRecentlyActive: number;
 }

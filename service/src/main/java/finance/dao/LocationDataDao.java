@@ -38,7 +38,7 @@ public class LocationDataDao extends Dao {
 
     private static final String SELECT_ALL_LOCATION_DATA_QUERY = "SELECT state_country, SUM(total_recently_active) as total_recently_active FROM finance.location_data GROUP BY state_country";
 
-    private static final String SELECT_ALL_SIC_DETAILS_QUERY = "SELECT sic_description, total_recently_active FROM finance.location_data WHERE state_country = ? ORDER BY total_recently_active DESC";
+    private static final String SELECT_ALL_SIC_DETAILS_QUERY = "SELECT sic_description, total_recently_active FROM finance.location_data WHERE state_country = ?";
     
     public LocationDataDao() {
         super(); 

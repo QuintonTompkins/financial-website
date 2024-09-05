@@ -150,12 +150,12 @@ import UserCommentComp from '@/components/UserComment.vue'
                                 </div>
                             </v-card>
                         </div>
-                        <div style="margin-top: 15px;">
+                        <v-form style="margin-top: 15px; margin-left: 5px;" @submit.prevent>
                             <v-text-field v-model="newComment.minPrice" placeholder="Min Price" style="margin-left: 5px; width: 120px; display: inline-block;"></v-text-field>
                             <v-text-field v-model="newComment.maxPrice" placeholder="Max Price" style="margin-left: 5px; width: 120px; display: inline-block;"></v-text-field>
                             <v-text-field v-model="newComment.commentText" placeholder="Comment" style="margin-left: 5px; width: 500px; display: inline-block;" maxlength="10000"></v-text-field>
-                            <v-btn color="primary" @click="submitComment" style="margin-left: 5px; display: inline-block; vertical-align: top;">Submit</v-btn>
-                        </div>
+                            <v-btn type="submit" color="primary" @click="submitComment" style="margin-left: 5px; display: inline-block; vertical-align: top;">Submit</v-btn>
+                        </v-form>
                     </div>
                 </div>
             </v-card>

@@ -47,8 +47,10 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
     <div style="margin-left: 15px">
         <div v-if="searchType == 'name'" style="height: 40px;">
             <h3 style="display: inline; vertical-align: top;">Search Name</h3>
-            <v-text-field placeholder="Search for company name" v-model="companyName" density="compact" style="display: inline-block; width: 500px; margin-left: 14px;"></v-text-field>
-            <v-btn color="primary" @click="getCompanyByName" style="display: inline-block; vertical-align: top; margin-left: 14px;">Search</v-btn>
+            <v-form style="display: inline-block;" @submit.prevent>
+                <v-text-field placeholder="Search for company name" v-model="companyName" density="compact" style="display: inline-block; width: 500px; margin-left: 14px;"></v-text-field>
+                <v-btn type="submit" color="primary" @click="getCompanyByName" style="display: inline-block; vertical-align: top; margin-left: 14px;">Search</v-btn>
+            </v-form>
         </div>
         <div v-if="searchType == 'recent'">
             <h3 style="display: inline;">Recent Filings</h3>
@@ -70,49 +72,70 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
         </div>
         <v-progress-linear v-if="loading" color="primary" indeterminate class="loader"></v-progress-linear>
     </div>
+    <div v-if="searchType == 'name'" class="scrollable-tbody">
+        <v-data-table-virtual
+            :headers="companyHeaders"
+            :items="companies"
+            :loading="loadingTable"
+            :loading-text="loadingCompaniesMessage"
+            class="search-table"
+            fixed-header>
+            <template #item.cik="{ item }">
+                <a :href="'/company/'+item.cik">
+                    <v-btn color="secondary">{{item.cik}}</v-btn>
+                </a>
+            </template>
+        </v-data-table-virtual>
+    </div>
+    <div v-if="searchType == 'recent'" class="scrollable-tbody">
+        <v-data-table-virtual
+            :headers="companyFilingsHeaders"
+            :items="companyFilings"
+            :loading="loadingTable"
+            :loading-text="loadingCompaniesMessage"
+            class="search-table"
+            fixed-header>
+            <template #item.cik="{ item }">
+                <a :href="'/company/'+item.cik">
+                    <v-btn color="secondary">{{item.cik}}</v-btn>
+                </a>
+            </template>
+        </v-data-table-virtual>
+    </div>
+    <div v-if="searchType == 'saved'" class="scrollable-tbody">
+        <v-data-table-virtual
+            :headers="savedHeaders"
+            :items="savedCiks"
+            :loading="loadingTable"
+            :loading-text="loadingCompaniesMessage"
+            class="search-table"
+            fixed-header>
+            <template #item.cik="{ item }">
+                <a :href="'/company/'+item.cik">
+                    <v-btn color="secondary">{{item.cik}}</v-btn>
+                </a>
+            </template>
+        </v-data-table-virtual>
+    </div>
     <div v-if="!loading">
-        <div v-if="searchType == 'name'" class="scrollable-tbody">
-            <v-data-table-virtual
-                :headers="companyHeaders"
-                :items="companies"
-                class="search-table"
-                fixed-header>
-                <template #item.cik="{ item }">
-                    <a :href="'/company/'+item.cik">
-                        <v-btn color="primary">{{item.cik}}</v-btn>
-                    </a>
-                </template>
-            </v-data-table-virtual>
-        </div>
-        <div v-if="searchType == 'recent'" class="scrollable-tbody">
-            <v-data-table-virtual
-                :headers="companyFilingsHeaders"
-                :items="companyFilings"
-                class="search-table"
-                fixed-header>
-                <template #item.cik="{ item }">
-                    <a :href="'/company/'+item.cik">
-                        <v-btn color="primary">{{item.cik}}</v-btn>
-                    </a>
-                </template>
-            </v-data-table-virtual>
-        </div>
         <div v-if="searchType == 'map'">
             <div class="scrollable-tbody" style="display: inline-block; width: 400px; vertical-align: top;">
                 <v-data-table-virtual
-                    v-if="sicDescSelected !== ''"
+                    v-if="sicDescSelected !== undefined"
                     :headers="companyHeaders"
                     :items="companies"
+                    :loading="loadingTable"
+                    :loading-text="loadingCompaniesMessage"
                     class="search-table"
                     fixed-header>
                     <template #item.cik="{ item }">
                         <a :href="'/company/'+item.cik">
-                            <v-btn color="primary" density="compact">{{item.cik}}</v-btn>
+                            <v-btn color="secondary" density="compact">{{item.cik}}</v-btn>
                         </a>
                     </template>
                 </v-data-table-virtual>
                 <v-data-table-virtual
-                    v-if="sicDescSelected === ''"
+                    v-if="sicDescSelected === undefined"
                     :headers="sicDetailsHeaders"
                     :items="sicDetails"
                     class="search-table"
@@ -120,7 +143,7 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
                     <template #item.sicDescription="{ item }">
                         <v-tooltip>
                             <template v-slot:activator="{ props }">
-                                <v-btn  v-bind="props" color="primary" density="compact" style="width: 275px" @click="selectSicDetails">
+                                <v-btn v-bind="props" color="secondary" density="compact" style="width: 275px" @click="selectSicDetails(item.sicDescription)">
                                     {{item.sicDescription === "" ? "N/A" : item.sicDescription?.substring(0, 25)}}</v-btn>
                             </template>
                             <span>{{ item.sicDescription }}</span>
@@ -131,19 +154,6 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
             <div class="map">
                 <Map :locations="locations" :jwt="jwt" :selectLocationCallback="selectLocationCallback"></Map>
             </div>
-        </div>
-        <div v-if="searchType == 'saved'" class="scrollable-tbody">
-            <v-data-table-virtual
-                :headers="savedHeaders"
-                :items="savedCiks"
-                class="search-table"
-                fixed-header>
-                <template #item.cik="{ item }">
-                    <a :href="'/company/'+item.cik">
-                        <v-btn color="primary">{{item.cik}}</v-btn>
-                    </a>
-                </template>
-            </v-data-table-virtual>
         </div>
         <div v-if="searchType == 'comments'">
             <div class="scrollable-list">
@@ -201,9 +211,12 @@ export default defineComponent({
             profitOnly: true as Boolean,
             annualOnly: true as Boolean,
             loading: false as Boolean,
+            loadingTable: false as boolean | string,
             hasCommentorRole: false as Boolean,
             companyName: "" as String,
-            sicDescSelected: "" as String
+            countryStateSelected: "" as String,
+            sicDescSelected: undefined as string | undefined,
+            loadingCompaniesMessage: 'Loading Companies...' as string
         };
     },
     watch: {
@@ -252,18 +265,29 @@ export default defineComponent({
 
     methods: {
         selectLocationCallback(location: LocationDataLatLng){
+            this.sicDescSelected = undefined
+            this.countryStateSelected = location.code
             this.sicDetails = location.sicDetails
         },
-        selectSicDetails(){
-            // TO DO
+        selectSicDetails(sicDesc: string | undefined){
+            if(sicDesc !== undefined){
+                this.sicDescSelected = sicDesc
+                this.getCompanyByCountrySicDesc()
+            }
+        },
+        async getCompanyByCountrySicDesc(){
+            this.companies = []
+            this.loadingTable = "primary"
+            const responseFilings = await FinanceApi.getCompanySummaryByCountrySicDesc(this.countryStateSelected, this.sicDescSelected)
+            this.companies = responseFilings.data.data.companySummaries
+            this.loadingTable = false
         },
         async getCompanyByName(){
             this.companies = []
-            this.loading = true
+            this.loadingTable = "primary"
             const responseFilings = await FinanceApi.getCompanySummaryByName(this.companyName)
             this.companies = responseFilings.data.data.companySummaries
-            await this.getCompanyNames(this.companyFilings)
-            this.loading = false
+            this.loadingTable = false
         },
         async getLocationData(){
             this.locations = []
@@ -286,7 +310,7 @@ export default defineComponent({
         },
         async getCompanyRecentFilings(){
             this.companyFilings = []
-            this.loading = true
+            this.loadingTable = "primary"
             let recentGenericFilters = [] as GenericFilter[]
             let recentCompanyFilingDataFilter = [] as CompanyFilingDataFilter[]
             
@@ -315,24 +339,24 @@ export default defineComponent({
                 })
             }
             const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter, false)
-            this.companyFilings = responseFilings.data.data.companyFilings
-            await this.getCompanyNames(this.companyFilings)
-            this.loading = false
+            let companyFilings = responseFilings.data.data.companyFilings
+            this.companyFilings = await this.getCompanyNames(companyFilings)
+            this.loadingTable = false
         },
         async getSavedCiks(){
             this.savedCiks = []
-            this.loading = true
+            this.loadingTable = "primary"
             const responseFilings = await UserApi.getSavedCiks(this.jwt)
-            this.savedCiks = responseFilings.data.data.savedCiks.map(function(cik) { return {cik: cik, name: ""} })
-            await this.getCompanyNames(this.savedCiks)
-            this.loading = false
+            let savedCiks = responseFilings.data.data.savedCiks.map(function(cik) { return {cik: cik, name: ""} })
+            this.savedCiks = await this.getCompanyNames(savedCiks)
+            this.loadingTable = false
         },
         async getComments(){
             this.comments = []
             this.loading = true
             const responseFilings = await UserApi.getRecentComments(this.jwt)
-            this.comments = responseFilings.data.data.userComments
-            await this.getCompanyNames(this.comments)
+            let comments = responseFilings.data.data.userComments
+            this.comments = await this.getCompanyNames(comments)
             this.loading = false
         },
         async getCompanyNames(records: any[]){
@@ -340,6 +364,7 @@ export default defineComponent({
                 const nameResponse = await FinanceApi.getCompanyName(record.cik)
                 record.name = nameResponse.data.data.companySummaries[0].name
             }
+            return records
         },
         goToCompanyPage(cik?: String){
             if(cik != null)

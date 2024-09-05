@@ -44,6 +44,26 @@ export function getCompanySummary(cik: String){
     )
 }
 
+export function getCompanySummaryByCountrySicDesc(countryStateSelected: String, sicDescSelected: String | undefined) {
+    return axios.post<{ data: { companySummaries: CompanySummary[] } }>(BASE_URL+'graphql',
+        {
+            "query": `query ($input: GenericParameters!) {
+                            companySummaries(input: $input) {
+                                cik,
+                                name
+                            }
+                        }`,
+            "variables": {
+                "input":{ "filters": [ 
+                    { "field": "state_country" , "comparator": "=", "value": countryStateSelected },
+                    { "field": "sic_description" , "comparator": "=", "value": sicDescSelected }
+                ] }
+            }
+        }
+    )
+}
+
+
 export function getCompanySummaryByName(name: String){
     return axios.post<{ data: { companySummaries: CompanySummary[] } }>(BASE_URL+'graphql',
         {
