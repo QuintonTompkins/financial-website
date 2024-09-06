@@ -48,6 +48,9 @@ import { defineComponent } from 'vue'
                     <br>
                     Users must request the ability to comment or view comments on the website. Moderators will screen users to ensure they can provide quality assessments on companies.
                     Low-quality comments or a lack of comments may result in commenting abilities being revoked.
+                    <br>
+                    <br>
+                    <a :href="`https://github.com/QuintonTompkins/financial-website`">Source code for this website can be viewed here.</a>
                 </div>
             </div>
         </v-card>
