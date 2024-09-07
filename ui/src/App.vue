@@ -30,8 +30,8 @@ import { jwtDecode } from "jwt-decode";
             <v-btn to="/search" value="/search" class="toolbar-menu-button">Search</v-btn>
             <v-btn to="/recentFilings" value="/recentFilings" class="toolbar-menu-button">Recent Filings</v-btn>
             <v-btn to="/mapView" value="/mapView" class="toolbar-menu-button">Map View</v-btn>
-            <v-btn to="/savedCiks" value="/savedCiks" class="toolbar-menu-button">Saved Ciks</v-btn>
-            <v-btn to="/recentComments" value="/recentComments" class="toolbar-menu-button" :disabled="!hasCommentorRole">Recent Comments</v-btn>
+            <v-btn to="/savedCiks" value="/savedCiks" class="toolbar-menu-button" :disabled="jwt === ''">Saved Ciks</v-btn>
+            <v-btn to="/recentComments" value="/recentComments" class="toolbar-menu-button" :disabled="jwt === '' || !hasCommentorRole">Recent Comments</v-btn>
             <v-btn to="/account" value="/account" class="toolbar-menu-button">{{jwt != '' ? userName : 'Login'}}</v-btn>
         </v-btn-toggle>
     </div>

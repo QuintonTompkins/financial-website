@@ -27,9 +27,11 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
                 <v-expansion-panel>
                     <v-expansion-panel-title>Login</v-expansion-panel-title>
                     <v-expansion-panel-text>
-                        <v-text-field type="text" placeholder="Username/Email" v-model="usernameEmail"></v-text-field><br>
-                        <v-text-field type="text" placeholder="Password" v-model="passwordLogin"></v-text-field><br>
-                        <v-btn color="primary" @click="login">login</v-btn><br>
+                        <v-form @submit.prevent>
+                            <v-text-field type="text" placeholder="Username/Email" v-model="usernameEmail"></v-text-field><br>
+                            <v-text-field type="text" placeholder="Password" v-model="passwordLogin"></v-text-field><br>
+                            <v-btn type="submit" color="primary" @click="login">login</v-btn><br>
+                        </v-form>
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -37,10 +39,12 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
                 <v-expansion-panel>
                     <v-expansion-panel-title>Create User</v-expansion-panel-title>
                     <v-expansion-panel-text>
-                        <v-text-field type="text" placeholder="Username" v-model="username"></v-text-field><br>
-                        <v-text-field type="text" placeholder="Email" v-model="email"></v-text-field><br>
-                        <v-text-field type="text" placeholder="Password" v-model="passwordCreate"></v-text-field><br>
-                        <v-btn color="primary" @click="createUser">create user</v-btn><br>
+                        <v-form @submit.prevent>
+                            <v-text-field type="text" placeholder="Username" v-model="username"></v-text-field><br>
+                            <v-text-field type="text" placeholder="Email" v-model="email"></v-text-field><br>
+                            <v-text-field type="text" placeholder="Password" v-model="passwordCreate"></v-text-field><br>
+                            <v-btn type="submit" color="primary" @click="createUser">create user</v-btn><br>  
+                        </v-form>
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -48,8 +52,10 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
                 <v-expansion-panel>
                     <v-expansion-panel-title>Reset Password</v-expansion-panel-title>
                     <v-expansion-panel-text>
-                        <v-text-field type="text" placeholder="Email" v-model="emailReset"></v-text-field><br>
-                        <v-btn color="primary" @click="resetPassword">reset password</v-btn>
+                        <v-form @submit.prevent>
+                            <v-text-field type="text" placeholder="Email" v-model="emailReset"></v-text-field><br>
+                            <v-btn type="submit" color="primary" @click="resetPassword">reset password</v-btn>
+                        </v-form>
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -59,11 +65,13 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
                 <v-expansion-panel>
                     <v-expansion-panel-title>Update Password</v-expansion-panel-title>
                     <v-expansion-panel-text>
-                        <v-text-field type="text" placeholder="Email" v-model="emailPassword"></v-text-field><br>
-                        <v-text-field type="text" placeholder="Old Password" v-model="oldPassword"></v-text-field><br>
-                        <v-text-field type="text" placeholder="New Password" v-model="newPassword1"></v-text-field><br>
-                        <v-text-field type="text" placeholder="New Password again" v-model="newPassword2"></v-text-field><br>
-                        <v-btn color="primary" :disabled="newPassword1 != newPassword2" @click="updatePassword">update password</v-btn><br>
+                        <v-form @submit.prevent>
+                            <v-text-field type="text" placeholder="Email" v-model="emailPassword"></v-text-field><br>
+                            <v-text-field type="text" placeholder="Old Password" v-model="oldPassword"></v-text-field><br>
+                            <v-text-field type="text" placeholder="New Password" v-model="newPassword1"></v-text-field><br>
+                            <v-text-field type="text" placeholder="New Password again" v-model="newPassword2"></v-text-field><br>
+                            <v-btn type="submit" color="primary" :disabled="newPassword1 != newPassword2" @click="updatePassword">update password</v-btn><br>
+                        </v-form>
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -71,8 +79,10 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
                 <v-expansion-panel>
                     <v-expansion-panel-title>Update Username</v-expansion-panel-title>
                     <v-expansion-panel-text>
-                        <v-text-field type="text" placeholder="Username" v-model="newUsername"></v-text-field><br>
-                        <v-btn color="primary" @click="updateUsername">update username</v-btn>
+                        <v-form @submit.prevent>
+                            <v-text-field type="text" placeholder="Username" v-model="newUsername"></v-text-field><br>
+                            <v-btn type="submit" color="primary" @click="updateUsername">update username</v-btn>
+                        </v-form>
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -80,8 +90,10 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
                 <v-expansion-panel>
                     <v-expansion-panel-title>Update Email</v-expansion-panel-title>
                     <v-expansion-panel-text>
-                        <v-text-field type="text" placeholder="Email" v-model="newEmail"></v-text-field><br>
-                        <v-btn color="primary" @click="updateEmail">update email</v-btn>
+                        <v-form @submit.prevent>
+                            <v-text-field type="text" placeholder="Email" v-model="newEmail"></v-text-field><br>
+                            <v-btn type="submit" color="primary" @click="updateEmail">update email</v-btn>
+                        </v-form>
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -89,8 +101,10 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
                 <v-expansion-panel>
                     <v-expansion-panel-title>Request Commentor Status</v-expansion-panel-title>
                     <v-expansion-panel-text>
-                        <v-text-field type="text" placeholder="Reason" v-model="reasonStatus"></v-text-field><br>
-                        <v-btn color="primary" @click="requestCommentor">request commentor status</v-btn>
+                        <v-form @submit.prevent>
+                            <v-text-field type="text" placeholder="Reason" v-model="reasonStatus"></v-text-field><br>
+                            <v-btn type="submit" color="primary" @click="requestCommentor">request commentor status</v-btn>
+                        </v-form>
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -98,8 +112,10 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
                 <v-expansion-panel>
                     <v-expansion-panel-title>Report Data/Website Issue</v-expansion-panel-title>
                     <v-expansion-panel-text>
-                        <v-text-field type="text" placeholder="Reason" v-model="reasonIssue"></v-text-field><br>
-                        <v-btn color="primary" @click="reportIssue">report issue</v-btn>
+                        <v-form @submit.prevent>
+                            <v-text-field type="text" placeholder="Reason" v-model="reasonIssue"></v-text-field><br>
+                            <v-btn type="submit" color="primary" @click="reportIssue">report issue</v-btn>
+                        </v-form>
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </v-expansion-panels>
