@@ -20,8 +20,8 @@ import { defineComponent } from 'vue'
 </script>
 
 <template>
-    <div class="scrollable-list" style="margin: 15px;">
-        <v-card style="margin: 20px;">
+    <div class="scrollable-list" style="margin-left: 15px; margin-right: 15px;">
+        <v-card>
             <div style="margin: 15px;">
                 <h1>Welcome to Quinton's Finance Website!</h1>
                 <div v-if="isMobileDevice()">This website is not intended for mobile devices or touch screens. Please switch devices to view.</div>
@@ -32,6 +32,12 @@ import { defineComponent } from 'vue'
                     1. The application should support value investing goals and the evaluation of company fundamentals.
                     <br>
                     2. The application should encourage user engagement in value investing while avoiding low-effort interactions.
+                    <br>
+                    <br>
+                    <h2>Disclaimer</h2>
+                    This application shows financial information, but nothing on this application should be considered financial advice. 
+                    Data is provided by the SEC and nothing in the application verifies or validates the information provided. Comments on 
+                    this application should be assumed to be the opinion of the commentor and not financial advice from the application or its owner.
                     <br>
                     <br>
                     <h2>Valuable Information</h2>

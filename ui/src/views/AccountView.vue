@@ -21,7 +21,7 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
 </script>
 
 <template>
-    <div class="scrollable-list" style="margin: 15px;">
+    <div class="scrollable-list" style="margin-left: 15px; margin-right: 15px; margin-top: 7px;">
         <div v-if="jwt == ''">
             <v-expansion-panels>
                 <v-expansion-panel>

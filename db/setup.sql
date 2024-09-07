@@ -132,7 +132,8 @@ CREATE TABLE finance.logged_action (
 
 CREATE MATERIALIZED VIEW finance.recent_company_filings_with_potential_data_view AS 
     SELECT cf.cik, cf.accession_number, cf.filing_date, cf.report_date, cf.form, cf.data  FROM finance.company_filing cf
-    where filing_date > now() - interval '6' year and cf.form in (select form from finance.company_filing cf  where data::text <> '{}'::text group by form);
+    WHERE filing_date > now() - interval '6' year and cf.form in (select form from finance.company_filing cf  where data::text <> '{}'::text group by form)
+        AND cik IN (SELECT cik FROM finance.company_filing WHERE filing_date > NOW() - INTERVAL '1 year' GROUP BY cik);
 
 CREATE UNIQUE INDEX recent_company_filings_with_potential_data_view_index ON finance.recent_company_filings_with_potential_data_view (cik, accession_number);
 
@@ -144,10 +145,16 @@ CREATE UNIQUE INDEX recent_company_filings_data_key_index ON finance.recent_comp
 
 CREATE MATERIALIZED VIEW finance.location_data AS 
     SELECT UPPER(state_country) as state_country, sic_description, count(*) AS total_recently_active FROM finance.company_summary 
-        WHERE cik IN (SELECT cik FROM finance.recent_company_filings_with_potential_data_view WHERE filing_date > NOW() - INTERVAL '1 year' GROUP BY cik) 
+        WHERE cik IN (SELECT cik FROM finance.recent_company_filings_with_potential_data_view GROUP BY cik) 
         GROUP BY UPPER(state_country), sic_description;
 
 CREATE UNIQUE INDEX location_data_index ON finance.location_data (state_country, sic_description);
+
+CREATE MATERIALIZED VIEW finance.recent_company_summary AS 
+    SELECT * FROM finance.company_summary 
+        WHERE cik IN (SELECT cik FROM finance.recent_company_filings_with_potential_data_view GROUP BY cik);
+
+CREATE UNIQUE INDEX recent_company_summary_index ON finance.recent_company_summary (cik);
 
 CREATE OR REPLACE FUNCTION refresh_materialized_views()
 RETURNS trigger LANGUAGE plpgsql

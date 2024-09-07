@@ -32,7 +32,7 @@ import UserCommentComp from '@/components/UserComment.vue'
 <template>
     <div class="view" >
         <div class="left-column" >
-            <v-card style="margin: 10px;">
+            <v-card style="margin-left: 15px;">
                 <div style="height: 195px; width: 480px;">
                     <div class="card-title">Company Details</div>
                     <v-icon color="green" icon="mdi-bookmark-plus" size="large" v-if="!cikIsSaved" @click="addToSavedCik" :disabled="jwt==''"></v-icon>
@@ -60,7 +60,7 @@ import UserCommentComp from '@/components/UserComment.vue'
                         </div>
                 </div>
             </v-card>
-            <v-card style="margin: 10px; margin-top: 23px;">
+            <v-card style="margin-left: 15px; margin-top: 23px;">
                 <div class="filing-card">
                     <div class="card-title">Company Filings</div>
                     <div style="display: inline-block; vertical-align: bottom;">

@@ -33,42 +33,31 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
 </script>
 
 <template>
-    <div style="margin:15px;">
+    <div style="margin-left:16px;">
         <v-card style="width: 600px;">
             <v-btn-toggle color="primary" v-model="searchType" borderless variant="outlined">
-                <v-btn color="primary" size="small" value="name" :disabled="loading == true">Search Name</v-btn>
-                <v-btn color="primary" size="small" value="recent" :disabled="loading == true">Recent Filings</v-btn>
-                <v-btn color="primary" size="small" value="map" :disabled="loading == true">Map View</v-btn>
-                <v-btn color="primary" size="small" value="saved" :disabled="jwt=='' || loading == true">Saved Ciks</v-btn>
-                <v-btn color="primary" size="small" value="comments" :disabled="!hasCommentorRole || loading == true">Recent Comments</v-btn>
+                <v-btn color="primary" size="small" value="name" :disabled="loading == true || loadingTable != false">Search Name</v-btn>
+                <v-btn color="primary" size="small" value="recent" :disabled="loading == true || loadingTable != false">Recent Filings</v-btn>
+                <v-btn color="primary" size="small" value="map" :disabled="loading == true || loadingTable != false">Map View</v-btn>
+                <v-btn color="primary" size="small" value="saved" :disabled="jwt=='' || loading == true || loadingTable != false">Saved Ciks</v-btn>
+                <v-btn color="primary" size="small" value="comments" :disabled="!hasCommentorRole || loading == true || loadingTable != false">Recent Comments</v-btn>
             </v-btn-toggle>
         </v-card>
     </div>
-    <div style="margin-left: 15px">
+    <div style="margin-left: 15px; margin-top: 10px">
         <div v-if="searchType == 'name'" style="height: 40px;">
-            <h3 style="display: inline; vertical-align: top;">Search Name</h3>
             <v-form style="display: inline-block;" @submit.prevent>
-                <v-text-field placeholder="Search for company name" v-model="companyName" density="compact" style="display: inline-block; width: 500px; margin-left: 14px;"></v-text-field>
+                <v-text-field placeholder="Search for company name" v-model="companyName" density="compact" style="display: inline-block; width: 500px; margin-left: 11px;"></v-text-field>
                 <v-btn type="submit" color="primary" @click="getCompanyByName" style="display: inline-block; vertical-align: top; margin-left: 14px;">Search</v-btn>
             </v-form>
         </div>
         <div v-if="searchType == 'recent'">
-            <h3 style="display: inline;">Recent Filings</h3>
-            <div style="display: inline-block; vertical-align: bottom;">
-                <v-checkbox-btn label="Profitable Only" v-model="profitOnly" color="primary"/>
+            <div style="display: inline-block; vertical-align: bottom; margin-left: 5px;">
+                <v-checkbox-btn label="Profitable Only" v-model="profitOnly" color="secondary"/>
             </div>
-            <div style="display: inline-block; vertical-align: bottom;">
-                <v-checkbox-btn label="10-K Only" v-model="annualOnly" color="primary"/>
+            <div style="display: inline-block; vertical-align: bottom; margin-left: 15px;">
+                <v-checkbox-btn label="10-K Only" v-model="annualOnly" color="secondary"/>
             </div>
-        </div>
-        <div v-if="searchType == 'map'" style="height: 40px;">
-            <h3>Map View</h3>
-        </div>
-        <div v-if="searchType == 'saved'">
-            <h3>Saved Ciks</h3>
-        </div>
-        <div v-if="searchType == 'comments'">
-            <h3>Recent Comments</h3>
         </div>
         <v-progress-linear v-if="loading" color="primary" indeterminate class="loader"></v-progress-linear>
     </div>
@@ -126,7 +115,7 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
                     :items="companies"
                     :loading="loadingTable"
                     :loading-text="loadingCompaniesMessage"
-                    class="search-table"
+                    class="map-search-table"
                     fixed-header>
                     <template #item.cik="{ item }">
                         <a :href="'/company/'+item.cik">
@@ -138,7 +127,7 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
                     v-if="sicDescSelected === undefined"
                     :headers="sicDetailsHeaders"
                     :items="sicDetails"
-                    class="search-table"
+                    class="map-search-table"
                     fixed-header>
                     <template #item.sicDescription="{ item }">
                         <v-tooltip>
@@ -396,12 +385,20 @@ export default defineComponent({
     margin-left: 25px;
     margin-top: 15px;
 }
+.map-search-table {
+    width: v-bind((width-50) + 'px');
+    height: v-bind((height-155) + 'px');
+    margin-left: 25px;
+    margin-top: 15px;
+}
 .map {
     width: v-bind((width-480) + 'px');
-    height: v-bind((height-215) + 'px');
+    height: v-bind((height-155) + 'px');
     display: inline-block;
     margin-left: 50px;
-    margin-top: 18px;
+    margin-top: 15px;
+    border: 2px solid black !important;
+    box-shadow: 3px 6px 10px black !important;
 }
 
 </style>

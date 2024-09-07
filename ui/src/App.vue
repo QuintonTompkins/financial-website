@@ -41,9 +41,6 @@ import { jwtDecode } from "jwt-decode";
           </v-list-item>
         </v-list>
       </v-menu>
-      <div class="toolbar-disclaimer">Nothing on this application should be considered financial advice. Data is provided by the SEC 
-        and nothing in the application verifies or validates the information provided. Comments on this application should be assumed
-        to be the opinion of the commentor and not financial advice from the application or its owner.</div>
       </div>
     <RouterView @updateJwt="updateJwt" v-slot="{ Component }">
       <component :is="Component" :jwt=jwt />
@@ -108,12 +105,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.toolbar {
-  height: 50px; 
-  background: #252525;
-  border-bottom: solid;
-  border-color: black;
-}
 
 .nav-button {
   height: 35px;
@@ -125,12 +116,5 @@ export default defineComponent({
   margin-right: 15px;
   margin-top: 5px;
   margin-left: 5px;
-}
-
-.toolbar-disclaimer {
-  width: v-bind((width-150) + 'px');
-  display: inline-block;
-  color: #ee0000;
-  font-size: 14px;
 }
 </style>

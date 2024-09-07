@@ -54,10 +54,11 @@ export function getCompanySummaryByCountrySicDesc(countryStateSelected: String, 
                             }
                         }`,
             "variables": {
-                "input":{ "filters": [ 
-                    { "field": "state_country" , "comparator": "=", "value": countryStateSelected },
-                    { "field": "sic_description" , "comparator": "=", "value": sicDescSelected }
-                ] }
+                "input":{   "filters": [ 
+                                { "field": "state_country" , "comparator": "=", "value": countryStateSelected },
+                                { "field": "sic_description" , "comparator": "=", "value": sicDescSelected }
+                            ]
+                }
             }
         }
     )

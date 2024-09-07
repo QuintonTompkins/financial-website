@@ -37,7 +37,7 @@ public class CompanySummaryDao extends Dao {
 
     protected static final List<String> STRING_COLUMN_LIST = Arrays.asList("cik", "name", "sic_description", "category", "entity_type", "street1", "street2", "city", "state_country", "zip_code", "state_country_description");
 
-    private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", STRING_COLUMN_LIST)+" FROM finance.company_summary ";
+    private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", STRING_COLUMN_LIST)+" FROM finance.recent_company_summary ";
     private static final String QUERY_LIMIT = " LIMIT 250;";
 
     public CompanySummaryDao() {

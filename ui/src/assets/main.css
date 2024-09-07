@@ -16,64 +16,64 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 .v-overlay__content {
-  border: 2px solid black !important;
-  box-shadow: 3px 6px 10px black !important;
+    border: 2px solid black !important;
+    box-shadow: 3px 6px 10px black !important;
 }
 
 .v-card {
-  border: 2px solid black !important;
-  margin: 10px;
-  box-shadow: 3px 6px 10px black !important;
+    border: 2px solid black !important;
+    margin: 10px;
+    box-shadow: 3px 6px 10px black !important;
 }
 
 .v-expansion-panel {
-  border: 2px solid black !important;
+    border: 2px solid black !important;
 }
 
 .v-expansion-panel-title {
-  border-bottom: 2px solid black !important;
+    border-bottom: 2px solid black !important;
 }
 
 .card-title {
-  margin: 5px;
-  font-size: 23px;
-  font-weight: bold;
-  display: inline-block;
+    margin: 5px;
+    font-size: 23px;
+    font-weight: bold;
+    display: inline-block;
 }
 
 .card-text-sub-title {
-  margin: 5px;
-  font-size: 16px;
-  font-weight: bold;
-  display: inline-block;
+    margin: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    display: inline-block;
 }
 
 .card-text {
-  margin: 5px;
-  font-size: 16px;
-  font-weight: normal;
-  display: inline-block;
+    margin: 5px;
+    font-size: 16px;
+    font-weight: normal;
+    display: inline-block;
 }
 
 .a-hidden {
-  color: inherit;
-  text-decoration: inherit;
+    color: inherit;
+    text-decoration: inherit;
 }
 
 .v-table__wrapper {
-  box-shadow: 3px 6px 10px black !important;
-  border: 1px solid #000000 !important;
+    box-shadow: 3px 6px 10px black !important;
+    border: 1px solid #000000 !important;
 }
 
 .v-data-table__th {
-  background-color: #252525 !important;
+    background-color: #252525 !important;
 }
 
 .v-data-table__td {
-  border: 1px solid #a3a3a3 !important;
-  padding: 0px 5px 0px 5px !important
+    border: 1px solid #a3a3a3 !important;
+    padding: 0px 5px 0px 5px !important
 }
 
 tr:nth-child(even) {
-  background-color: #4d4d4d;
+    background-color: #4d4d4d;
 }
