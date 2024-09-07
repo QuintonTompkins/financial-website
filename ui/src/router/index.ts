@@ -21,6 +21,10 @@ import SearchView from '../views/SearchView.vue'
 import AccountView from '../views/AccountView.vue'
 import CompanyView from '../views/CompanyView.vue'
 import UserView from '../views/UserView.vue'
+import RecentFilingView from '@/views/RecentFilingView.vue'
+import MapView from '@/views/MapView.vue'
+import SavedCiksView from '@/views/SavedCiksView.vue'
+import RecentCommentsView from '@/views/RecentCommentsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +38,26 @@ const router = createRouter({
       path: '/search',
       name: 'Search',
       component: SearchView
+    },
+    {
+      path: '/recentFilings',
+      name: 'Recent Filing',
+      component: RecentFilingView
+    },
+    {
+      path: '/mapView',
+      name: 'Map View',
+      component: MapView
+    },
+    {
+      path: '/savedCiks',
+      name: 'Saved Ciks',
+      component: SavedCiksView
+    },
+    {
+      path: '/recentComments',
+      name: 'Recent Comments',
+      component: RecentCommentsView
     },
     {
       path: '/account',

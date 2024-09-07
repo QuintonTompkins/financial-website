@@ -17,23 +17,16 @@
 -->
 <script setup lang="ts">
 import { defineComponent } from 'vue'
-import { jwtDecode } from "jwt-decode"
 
 import * as FinanceApi from '@/services/FinanceApi.js'
-import type { CompanySummary } from '@/services/types/CompanySummary'
+import * as UserApi from '@/services/UserApi.js'
 </script>
 
 <template>
-    <div style="margin-left: 15px; margin-top: 20px">
-        <v-form style="display: inline-block;" @submit.prevent>
-            <v-text-field placeholder="Search for company name" v-model="companyName" density="compact" style="display: inline-block; width: 500px; margin-left: 11px;"></v-text-field>
-            <v-btn type="submit" color="primary" @click="getCompanyByName" style="display: inline-block; vertical-align: top; margin-left: 14px;">Search</v-btn>
-        </v-form>
-    </div>
     <div class="scrollable-tbody">
         <v-data-table-virtual
-            :headers="companyHeaders"
-            :items="companies"
+            :headers="savedHeaders"
+            :items="savedCiks"
             :loading="loadingTable"
             :loading-text="loadingCompaniesMessage"
             class="search-table"
@@ -56,47 +49,40 @@ export default defineComponent({
     },
     data() {
         return {
-            companyHeaders: [
+            savedHeaders: [
                 {title: 'CIK', key: 'cik', width: '150px'},
-                {title: 'Name', key: 'name', width: '800px'}
+                {title: 'Name', key: 'name'}
             ],
-            companies: [] as CompanySummary[],
+            savedCiks: [] as {cik: String, name: String}[],
             width: window.innerWidth,
             height: window.innerHeight,
             loadingTable: false as boolean | string,
-            companyName: "" as String,
-            hasCommentorRole: false as Boolean,
             loadingCompaniesMessage: 'Loading Companies...' as string
         };
-    },
-    watch: {
-        jwt: {
-            immediate: true, 
-            handler (newVal, oldVal) {
-                if(newVal != ""){
-                    const claims: {exp: number, sub: string, roles: String[]} = jwtDecode(newVal)
-                    this.hasCommentorRole = claims.roles.includes('commentor')
-                }
-                else{
-                    this.hasCommentorRole = false
-                }
-            }
-        }
     },
     mounted() {
         window.addEventListener('resize', () => {
             this.width = window.innerWidth
             this.height = window.innerHeight
         })
+        this.getSavedCiks()
     },
 
     methods: {
-        async getCompanyByName(){
-            this.companies = []
+        async getSavedCiks(){
+            this.savedCiks = []
             this.loadingTable = "primary"
-            const responseFilings = await FinanceApi.getCompanySummaryByName(this.companyName)
-            this.companies = responseFilings.data.data.companySummaries
+            const responseFilings = await UserApi.getSavedCiks(this.jwt)
+            let savedCiks = responseFilings.data.data.savedCiks.map(function(cik) { return {cik: cik, name: ""} })
+            this.savedCiks = await this.getCompanyNames(savedCiks)
             this.loadingTable = false
+        },
+        async getCompanyNames(records: any[]){
+            for(let record of records){
+                const nameResponse = await FinanceApi.getCompanyName(record.cik)
+                record.name = nameResponse.data.data.companySummaries[0].name
+            }
+            return records
         }
     }
 });
@@ -105,8 +91,8 @@ export default defineComponent({
 <style scoped>
 .search-table {
     width: v-bind((width-50) + 'px');
-    height: v-bind((height-155) + 'px');
+    height: v-bind((height-80) + 'px');
     margin-left: 25px;
+    margin-top: 15px;
 }
-
 </style>

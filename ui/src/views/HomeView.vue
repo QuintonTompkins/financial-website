@@ -20,7 +20,7 @@ import { defineComponent } from 'vue'
 </script>
 
 <template>
-    <div class="scrollable-list" style="margin-left: 15px; margin-right: 15px;">
+    <div class="scrollable-list" style="margin-left: 15px; margin-right: 15px; margin-top: 5px;">
         <v-card>
             <div style="margin: 15px;">
                 <h1>Welcome to Quinton's Finance Website!</h1>
@@ -95,7 +95,7 @@ export default defineComponent({
 
 <style scoped>
 .scrollable-list {
-  height: v-bind((height-80) + 'px');
+  height: v-bind((height-70) + 'px');
   overflow-y: auto;
 }
 </style>

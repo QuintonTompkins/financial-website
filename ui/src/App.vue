@@ -18,30 +18,23 @@
 
 <script setup lang="ts">
 import { defineComponent } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import { jwtDecode } from "jwt-decode";
 </script>
 
 <template>
   <v-app>
-    <div v-if="!isMobileDevice()">
-      <v-menu>
-        <template v-slot:activator="{ props }">
-          <v-btn color="primary" icon="mdi-menu" size="small" class="toolbar-menu-button" v-bind="props" variant="outlined"></v-btn>
-        </template>
-        <v-list>
-          <v-list-item>
-            <router-link to="/"><v-btn color="primary" class="nav-button" variant="outlined">Home</v-btn></router-link>
-          </v-list-item>
-          <v-list-item>
-            <router-link to="/search"><v-btn color="primary" class="nav-button" variant="outlined">Search</v-btn></router-link>
-          </v-list-item>
-          <v-list-item>
-            <router-link to="/account"><v-btn color="primary" class="nav-button" variant="outlined">{{jwt != '' ? userName : 'Login'}}</v-btn></router-link>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-      </div>
+    <div v-if="!isMobileDevice()" class="toolbar">
+        <v-btn-toggle color="primary" v-model="path" borderless variant="outlined">
+            <v-btn to="/" value="/" class="toolbar-menu-button">Home</v-btn>
+            <v-btn to="/search" value="/search" class="toolbar-menu-button">Search</v-btn>
+            <v-btn to="/recentFilings" value="/recentFilings" class="toolbar-menu-button">Recent Filings</v-btn>
+            <v-btn to="/mapView" value="/mapView" class="toolbar-menu-button">Map View</v-btn>
+            <v-btn to="/savedCiks" value="/savedCiks" class="toolbar-menu-button">Saved Ciks</v-btn>
+            <v-btn to="/recentComments" value="/recentComments" class="toolbar-menu-button" :disabled="!hasCommentorRole">Recent Comments</v-btn>
+            <v-btn to="/account" value="/account" class="toolbar-menu-button">{{jwt != '' ? userName : 'Login'}}</v-btn>
+        </v-btn-toggle>
+    </div>
     <RouterView @updateJwt="updateJwt" v-slot="{ Component }">
       <component :is="Component" :jwt=jwt />
     </RouterView>
@@ -60,7 +53,23 @@ export default defineComponent({
           userName: "" as string,
           width: window.innerWidth,
           height: window.innerHeight,
+          path: this.$route.path,
+          hasCommentorRole: false as boolean
       };
+    },
+    watch: {
+        jwt: {
+            immediate: true, 
+            handler (newVal, oldVal) {
+                if(newVal != ""){
+                    const claims: {exp: number, sub: string, roles: String[]} = jwtDecode(newVal)
+                    this.hasCommentorRole = claims.roles.includes('commentor')
+                }
+                else{
+                    this.hasCommentorRole = false
+                }
+            }
+        }
     },
     mounted(){
       const self = this; 
@@ -107,14 +116,18 @@ export default defineComponent({
 <style scoped>
 
 .nav-button {
-  height: 35px;
-  width: 100px;
+    height: 35px;
+    width: 100px;
+}
+
+.toolbar {
+    width: 100%;
+    margin: 0px;
+    background-color: #353535;
+    border-bottom: 2px solid black;
 }
 
 .toolbar-menu-button {
-  vertical-align: top;
-  margin-right: 15px;
-  margin-top: 5px;
-  margin-left: 5px;
+    border: 1px solid black !important;
 }
 </style>
