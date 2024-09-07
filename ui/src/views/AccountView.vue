@@ -29,7 +29,11 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
                     <v-expansion-panel-text>
                         <v-form @submit.prevent>
                             <v-text-field type="text" placeholder="Username/Email" v-model="usernameEmail"></v-text-field><br>
-                            <v-text-field type="text" placeholder="Password" v-model="passwordLogin"></v-text-field><br>
+                            <v-text-field placeholder="Password" 
+                                            v-model="passwordLogin" 
+                                            :append-icon="showPasswordLogin ? 'mdi-eye' : 'mdi-eye-off'"
+                                            :type="showPasswordLogin ? 'text' : 'password'" 
+                                            @click:append="showPasswordLogin = !showPasswordLogin"></v-text-field><br>
                             <v-btn type="submit" color="primary" @click="login">login</v-btn><br>
                         </v-form>
                     </v-expansion-panel-text>
@@ -42,7 +46,11 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
                         <v-form @submit.prevent>
                             <v-text-field type="text" placeholder="Username" v-model="username"></v-text-field><br>
                             <v-text-field type="text" placeholder="Email" v-model="email"></v-text-field><br>
-                            <v-text-field type="text" placeholder="Password" v-model="passwordCreate"></v-text-field><br>
+                            <v-text-field placeholder="Password" 
+                                            v-model="passwordCreate"
+                                            :type="showPasswordCreate ? 'text' : 'password'" 
+                                            :append-icon="showPasswordCreate ? 'mdi-eye' : 'mdi-eye-off'"
+                                            @click:append="showPasswordCreate = !showPasswordCreate"></v-text-field><br>
                             <v-btn type="submit" color="primary" @click="createUser">create user</v-btn><br>  
                         </v-form>
                     </v-expansion-panel-text>
@@ -67,9 +75,21 @@ import * as AuthorizationApi from '@/services/AuthorizationApi.js'
                     <v-expansion-panel-text>
                         <v-form @submit.prevent>
                             <v-text-field type="text" placeholder="Email" v-model="emailPassword"></v-text-field><br>
-                            <v-text-field type="text" placeholder="Old Password" v-model="oldPassword"></v-text-field><br>
-                            <v-text-field type="text" placeholder="New Password" v-model="newPassword1"></v-text-field><br>
-                            <v-text-field type="text" placeholder="New Password again" v-model="newPassword2"></v-text-field><br>
+                            <v-text-field placeholder="Old Password" 
+                                            v-model="oldPassword"
+                                            :type="showOldPassword ? 'text' : 'password'" 
+                                            :append-icon="showOldPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                                            @click:append="showOldPassword = !showOldPassword"></v-text-field><br>
+                            <v-text-field placeholder="New Password" 
+                                            v-model="newPassword1"
+                                            :type="showNewPassword1 ? 'text' : 'password'" 
+                                            :append-icon="showNewPassword1 ? 'mdi-eye' : 'mdi-eye-off'"
+                                            @click:append="showNewPassword1 = !showNewPassword1"></v-text-field><br>
+                            <v-text-field placeholder="New Password again" 
+                                            v-model="newPassword2"
+                                            :type="showNewPassword2 ? 'text' : 'password'" 
+                                            :append-icon="showNewPassword2 ? 'mdi-eye' : 'mdi-eye-off'"
+                                            @click:append="showNewPassword2 = !showNewPassword2"></v-text-field><br>
                             <v-btn type="submit" color="primary" :disabled="newPassword1 != newPassword2" @click="updatePassword">update password</v-btn><br>
                         </v-form>
                     </v-expansion-panel-text>
@@ -145,12 +165,19 @@ export default defineComponent({
             email: "" as string,
             emailReset: "" as string,
             emailPassword: "" as string,
+            showEmailPassword: false as boolean,
             password: "" as string,
+            showPassword: false as boolean,
             passwordLogin: "" as string,
+            showPasswordLogin: false as boolean,
             passwordCreate: "" as string,
+            showPasswordCreate: false as boolean,
             oldPassword: "" as string,
+            showOldPassword: false as boolean,
             newPassword1: "" as string,
+            showNewPassword1: false as boolean,
             newPassword2: "" as string,
+            showNewPassword2: false as boolean,
             newUsername: "" as string,
             newEmail: "" as string,
             reasonStatus: "" as string,
