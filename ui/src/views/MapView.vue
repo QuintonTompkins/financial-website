@@ -33,13 +33,20 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
     </div>
     <div v-if="!loading">
         <div class="scrollable-tbody" style="display: inline-block; width: 400px; vertical-align: top;">
+            <div v-if="sicDescSelected !== undefined" style="margin-left: 25px; max-height: 37px;">
+                <v-btn icon="mdi-arrow-left" style="display: inline-block; vertical-align: top;" color="secondary" size="small" variant="outlined" @click="goBack">
+                </v-btn>
+                <div style="display: inline-block; width: 320px; margin-left: 15px;">
+                    {{ sicDescSelected }} in {{ stateCountryCodes.data[countryStateSelected].name }}
+                </div>
+            </div>
             <v-data-table-virtual
                 v-if="sicDescSelected !== undefined"
                 :headers="companyHeaders"
                 :items="companies"
                 :loading="loadingTable"
                 :loading-text="loadingCompaniesMessage"
-                class="search-table"
+                class="companies-table"
                 fixed-header>
                 <template #item.cik="{ item }">
                     <a :href="'/company/'+item.cik">
@@ -51,7 +58,7 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
                 v-if="sicDescSelected === undefined"
                 :headers="sicDetailsHeaders"
                 :items="sicDetails"
-                class="search-table"
+                class="industry-table"
                 fixed-header>
                 <template #item.sicDescription="{ item }">
                     <v-tooltip>
@@ -95,7 +102,7 @@ export default defineComponent({
             height: window.innerHeight,
             loading: false as Boolean,
             loadingTable: false as boolean | string,
-            countryStateSelected: "" as String,
+            countryStateSelected: "" as string,
             sicDescSelected: undefined as string | undefined,
             loadingCompaniesMessage: 'Loading Companies...' as string
         };
@@ -111,6 +118,9 @@ export default defineComponent({
     },
 
     methods: {
+        goBack(){
+            this.sicDescSelected = undefined
+        },
         selectLocationCallback(location: LocationDataLatLng){
             this.sicDescSelected = undefined
             this.countryStateSelected = location.code
@@ -157,7 +167,13 @@ export default defineComponent({
     width: v-bind((width-50) + 'px');
     margin: 15px;
 }
-.search-table {
+.companies-table {
+    width: v-bind((width-50) + 'px');
+    height: v-bind((height-132) + 'px');
+    margin-left: 25px;
+    margin-top: 15px;
+}
+.industry-table {
     width: v-bind((width-50) + 'px');
     height: v-bind((height-95) + 'px');
     margin-left: 25px;
