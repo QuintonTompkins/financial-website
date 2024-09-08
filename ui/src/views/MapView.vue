@@ -34,9 +34,8 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
     <div v-if="!loading">
         <div class="scrollable-tbody" style="display: inline-block; width: 400px; vertical-align: top;">
             <div v-if="sicDescSelected !== undefined" style="margin-left: 25px; max-height: 37px;">
-                <v-btn icon="mdi-arrow-left" style="display: inline-block; vertical-align: top;" color="secondary" size="small" variant="outlined" @click="goBack">
-                </v-btn>
-                <div style="display: inline-block; width: 320px; margin-left: 15px;">
+                <v-btn icon="mdi-arrow-left" style="display: inline-block; vertical-align: top;" color="secondary" variant="text" @click="goBack" />
+                <div style="display: inline-block; width: 310px; margin-left: 15px;">
                     {{ sicDescSelected }} in {{ stateCountryCodes.data[countryStateSelected].name }}
                 </div>
             </div>
@@ -50,7 +49,7 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
                 fixed-header>
                 <template #item.cik="{ item }">
                     <a :href="'/company/'+item.cik">
-                        <v-btn color="secondary" density="compact">{{item.cik}}</v-btn>
+                        <v-btn color="secondary" variant="text">{{item.cik}}</v-btn>
                     </a>
                 </template>
             </v-data-table-virtual>
@@ -63,7 +62,7 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
                 <template #item.sicDescription="{ item }">
                     <v-tooltip>
                         <template v-slot:activator="{ props }">
-                            <v-btn v-bind="props" color="secondary" density="compact" style="width: 275px" @click="selectSicDetails(item.sicDescription)">
+                            <v-btn v-bind="props" color="secondary" variant="text" style="width: 275px" @click="selectSicDetails(item.sicDescription)">
                                 {{item.sicDescription === "" ? "N/A" : item.sicDescription?.substring(0, 25)}}</v-btn>
                         </template>
                         <span>{{ item.sicDescription }}</span>

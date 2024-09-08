@@ -35,8 +35,13 @@ import UserCommentComp from '@/components/UserComment.vue'
             <v-card style="margin-left: 15px;">
                 <div style="height: 195px; width: 480px;">
                     <div class="card-title">Company Details</div>
-                    <v-icon color="green" icon="mdi-bookmark-plus" size="large" v-if="!cikIsSaved" @click="addToSavedCik" :disabled="jwt==''"></v-icon>
-                    <v-icon color="red" icon="mdi-bookmark-remove" size="large" v-if="cikIsSaved" @click="removeSavedCik" :disabled="jwt==''"></v-icon>
+                    <v-btn :icon="cikIsSaved ? 'mdi-bookmark-remove' : 'mdi-bookmark-plus'"
+                            :color="cikIsSaved ? 'red' : 'green'" 
+                            size="large" 
+                            variant="text" 
+                            density="compact"
+                            @click="updateSavedCik" 
+                            :disabled="jwt==''"/>
                     <br>
                     <div class="card-text-sub-title company-details">Company Cik:</div>
                         <a :href="`https://www.sec.gov/edgar/browse/?CIK=${cik}`">{{ cik }}</a>
@@ -301,17 +306,19 @@ export default defineComponent({
                 this.companyFilingKeys = response.data.data.companyFilingKeys.map(function (keyObj) { return keyObj.key; });
             })
         },
-        addToSavedCik(){
-            UserApi.addToSavedCik(this.cik, this.jwt).then((response: { data: { data: String }; status: number; }) => {
-                if(response.status == 200)
-                    this.cikIsSaved = true
-             })
-        },
-        removeSavedCik(){
-            UserApi.removeSavedCik(this.cik, this.jwt).then((response: { data: { data: String }; status: number; }) => {
-                if(response.status == 200)
-                    this.cikIsSaved = false
-             })
+        updateSavedCik(){
+            if(this.cikIsSaved){
+                UserApi.removeSavedCik(this.cik, this.jwt).then((response: { data: { data: String }; status: number; }) => {
+                    if(response.status == 200)
+                        this.cikIsSaved = false
+                })
+            }
+            else{
+                UserApi.addToSavedCik(this.cik, this.jwt).then((response: { data: { data: String }; status: number; }) => {
+                    if(response.status == 200)
+                        this.cikIsSaved = true
+                })
+            }
         },
         getSavedCiks(){
             UserApi.getSavedCiks(this.jwt).then((response: { data: { data: { savedCiks: String[] } }; status: number; }) => {

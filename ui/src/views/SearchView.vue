@@ -40,7 +40,7 @@ import type { CompanySummary } from '@/services/types/CompanySummary'
             fixed-header>
             <template #item.cik="{ item }">
                 <a :href="'/company/'+item.cik">
-                    <v-btn color="secondary">{{item.cik}}</v-btn>
+                    <v-btn color="secondary" variant="text">{{item.cik}}</v-btn>
                 </a>
             </template>
         </v-data-table-virtual>
