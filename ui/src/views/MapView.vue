@@ -44,7 +44,7 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
                 :headers="companyHeaders"
                 :items="companies"
                 :loading="loadingTable"
-                :loading-text="loadingCompaniesMessage"
+                :loading-text="loadingMessage"
                 class="companies-table"
                 fixed-header>
                 <template #item.cik="{ item }">
@@ -103,7 +103,7 @@ export default defineComponent({
             loadingTable: false as boolean | string,
             countryStateSelected: "" as string,
             sicDescSelected: undefined as string | undefined,
-            loadingCompaniesMessage: 'Loading Companies...' as string
+            loadingMessage: 'Loading Companies...' as string
         };
     },
     watch: {

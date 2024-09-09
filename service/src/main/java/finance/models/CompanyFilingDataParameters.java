@@ -36,7 +36,7 @@ public class CompanyFilingDataParameters extends GenericParameters {
         validateGenericParameters(stringColumnList, dateColumnList, booleanColumnList, numericColumnList);
         ArrayList<String> filterStringList = new ArrayList<String>();
         for (GenericFilter filter : getFilters()) {
-            filterStringList.add(String.format(" %s %s ? ", filter.getField(), filter.getComparator()));
+            filterStringList.add(stringifyGenericFilter(filter));
         }
         for (CompanyFilingDataFilter filter : getCustomFilters()) {
             filterStringList.add(filter.generateFilterString());

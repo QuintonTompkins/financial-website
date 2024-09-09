@@ -105,8 +105,7 @@ export function getRecentCompanyFilings(genericFilters: GenericFilter[], recentC
           accessionNumber,
           form,
           filingDate,
-          reportDate,
-          data
+          reportDate
         }
       }`
     if(withData){

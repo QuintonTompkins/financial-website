@@ -47,7 +47,7 @@ public class CompanyFilingDao extends Dao{
                                                           .flatMap(List::stream)
                                                           .collect(Collectors.toList());
 
-    private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", COLUMN_LIST)+" FROM finance.recent_company_filings_with_potential_data_view ";
+    private static final String SELECT_ALL_QUERY = "SELECT "+String.join(",", COLUMN_LIST)+" FROM finance.recent_company_filings_view ";
     private static final String QUERY_LIMIT = " LIMIT 50;";
 
     public CompanyFilingDao() {

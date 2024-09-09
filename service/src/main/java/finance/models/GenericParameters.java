@@ -21,6 +21,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GenericParameters {
@@ -49,35 +50,55 @@ public class GenericParameters {
         }
     }
 
+    public String stringifyGenericFilter(GenericFilter filter){
+        if(filter.getComparator().equals("like")){
+            return String.format(" LOWER(%s) %s LOWER(?) ", filter.getField(), filter.getComparator());
+        }
+        else if(filter.getComparator().equals("in")){
+            String[] items = ((String) filter.getValue()).split(",");
+            List<String> itemsList = Collections.nCopies(items.length, "LOWER(?)");
+            String itemsString = String.join(",", itemsList);
+            String conditional = String.format(" LOWER(%s) %s (%s) ", filter.getField(), filter.getComparator(), itemsString);
+            return conditional;
+        }
+        else{
+            return String.format(" %s %s ? ", filter.getField(), filter.getComparator());
+        }
+    }
+
     public String generateFilterString(List<String> stringColumnList, List<String> dateColumnList, List<String> booleanColumnList, List<String> numericColumnList) {
         validateGenericParameters(stringColumnList, dateColumnList, booleanColumnList, numericColumnList);
         ArrayList<String> filterStringList = new ArrayList<String>();
         for (GenericFilter filter : this.filters) {
-            if(filter.getComparator().equals("like")){
-                filterStringList.add(String.format(" LOWER(%s) %s LOWER(?) ", filter.getField(), filter.getComparator()));
-            }
-            else{
-                filterStringList.add(String.format(" %s %s ? ", filter.getField(), filter.getComparator()));
-            }
+            filterStringList.add(stringifyGenericFilter(filter));
         }
         return filterStringList.size() == 0 ? "" : " WHERE " + String.join(" AND ", filterStringList);
     }
 
     public int setValues(PreparedStatement statement, int i, List<String> stringColumnList, List<String> dateColumnList, List<String> booleanColumnList, List<String> numericColumnList) throws SQLException {
-        for( int j = 0 ; j < filters.size() ; j++, i++){
+        for( int j = 0 ; j < filters.size() ; j++){
             String field = filters.get(j).getField();
+            String comparator = filters.get(j).getComparator();
             Object value = filters.get(j).getValue();
             if(stringColumnList.contains(field)){
-                statement.setString(i, (String) value);
+                if(comparator.equals("in")){
+                    String[] items = ((String) value).split(",");
+                    for(int itemCount = 0; itemCount < items.length ; itemCount++){
+                        statement.setString(i++, (String) items[itemCount]);
+                    }
+                }
+                else{
+                    statement.setString(i++, (String) value);
+                }
             }
             if(dateColumnList.contains(field)){
-                statement.setDate(i, Date.valueOf((String)value));
+                statement.setDate(i++, Date.valueOf((String)value));
             }
             if(numericColumnList.contains(field)){
-                statement.setInt(i, (int) value );
+                statement.setInt(i++, (int) value );
             }
             if(booleanColumnList.contains(field)){
-                statement.setBoolean(i, (boolean) value);
+                statement.setBoolean(i++, (boolean) value);
             }
         }
         return i;

@@ -28,7 +28,7 @@ import * as UserApi from '@/services/UserApi.js'
             :headers="savedHeaders"
             :items="savedCiks"
             :loading="loadingTable"
-            :loading-text="loadingCompaniesMessage"
+            :loading-text="loadingMessage"
             class="search-table"
             fixed-header>
             <template #item.cik="{ item }">
@@ -57,7 +57,7 @@ export default defineComponent({
             width: window.innerWidth,
             height: window.innerHeight,
             loadingTable: false as boolean | string,
-            loadingCompaniesMessage: 'Loading Companies...' as string
+            loadingMessage: 'Loading Companies...' as string
         };
     },
     mounted() {

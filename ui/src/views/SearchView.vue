@@ -26,7 +26,7 @@ import type { CompanySummary } from '@/services/types/CompanySummary'
 <template>
     <div style="margin-left: 15px; margin-top: 20px">
         <v-form style="display: inline-block;" @submit.prevent>
-            <v-text-field placeholder="Search for company name" v-model="companyName" density="compact" style="display: inline-block; width: 500px; margin-left: 11px;"></v-text-field>
+            <v-text-field placeholder="Company Name" v-model="companyName" density="compact" style="display: inline-block; width: 500px; margin-left: 11px;"></v-text-field>
             <v-btn type="submit" color="primary" @click="getCompanyByName" style="display: inline-block; vertical-align: top; margin-left: 14px;">Search</v-btn>
         </v-form>
     </div>
@@ -35,7 +35,7 @@ import type { CompanySummary } from '@/services/types/CompanySummary'
             :headers="companyHeaders"
             :items="companies"
             :loading="loadingTable"
-            :loading-text="loadingCompaniesMessage"
+            :loading-text="loadingMessage"
             class="search-table"
             fixed-header>
             <template #item.cik="{ item }">
@@ -66,7 +66,7 @@ export default defineComponent({
             loadingTable: false as boolean | string,
             companyName: "" as String,
             hasCommentorRole: false as Boolean,
-            loadingCompaniesMessage: 'Loading Companies...' as string
+            loadingMessage: 'Loading Companies...' as string
         };
     },
     watch: {

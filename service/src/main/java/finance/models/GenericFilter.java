@@ -30,9 +30,9 @@ public class GenericFilter {
     private String comparator;
     private Object value;
     
-    private static final List<String> VALID_NUMERIC_COMPARATORS =  Arrays.asList("=",">","<");
-    private static final List<String> VALID_STRING_COMPARATORS =  Arrays.asList("=","like");
-    private static final List<String> VALID_DATE_COMPARATORS =  Arrays.asList("=",">","<");
+    private static final List<String> VALID_NUMERIC_COMPARATORS =  Arrays.asList("=",">","<","in");
+    private static final List<String> VALID_STRING_COMPARATORS =  Arrays.asList("=","like","in");
+    private static final List<String> VALID_DATE_COMPARATORS =  Arrays.asList("=",">","<","in");
     private static final List<String> VALID_BOOLEAN_COMPARATORS =  Arrays.asList("=");
 
     public GenericFilter() {

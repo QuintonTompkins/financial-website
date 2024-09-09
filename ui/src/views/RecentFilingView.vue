@@ -23,20 +23,18 @@ import type { CompanyFilingWithName } from '@/services/types/CompanyFilingExtens
 </script>
 
 <template>
-    <div style="margin-left: 15px; margin-top: 10px">
-        <div style="display: inline-block; vertical-align: bottom; margin-left: 5px;">
-            <v-checkbox-btn label="Profitable Only" v-model="profitOnly" color="secondary"/>
-        </div>
-        <div style="display: inline-block; vertical-align: bottom; margin-left: 15px;">
-            <v-checkbox-btn label="10-K Only" v-model="annualOnly" color="secondary"/>
-        </div>
+    <div style="margin-left: 27px; margin-top: 10px">
+        <v-btn-toggle color="secondary" v-model="filterType" borderless variant="flat">
+            <v-btn value="profitable" class="recent-selection-button">Profitable 10-K</v-btn>
+            <v-btn value="spinoffs" class="recent-selection-button">Spin Offs</v-btn>
+        </v-btn-toggle>
     </div>
     <div class="scrollable-tbody">
         <v-data-table-virtual
             :headers="companyFilingsHeaders"
             :items="companyFilings"
             :loading="loadingTable"
-            :loading-text="loadingCompaniesMessage"
+            :loading-text="loadingMessage"
             class="search-table"
             fixed-header>
             <template #item.cik="{ item }">
@@ -68,17 +66,13 @@ export default defineComponent({
             companyFilings: [] as CompanyFilingWithName[],
             width: window.innerWidth,
             height: window.innerHeight,
-            profitOnly: true as Boolean,
-            annualOnly: true as Boolean,
             loadingTable: false as boolean | string,
-            loadingCompaniesMessage: 'Loading Companies...' as string
+            loadingMessage: 'Loading Filings...' as string,
+            filterType: "profitable" as String
         };
     },
     watch: {
-        profitOnly(newVal, oldVal){
-            this.getCompanyRecentFilings()
-        },
-        annualOnly(newVal, oldVal){
+        filterType(newVal, oldVal){
             this.getCompanyRecentFilings()
         }
     },
@@ -92,11 +86,20 @@ export default defineComponent({
 
     methods: {
         async getCompanyRecentFilings(){
+            switch(this.filterType){
+                case "profitable":
+                    this.getRecentProfitableAnnualEarnings()
+                    break
+                case "spinoffs":
+                    this.getRecentSpinoffFilings()
+                    break
+            }
+        },
+        async getRecentProfitableAnnualEarnings(){
             this.companyFilings = []
             this.loadingTable = "primary"
             let recentGenericFilters = [] as GenericFilter[]
             let recentCompanyFilingDataFilter = [] as CompanyFilingDataFilter[]
-            
             let date = new Date();
             date.setDate(date.getDate() - 30);
             let filterDate: String = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' +  date.getDate()
@@ -105,22 +108,40 @@ export default defineComponent({
                 comparator: ">",
                 value: filterDate
             })
-
-            if(this.annualOnly){
-                recentGenericFilters.push({
-                    field: "form",
-                    comparator: "=",
-                    value: "10-K"
-                })
-            }
-            if(this.profitOnly){
-                recentCompanyFilingDataFilter.push({
-                    field: "us-gaap_GrossProfit",
-                    comparator: ">",
-                    valueIsField: false,
-                    value: 0
-                })
-            }
+            recentGenericFilters.push({
+                field: "form",
+                comparator: "=",
+                value: "10-K"
+            })
+            recentCompanyFilingDataFilter.push({
+                field: "us-gaap_GrossProfit",
+                comparator: ">",
+                valueIsField: false,
+                value: 0
+            })
+            const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter, false)
+            let companyFilings = responseFilings.data.data.companyFilings
+            this.companyFilings = await this.getCompanyNames(companyFilings)
+            this.loadingTable = false
+        },
+        async getRecentSpinoffFilings(){
+            this.companyFilings = []
+            this.loadingTable = "primary"
+            let recentGenericFilters = [] as GenericFilter[]
+            let recentCompanyFilingDataFilter = [] as CompanyFilingDataFilter[]
+            let date = new Date();
+            date.setDate(date.getDate() - 365);
+            let filterDate: String = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' +  date.getDate()
+            recentGenericFilters.push({
+                field: "filing_date",
+                comparator: ">",
+                value: filterDate
+            })
+            recentGenericFilters.push({
+                field: "form",
+                comparator: "in",
+                value: "10-12B,10-12B/A"
+            })
             const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter, false)
             let companyFilings = responseFilings.data.data.companyFilings
             this.companyFilings = await this.getCompanyNames(companyFilings)
@@ -143,5 +164,8 @@ export default defineComponent({
     height: v-bind((height-135) + 'px');
     margin-left: 25px;
     margin-top: 15px;
+}
+.recent-selection-button {
+    border: 1px solid black !important;
 }
 </style>
