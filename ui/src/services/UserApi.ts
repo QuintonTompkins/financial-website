@@ -82,6 +82,7 @@ export function getCompanyComments(cik: String, jwt: any) {
             "query": `query ($input: GenericParameters!) {
                             userComments(input: $input) {
                                 commentId,
+                                userId,
                                 userName,
                                 comment,
                                 minPrice,

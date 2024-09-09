@@ -48,9 +48,7 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
                 class="companies-table"
                 fixed-header>
                 <template #item.cik="{ item }">
-                    <a :href="'/company/'+item.cik">
-                        <v-btn color="secondary" variant="text">{{item.cik}}</v-btn>
-                    </a>
+                    <v-btn :to="'/company/'+item.cik" color="secondary" variant="text">{{item.cik}}</v-btn>
                 </template>
             </v-data-table-virtual>
             <v-data-table-virtual

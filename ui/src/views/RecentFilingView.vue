@@ -25,8 +25,8 @@ import type { CompanyFilingWithName } from '@/services/types/CompanyFilingExtens
 <template>
     <div style="margin-left: 27px; margin-top: 10px">
         <v-btn-toggle color="secondary" v-model="filterType" borderless variant="flat">
-            <v-btn value="profitable" class="recent-selection-button">Profitable 10-K</v-btn>
-            <v-btn value="spinoffs" class="recent-selection-button">Spin Offs</v-btn>
+            <v-btn value="profitable" class="recent-selection-button" :disabled="loadingTable != false">Profitable 10-K</v-btn>
+            <v-btn value="spinoffs" class="recent-selection-button" :disabled="loadingTable != false">Spin Offs</v-btn>
         </v-btn-toggle>
     </div>
     <div class="scrollable-tbody">
@@ -38,9 +38,7 @@ import type { CompanyFilingWithName } from '@/services/types/CompanyFilingExtens
             class="search-table"
             fixed-header>
             <template #item.cik="{ item }">
-                <a :href="'/company/'+item.cik">
-                    <v-btn color="secondary" variant="text">{{item.cik}}</v-btn>
-                </a>
+                <v-btn :to="'/company/'+item.cik" color="secondary" variant="text">{{item.cik}}</v-btn>
             </template>
         </v-data-table-virtual>
     </div>

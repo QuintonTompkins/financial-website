@@ -23,26 +23,37 @@ import type { UserComment } from '@/services/types/UserComment';
 </script>
 
 <template>
-    <div>
-        <div v-if="comment.cik"class="card-text-sub-title">CIK:</div>
-        <a v-if="comment.cik" :href="'/company/'+comment.cik" style="display: inline-block;">{{ comment.cik }}</a>
-        <div v-if="comment.cik && comment.name" class="card-text-sub-title">Name:</div>
-        <div v-if="comment.cik && comment.name" class="card-text" style="display: inline-block;">{{ comment.name }}</div>
-        <div class="card-text-sub-title">Username:</div>
-        <a :href="'/user/'+comment.userId" style="display: inline-block;">{{ comment.userName }}</a>
-        <div class="card-text-sub-title">Created:</div>
-        <div class="card-text">{{ comment.created }}</div>
-        <div class="card-text-sub-title">Price Range:</div>
-        <div class="card-text">${{ comment.minPrice }} to ${{ comment.maxPrice }}</div>
-        
-        <div class="vote-block">
-            <img src="/arrow-sm-up-svgrepo-com.svg" alt="up vote" @click="upVote()"/>
-            <div class="card-text" style="font-size: 23px;">{{ comment.voteTotal }}</div>
-            <img src="/arrow-sm-down-svgrepo-com.svg" alt="down vote" @click="downVote()"/>
-        </div>
-        <br>
-        <div style="margin: 10px">
+    <div style="margin: 10px;">
+        <div class="left-block">
+            <div class="card-text-sub-title">Username:</div>
+            <v-btn :to="'/user/'+comment.userId" color="secondary" variant="text" density="compact" style="display: inline-block; margin-top: 3px;">{{ comment.userName }}</v-btn>
+            <div class="card-text-sub-title">Created:</div>
+            <div class="card-text">{{ comment.created }}</div>
+            <br>
+            <div v-if="comment.cik"class="card-text-sub-title">CIK:</div>
+            <v-btn v-if="comment.cik" :to="'/company/'+comment.cik" color="secondary" variant="text" density="compact" style="display: inline-block; margin-top: 3px;">{{ comment.cik }}</v-btn>
+            <div v-if="comment.cik && comment.name" class="card-text-sub-title">Name:</div>
+            <div v-if="comment.cik && comment.name" class="card-text" style="display: inline-block;">{{ comment.name }}</div>
+            <br v-if="comment.cik && comment.name">
+            <div v-if="comment.minPrice != -1 || comment.maxPrice != -1" class="card-text-sub-title">Price Range:</div>
+            <div v-if="comment.minPrice != -1 || comment.maxPrice != -1" class="card-text">${{ comment.minPrice }} to ${{ comment.maxPrice }}</div>
+            <br v-if="comment.minPrice != -1 || comment.maxPrice != -1">
             <div class="card-text" style="white-space: pre-line">{{comment.comment}}</div>
+        </div>
+        <div class="vote-block">
+            <v-btn :icon="'mdi-arrow-up'"
+                            :color="'white'" 
+                            size="small" 
+                            variant="text" 
+                            density="compact"
+                            @click="upVote"/>
+            <div class="card-text" style="display: block;">{{ comment.voteTotal }}</div>
+            <v-btn :icon="'mdi-arrow-down'"
+                            :color="'white'" 
+                            size="small" 
+                            variant="text" 
+                            density="compact"
+                            @click="downVote"/>
         </div>
     </div>
 </template>
@@ -58,6 +69,7 @@ export default defineComponent({
         }
     },
     mounted() {
+        console.log(this.comment)
     },
 
     methods: {
@@ -86,8 +98,14 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.left-block{
+    width: calc(100% - 40px);
+    display: inline-block;
+    margin-left: 10px
+}
 .vote-block{
+    width: 20px;
     float: right;
-    display: inline;
+    vertical-align: top;
 }
 </style>

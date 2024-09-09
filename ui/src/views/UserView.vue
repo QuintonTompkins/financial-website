@@ -28,9 +28,7 @@ import UserComment from '@/components/UserComment.vue'
     <div class="scrollable-list">
         <div v-for="comment in comments">
             <v-card class="card-width">
-                <div class="list-item">
-                    <UserComment :comment="comment" :jwt="jwt" />
-                </div>
+                <UserComment :comment="comment" :jwt="jwt" />
             </v-card>
         </div>
     </div>

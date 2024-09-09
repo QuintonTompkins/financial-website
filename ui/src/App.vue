@@ -30,10 +30,10 @@ import { jwtDecode } from "jwt-decode";
             <v-btn to="/search" value="/search" class="toolbar-menu-button">Search</v-btn>
             <v-btn to="/recentFilings" value="/recentFilings" class="toolbar-menu-button">Recent Filings</v-btn>
             <v-btn to="/mapView" value="/mapView" class="toolbar-menu-button">Map View</v-btn>
-            <v-btn to="/savedCiks" value="/savedCiks" class="toolbar-menu-button" :disabled="jwt === ''">Saved Ciks</v-btn>
+            <v-btn to="/savedCiks" value="/savedCiks" class="toolbar-menu-button" :disabled="jwt === ''">Saved</v-btn>
             <v-btn to="/recentComments" value="/recentComments" class="toolbar-menu-button" :disabled="jwt === '' || !hasCommentorRole">Recent Comments</v-btn>
-            <v-btn to="/account" value="/account" class="toolbar-menu-button">{{jwt != '' ? userName : 'Login'}}</v-btn>
         </v-btn-toggle>
+        <v-btn to="/account" :icon="'mdi-account-circle'" density="compact" variant="text" size="x-large" color="primary" class="user-icon"/>
     </div>
     <RouterView @updateJwt="updateJwt" v-slot="{ Component }">
       <component :is="Component" :jwt=jwt />
@@ -129,5 +129,11 @@ export default defineComponent({
 
 .toolbar-menu-button {
     border: 1px solid black !important;
+}
+
+.user-icon {
+    float: right;
+    margin-top: 3px;
+    margin-right: 5px;
 }
 </style>

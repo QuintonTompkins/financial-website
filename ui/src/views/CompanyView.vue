@@ -69,7 +69,7 @@ import UserCommentComp from '@/components/UserComment.vue'
                 <div class="filing-card">
                     <div class="card-title">Company Filings</div>
                     <div style="display: inline-block; vertical-align: bottom;">
-                        <v-checkbox-btn label="10-K/10-Q Only" v-model="tenOnly" color="primary"/>
+                        <v-checkbox-btn label="10-K/10-Q Only" v-model="tenOnly" color="secondary"/>
                     </div>
                     <br>
                     <div class="scrollable-tbody filing-list">
@@ -83,7 +83,7 @@ import UserCommentComp from '@/components/UserComment.vue'
                                     <td class="v-data-table__td v-data-table-column--align-start">
                                         <v-checkbox-btn
                                             v-model="item.selected"
-                                            color="primary"/>
+                                            color="secondary"/>
                                     </td>
                                     <td class="v-data-table__td v-data-table-column--align-start">{{ item.accessionNumber }}</td>
                                     <td class="v-data-table__td v-data-table-column--align-start">{{ item.reportDate }}</td>
@@ -101,7 +101,7 @@ import UserCommentComp from '@/components/UserComment.vue'
                 <div class="analysis-height-width">
                     <div class="card-title" style="margin-left: 10px; vertical-align: top;">Company Analysis</div>
                     <v-card class="analysis-toggle" variant="tonal">
-                        <v-btn-toggle v-model="companyView" color="primary" variant="outlined">
+                        <v-btn-toggle v-model="companyView" color="secondary" variant="flat">
                             <v-btn size="small" value="summary" >Summary</v-btn>
                             <v-btn size="small" value="comment" :disabled="!hasCommentorRole">Comments</v-btn>
                         </v-btn-toggle>
@@ -149,10 +149,8 @@ import UserCommentComp from '@/components/UserComment.vue'
                     </div>
                     <div v-if="companyView=='comment'" style="margin-right: 20px;">
                         <div class="scrollable-comment-list">
-                            <v-card style="margin: 10px;" variant="tonal" v-for="userComment in userComments">
-                                <div class="comment-list-item">
-                                    <UserCommentComp :comment="userComment" :jwt="jwt"/>
-                                </div>
+                            <v-card style="margin-left: 20px; margin-right: 20px;" variant="tonal" v-for="userComment in userComments">
+                                <UserCommentComp :comment="userComment" :jwt="jwt"/>
                             </v-card>
                         </div>
                         <v-form style="margin-top: 15px; margin-left: 5px;" @submit.prevent>
@@ -289,8 +287,8 @@ export default defineComponent({
             if(this.tenOnly){
                 recentGenericFilters.push({
                     field: "form",
-                    comparator: "like",
-                    value: "10-%"
+                    comparator: "in",
+                    value: "10-K,10-K/A,10-Q,10-Q/A"
                 })
             }
             FinanceApi.getRecentCompanyFilings(recentGenericFilters, [], true).then((response: { data: { data: { companyFilings: CompanyFiling[] } }; status: number; }) => {
@@ -389,10 +387,6 @@ export default defineComponent({
     height: v-bind((height-250) + 'px');
     overflow-y: auto;
 }
-.comment-list-item{
-    width: v-bind((width-605) + 'px');
-    margin: 5px;
-}
 
 .analysis-toggle {
     width: 190px;
@@ -421,5 +415,9 @@ export default defineComponent({
 
 .v-data-table__td{
     height: 25px !important;
+}
+
+.company-view-button {
+    border: 1px solid black !important;
 }
 </style>
