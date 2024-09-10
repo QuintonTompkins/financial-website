@@ -59,7 +59,7 @@ export function removeSavedCik(cik: String, jwt: any) {
     )
 }
 
-export function addComment(cik: String, minPrice: number, maxPrice: number, comment: String, jwt: any) {
+export function addComment(cik: String, minPrice: number | undefined, maxPrice: number | undefined, comment: String, jwt: any) {
     return axios.post<{ data: String }>(BASE_URL+'graphql',
         {
             "query": `mutation($cik: String!, $minPrice: Float!, $maxPrice: Float!, $comment: String!) {
@@ -67,8 +67,8 @@ export function addComment(cik: String, minPrice: number, maxPrice: number, comm
                         }`,
             "variables": {
                 "cik": cik,
-                "minPrice": minPrice,
-                "maxPrice": maxPrice,
+                "minPrice": minPrice ? minPrice : -1,
+                "maxPrice": maxPrice ? maxPrice : -1,
                 "comment": comment
             }
         },

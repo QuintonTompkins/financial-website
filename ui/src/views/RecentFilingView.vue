@@ -25,8 +25,9 @@ import type { CompanyFilingWithName } from '@/services/types/CompanyFilingExtens
 <template>
     <div style="margin-left: 27px; margin-top: 10px">
         <v-btn-toggle color="secondary" v-model="filterType" borderless variant="flat">
-            <v-btn value="profitable" class="recent-selection-button" :disabled="loadingTable != false">Profitable 10-K</v-btn>
+            <v-btn value="profitable" class="recent-selection-button" :disabled="loadingTable != false">Profitable Annual Earnings</v-btn>
             <v-btn value="spinoffs" class="recent-selection-button" :disabled="loadingTable != false">Spin Offs</v-btn>
+            <v-btn value="mergers" class="recent-selection-button" :disabled="loadingTable != false">Mergers and Acquisition</v-btn>
         </v-btn-toggle>
     </div>
     <div class="scrollable-tbody">
@@ -66,7 +67,7 @@ export default defineComponent({
             height: window.innerHeight,
             loadingTable: false as boolean | string,
             loadingMessage: 'Loading Filings...' as string,
-            filterType: "profitable" as String
+            filterType: "" as String
         };
     },
     watch: {
@@ -90,6 +91,9 @@ export default defineComponent({
                     break
                 case "spinoffs":
                     this.getRecentSpinoffFilings()
+                    break
+                case "mergers":
+                    this.getRecentMergersAndAcquisitionFilings()
                     break
             }
         },
@@ -139,6 +143,29 @@ export default defineComponent({
                 field: "form",
                 comparator: "in",
                 value: "10-12B,10-12B/A"
+            })
+            const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter, false)
+            let companyFilings = responseFilings.data.data.companyFilings
+            this.companyFilings = await this.getCompanyNames(companyFilings)
+            this.loadingTable = false
+        },
+        async getRecentMergersAndAcquisitionFilings(){
+            this.companyFilings = []
+            this.loadingTable = "primary"
+            let recentGenericFilters = [] as GenericFilter[]
+            let recentCompanyFilingDataFilter = [] as CompanyFilingDataFilter[]
+            let date = new Date();
+            date.setDate(date.getDate() - 365);
+            let filterDate: String = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' +  date.getDate()
+            recentGenericFilters.push({
+                field: "filing_date",
+                comparator: ">",
+                value: filterDate
+            })
+            recentGenericFilters.push({
+                field: "form",
+                comparator: "in",
+                value: "S-4,S-4/A"
             })
             const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter, false)
             let companyFilings = responseFilings.data.data.companyFilings

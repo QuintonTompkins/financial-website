@@ -35,9 +35,11 @@ import type { UserComment } from '@/services/types/UserComment';
             <div v-if="comment.cik && comment.name" class="card-text-sub-title">Name:</div>
             <div v-if="comment.cik && comment.name" class="card-text" style="display: inline-block;">{{ comment.name }}</div>
             <br v-if="comment.cik && comment.name">
-            <div v-if="comment.minPrice != -1 || comment.maxPrice != -1" class="card-text-sub-title">Price Range:</div>
-            <div v-if="comment.minPrice != -1 || comment.maxPrice != -1" class="card-text">${{ comment.minPrice }} to ${{ comment.maxPrice }}</div>
-            <br v-if="comment.minPrice != -1 || comment.maxPrice != -1">
+            <div v-if="comment.minPrice >= 0 || comment.maxPrice >= 0" class="card-text-sub-title">Price Range:</div>
+            <div v-if="comment.minPrice >= 0 || comment.maxPrice >= 0" class="card-text">
+                {{ comment.minPrice < 0 ? '-' : '$' + comment.minPrice }} to {{ comment.maxPrice < 0 ? '-' : '$' + comment.maxPrice }}
+            </div>
+            <br v-if="comment.minPrice >= 0 || comment.maxPrice >= 0">
             <div class="card-text" style="white-space: pre-line">{{comment.comment}}</div>
         </div>
         <div class="vote-block">
@@ -69,7 +71,6 @@ export default defineComponent({
         }
     },
     mounted() {
-        console.log(this.comment)
     },
 
     methods: {

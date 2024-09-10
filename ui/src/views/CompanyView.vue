@@ -40,6 +40,7 @@ import UserCommentComp from '@/components/UserComment.vue'
                             size="large" 
                             variant="text" 
                             density="compact"
+                            v-tooltip="cikIsSaved ? 'Remove Saved Company' : 'Save Company'"
                             @click="updateSavedCik" 
                             :disabled="jwt==''"/>
                     <br>
@@ -154,8 +155,8 @@ import UserCommentComp from '@/components/UserComment.vue'
                             </v-card>
                         </div>
                         <v-form style="margin-top: 15px; margin-left: 5px;" @submit.prevent>
-                            <v-text-field v-model="newComment.minPrice" placeholder="Min Price" style="margin-left: 5px; width: 120px; display: inline-block;"></v-text-field>
-                            <v-text-field v-model="newComment.maxPrice" placeholder="Max Price" style="margin-left: 5px; width: 120px; display: inline-block;"></v-text-field>
+                            <v-text-field v-model="newComment.minPrice" placeholder="Min Price" prefix="$" style="margin-left: 5px; width: 120px; display: inline-block;"></v-text-field>
+                            <v-text-field v-model="newComment.maxPrice" placeholder="Max Price" prefix="$" style="margin-left: 5px; width: 120px; display: inline-block;"></v-text-field>
                             <v-text-field v-model="newComment.commentText" placeholder="Comment" style="margin-left: 5px; width: 500px; display: inline-block;" maxlength="10000"></v-text-field>
                             <v-btn type="submit" color="primary" @click="submitComment" style="margin-left: 5px; display: inline-block; vertical-align: top;">Submit</v-btn>
                         </v-form>
@@ -201,8 +202,8 @@ export default defineComponent({
             cikIsSaved: false as Boolean,
             companyView: "summary" as String,
             newComment: {
-                minPrice: -1 as number,
-                maxPrice: -1 as number,
+                minPrice: undefined as number | undefined,
+                maxPrice: undefined as number | undefined,
                 commentText: "" as string
             },
             hasCommentorRole: false as boolean,
