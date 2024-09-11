@@ -69,7 +69,7 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
             </v-data-table-virtual>
         </div>
         <div class="map">
-            <Map :locations="locations" :jwt="jwt" :selectLocationCallback="selectLocationCallback"></Map>
+            <Map :locations="locations" :selectLocationCallback="selectLocationCallback"></Map>
         </div>
     </div>
 </template>

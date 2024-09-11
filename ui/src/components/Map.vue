@@ -46,7 +46,7 @@ import type { LocationDataLatLng } from '@/services/types/LocationDataExtensions
 <script lang="ts">
 export default defineComponent({
     name: 'WarMap',
-    props: ["jwt", "locations", "selectLocationCallback"],
+    props: ["locations", "selectLocationCallback"],
     components: {
         LMap,
         LTileLayer,
