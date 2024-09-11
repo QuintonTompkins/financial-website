@@ -72,9 +72,6 @@ public class AuthController {
     private static final String USERNAME_REGEX = "^[a-zA-Z0-9]*$";
     private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
     private static final Pattern USERNAME_PATTERN = Pattern.compile(USERNAME_REGEX);
-    
-    @Autowired
-    AuthDao authDao;
 
     @Autowired
     EmailHandler emailHandler;
@@ -86,6 +83,7 @@ public class AuthController {
     private HttpServletRequest request;
 
     private void callFrequencyCheck(HttpServletRequest request) throws InterruptedException {
+        AuthDao authDao = new AuthDao();
         if(authDao.getRecentAuthRequestCount(request.getRemoteAddr()) > TOO_MANY_REQUESTS){
             LOGGER.log(Level.WARNING, TOO_MANY_REQUESTS_MESSAGE);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,TOO_MANY_REQUESTS_MESSAGE);
@@ -99,6 +97,7 @@ public class AuthController {
     // -------------------- Mutations --------------------
     @MutationMapping
     public String login(@Argument String userNameEmail, @Argument String password) throws InterruptedException {
+        AuthDao authDao = new AuthDao();
         callFrequencyCheck(request);
         User userFound = authDao.getUser(userNameEmail);
         ArrayList<String> roles = authDao.getUserRoles(userFound.getUserId());
@@ -120,6 +119,7 @@ public class AuthController {
 
     @MutationMapping
     public String createUser(@Argument String userName, @Argument String email, @Argument String password) throws InterruptedException {
+        AuthDao authDao = new AuthDao();
         callFrequencyCheck(request);
         Matcher emailMathcer = EMAIL_PATTERN.matcher(email);
         Matcher usernameMatcher = USERNAME_PATTERN.matcher(userName);
@@ -140,6 +140,7 @@ public class AuthController {
 
     @MutationMapping
     public String resetPassword(@Argument String email) throws InterruptedException {
+        AuthDao authDao = new AuthDao();
         callFrequencyCheck(request);
         User userFound = authDao.getUser(email);
         authDao.insertAuthRequest(userFound.getUsername(), email, userFound.getUserId(), request.getRemoteAddr(), "resetPassword");
@@ -156,6 +157,7 @@ public class AuthController {
 
     @MutationMapping
     public String updatePassword(@Argument String email, @Argument String oldPassword, @Argument String newPassword) throws InterruptedException {
+        AuthDao authDao = new AuthDao();
         callFrequencyCheck(request);
         User userFound = authDao.getUser(email);
         if(userFound.getUserId() != 0 && encoder.matches(oldPassword, userFound.getPassword())){
@@ -171,6 +173,7 @@ public class AuthController {
 
     @MutationMapping
     public String updateUserName(@Argument String userName) {
+        AuthDao authDao = new AuthDao();
         Claims claims = jwtUtils.getClaims(request.getHeader("Authorization"));
         Matcher usernameMatcher = USERNAME_PATTERN.matcher(userName);
         if (!usernameMatcher.matches() || userName.length() > 20) {
@@ -190,6 +193,7 @@ public class AuthController {
 
     @MutationMapping
     public String updateEmail(@Argument String email) {
+        AuthDao authDao = new AuthDao();
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
         Matcher emailMatcher = EMAIL_PATTERN.matcher(email);
         if (!emailMatcher.matches()) {

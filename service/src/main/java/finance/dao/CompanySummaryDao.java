@@ -47,7 +47,7 @@ public class CompanySummaryDao extends Dao {
     public List<CompanySummary> getCompanySummaries(GenericParameters params) {
         String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
         String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql = SELECT_ALL_QUERY +filter+sort+QUERY_LIMIT;
         List<CompanySummary> companySummaries = new ArrayList<CompanySummary>();
         try {

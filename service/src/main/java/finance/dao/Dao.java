@@ -19,13 +19,11 @@ package finance.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import java.lang.RuntimeException;
 
 public class Dao {
     protected static final Logger LOGGER = Logger.getLogger(Dao.class.getName());
@@ -42,22 +40,27 @@ public class Dao {
 
     protected Connection connection = null;
 
-    public Dao() {
-        getConnection(url, user, password);
-    }
+    public Dao() { }
     
-    public void getConnection(String url, String user, String password) {
+    public void getConnection(String url, String user, String password, int retryCount) {
         try{
+            if(retryCount > 0){
+                int max = 5;
+                int min = 2;
+                TimeUnit.SECONDS.sleep((int)(Math.random() * ((max - min) + 1)));
+            }
             if (this.connection == null || !this.connection.isValid(5) || this.connection.isClosed()) {
-                try {
                     this.connection = DriverManager.getConnection(url, user, password);
-                } catch (SQLException ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
-                }
             }
         }
         catch(Exception ex){
-            throw new RuntimeException("DB connection failure");
+            LOGGER.log(Level.SEVERE, "Failed to connect to database");
+            if(retryCount  < 5){
+                getConnection(url, user, password, retryCount);
+            }
+            else{
+                throw new RuntimeException("Failed to connect to database");
+            }
         }
     }
     
@@ -68,7 +71,7 @@ public class Dao {
             }
         }
         catch(Exception ex){
-            LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Failed to close connection to database");
         }
     }
 

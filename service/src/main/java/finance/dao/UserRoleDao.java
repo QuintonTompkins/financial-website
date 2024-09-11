@@ -36,7 +36,7 @@ public class UserRoleDao extends Dao {
     }
 
     public void insertUserRole(int userId, String role) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         try {
             PreparedStatement statement = this.connection.prepareStatement(INSERT_QUERY);
             statement.setInt(1, userId);
@@ -50,7 +50,7 @@ public class UserRoleDao extends Dao {
     }
 
     public void deleteUserRole(int userId, String role) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         try {
             PreparedStatement statement = this.connection.prepareStatement(DELETE_QUERY);
             statement.setInt(1, userId);

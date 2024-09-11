@@ -58,7 +58,7 @@ public class UserRequestDao extends Dao {
     public List<UserRequest> getUserRequests(GenericParameters params) {
         String filter = params == null ? "" : params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
         String sort = params == null ? "" : params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql = SELECT_ALL_QUERY +filter+sort+QUERY_LIMIT;
         List<UserRequest> userRequests = new ArrayList<UserRequest>();
         try {
@@ -89,7 +89,7 @@ public class UserRequestDao extends Dao {
     }
 
     public void insertUserRequest(int userId, int commentId, String type, String reason) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         try {
             PreparedStatement statement = this.connection.prepareStatement(INSERT_QUERY);
             statement.setInt(1, userId);
@@ -105,7 +105,7 @@ public class UserRequestDao extends Dao {
     }
 
     public void completeRequest(int requestId) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         try {
             PreparedStatement statement = this.connection.prepareStatement(COMPLETE_REQUEST_QUERY);
             statement.setInt(1, requestId);

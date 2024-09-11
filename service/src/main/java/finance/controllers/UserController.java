@@ -34,6 +34,7 @@ import finance.authorization.JwtUtils;
 import finance.dao.AuthDao;
 import finance.dao.SavedCikDao;
 import finance.dao.UserCommentDao;
+import finance.dao.UserRoleDao;
 import finance.exceptions.InvalidInputException;
 import finance.models.GenericParameters;
 import finance.models.UserComment;
@@ -47,13 +48,6 @@ public class UserController {
     
     private static final String CIK_REGEX = "^[0-9]*$";
     private static final Pattern CIK_PATTERN = Pattern.compile(CIK_REGEX);
-    
-    @Autowired
-    SavedCikDao savedCikDao;
-    @Autowired
-    UserCommentDao userCommentDao;
-    @Autowired
-    AuthDao authDao;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -64,27 +58,32 @@ public class UserController {
     // -------------------- Queries --------------------
 	@QueryMapping
     public List<String> savedCiks(){
+        SavedCikDao savedCikDao = new SavedCikDao();
         return savedCikDao.getUserSavedCiks(jwtUtils.getUserId(request.getHeader("Authorization")));
     }
 	
 	@QueryMapping
     public List<UserComment> userComments(@Argument GenericParameters input){
+        UserCommentDao userCommentDao = new UserCommentDao();
         return userCommentDao.getUserComments(input);
     }
 
     @SchemaMapping(typeName="UserComment", field="voteTotal")
     public int getVoteTotal(UserComment userComment) {
+        UserCommentDao userCommentDao = new UserCommentDao();
         return userCommentDao.getUserCommentVotes(userComment.getCommentId());
     }
 
     @SchemaMapping(typeName="UserComment", field="userName")
     public String getUserCommentName(UserComment userComment) {
+        AuthDao authDao = new AuthDao();
         return authDao.getUser(userComment.getUserId()).getUsername();
     }
 
     // -------------------- Mutations --------------------
     @MutationMapping
     public int addUserComment(@Argument String cik, @Argument float minPrice, @Argument float maxPrice, @Argument String comment) {
+        UserCommentDao userCommentDao = new UserCommentDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
         return userCommentDao.insertUserComment(userId, cik, minPrice, maxPrice, comment);
@@ -92,6 +91,7 @@ public class UserController {
 
     @MutationMapping
     public String upVoteComment(@Argument int commentId) {
+        UserCommentDao userCommentDao = new UserCommentDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
         userCommentDao.updateCommentVote(commentId, userId, 1);
@@ -100,6 +100,7 @@ public class UserController {
 
     @MutationMapping
     public String downVoteComment(@Argument int commentId) {
+        UserCommentDao userCommentDao = new UserCommentDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
         userCommentDao.updateCommentVote(commentId, userId, -1);
@@ -108,6 +109,7 @@ public class UserController {
 
     @MutationMapping
     public String deleteVoteComment(@Argument int commentId) {
+        UserCommentDao userCommentDao = new UserCommentDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
         userCommentDao.updateCommentVote(commentId, userId, 0);
@@ -116,6 +118,7 @@ public class UserController {
 
     @MutationMapping
     public String addToSavedCikList(@Argument String cik) {
+        SavedCikDao savedCikDao = new SavedCikDao();
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
         Matcher cikMatcher = CIK_PATTERN.matcher(cik);
         if (!cikMatcher.matches()) {
@@ -127,6 +130,7 @@ public class UserController {
 
     @MutationMapping
     public String deleteFromSavedCikList(@Argument String cik) {
+        SavedCikDao savedCikDao = new SavedCikDao();
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
         Matcher cikMatcher = CIK_PATTERN.matcher(cik);
         if (!cikMatcher.matches()) {

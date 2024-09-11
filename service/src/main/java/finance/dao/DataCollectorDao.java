@@ -40,7 +40,7 @@ public class DataCollectorDao extends Dao {
     }
 
     public int getTimeSinceRefresh() {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         int timeSinceRefresh = -1;
         try {
             PreparedStatement statement = this.connection.prepareStatement(SELECT_QUERY);

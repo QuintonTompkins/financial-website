@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
@@ -49,22 +48,12 @@ import finance.models.SicDetails;
 public class FinanceController {
     protected static final Logger LOGGER = Logger.getLogger(FinanceController.class.getName());
     
-    @Autowired
-    CompanyFilingDao companyFilingDao;
-    @Autowired
-    CompanyFilingKeyDao companyFilingKeyDao;
-    @Autowired
-    CompanySummaryDao companySummaryDao;
-    @Autowired
-    CompanyTickerDao companyTickerDao;
-    @Autowired
-    DataCollectorDao dataCollectorDao;
-    @Autowired
-    LocationDataDao locationDataDao;
-	
     // -------------------- Queries --------------------
-	@QueryMapping
+    @QueryMapping
     public List<CompanyFiling> companyFilings(@Argument CompanyFilingDataParameters input){
+        CompanyFilingKeyDao companyFilingKeyDao = new CompanyFilingKeyDao();
+        CompanyFilingDao companyFilingDao = new CompanyFilingDao();
+
         if(input != null && input.getCustomFilters() != null && input.getCustomFilters().size() > 0){
             for (CompanyFilingDataFilter filter : input.getCustomFilters()) {
                 filter.validateFilter(companyFilingKeyDao);
@@ -73,42 +62,48 @@ public class FinanceController {
         return companyFilingDao.getCompanyFilings(input);
     }
 
-	@QueryMapping
+    @QueryMapping
     public List<CompanyFilingKey> companyFilingKeys(@Argument GenericParameters input){
+        CompanyFilingKeyDao companyFilingKeyDao = new CompanyFilingKeyDao();
         return companyFilingKeyDao.getCompanyFilingKeys(input);
     }
-	
-	@QueryMapping
+    
+    @QueryMapping
     public List<CompanySummary> companySummaries(@Argument GenericParameters input){
+        CompanySummaryDao companySummaryDao = new CompanySummaryDao();
         return companySummaryDao.getCompanySummaries(input);
     }
 
     @SchemaMapping(typeName="CompanySummary", field="tickers")
     public List<CompanyTicker> getTickers(CompanySummary companySummary) {
+        CompanyTickerDao companyTickerDao = new CompanyTickerDao();
         GenericParameters params = new GenericParameters();
         GenericFilter filter = new GenericFilter("cik","=",companySummary.getCik());
         params.setFilters(Arrays.asList(filter));
         return companyTickerDao.getCompanyTickers(params);
     }
-	
-	@QueryMapping
+    
+    @QueryMapping
     public List<CompanyTicker> companyTickers(@Argument GenericParameters input){
+        CompanyTickerDao companyTickerDao = new CompanyTickerDao();
         return companyTickerDao.getCompanyTickers(input);
     }
-	
-	@QueryMapping
+    
+    @QueryMapping
     public List<LocationData> locationData(){
+        LocationDataDao locationDataDao = new LocationDataDao();
         return locationDataDao.getLocationData();
     }
 
     @SchemaMapping(typeName="LocationData", field="sicDetails")
-    public List<SicDetails> getSicDetails(LocationData locationData) {
-        return locationDataDao.getSicDetails(locationData.getCode());
+    public List<SicDetails> getSicDetails(LocationData location) {
+        LocationDataDao locationDataDao = new LocationDataDao();
+        return locationDataDao.getSicDetails(location.getCode());
     }
-	
-	
-	@QueryMapping
+    
+    @QueryMapping
     public int timeSinceRefresh(){
+        DataCollectorDao dataCollectorDao = new DataCollectorDao();
         return dataCollectorDao.getTimeSinceRefresh();
     }
 

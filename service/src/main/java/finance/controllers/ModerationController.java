@@ -50,15 +50,6 @@ public class ModerationController {
     
     private static final String REASON_REGEX = "^[a-zA-Z0-9. ]*$";
     private static final Pattern REASON_PATTERN = Pattern.compile(REASON_REGEX);
-    
-    @Autowired
-    UserCommentDao userCommentDao;
-    @Autowired
-    UserRequestDao userRequestDao;
-    @Autowired
-    UserRoleDao userRoleDao;
-    @Autowired
-    LoggedActionDao loggedActionDao;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -69,6 +60,7 @@ public class ModerationController {
     // -------------------- Queries --------------------
     @QueryMapping
     public List<UserRequest> getUserRequests(@Argument GenericParameters input) {
+        UserRequestDao userRequestDao = new UserRequestDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"), MANAGING_ROLES);
         return userRequestDao.getUserRequests(input);
     }
@@ -77,6 +69,7 @@ public class ModerationController {
 
     @MutationMapping
     public String reportUserComment(@Argument int commentId, @Argument String reason) {
+        UserRequestDao userRequestDao = new UserRequestDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),COMMENTOR_ROLE);
         Matcher reasonMatcher = REASON_PATTERN.matcher(reason);
         if (!reasonMatcher.matches()) {
@@ -89,6 +82,7 @@ public class ModerationController {
 
     @MutationMapping
     public String requestCommentorStatus(@Argument String reason) {
+        UserRequestDao userRequestDao = new UserRequestDao();
         int userId = jwtUtils.getUserId(request.getHeader("Authorization"));
         Matcher reasonMatcher = REASON_PATTERN.matcher(reason);
         if (!reasonMatcher.matches()) {
@@ -100,6 +94,7 @@ public class ModerationController {
 
     @MutationMapping
     public String reportDataIssue(@Argument String reason) {
+        UserRequestDao userRequestDao = new UserRequestDao();
         Matcher reasonMatcher = REASON_PATTERN.matcher(reason);
         if (!reasonMatcher.matches()) {
             throw new InvalidInputException("Invalid comment provided.");
@@ -111,6 +106,8 @@ public class ModerationController {
 
     @MutationMapping
     public String hideUserComment(@Argument int commentId) {
+        UserCommentDao userCommentDao = new UserCommentDao();
+        LoggedActionDao loggedActionDao = new LoggedActionDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),MANAGING_ROLES);
         int managingUserId = jwtUtils.getUserId(request.getHeader("Authorization"));
         userCommentDao.hideComment(commentId);
@@ -120,6 +117,8 @@ public class ModerationController {
 
     @MutationMapping
     public String markUserRequestCompleted(@Argument int requestId) {
+        UserRequestDao userRequestDao = new UserRequestDao();
+        LoggedActionDao loggedActionDao = new LoggedActionDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),MANAGING_ROLES);
         int managingUserId = jwtUtils.getUserId(request.getHeader("Authorization"));
         userRequestDao.completeRequest(requestId);
@@ -129,6 +128,8 @@ public class ModerationController {
 
     @MutationMapping
     public String grantUserCommentorRole(@Argument int userId) {
+        UserRoleDao userRoleDao = new UserRoleDao();
+        LoggedActionDao loggedActionDao = new LoggedActionDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),MANAGING_ROLES);
         int managingUserId = jwtUtils.getUserId(request.getHeader("Authorization"));
         userRoleDao.insertUserRole(userId, COMMENTOR_ROLE);
@@ -138,6 +139,8 @@ public class ModerationController {
 
     @MutationMapping
     public String revokeUserCommentorRole(@Argument int userId) {
+        UserRoleDao userRoleDao = new UserRoleDao();
+        LoggedActionDao loggedActionDao = new LoggedActionDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),MANAGING_ROLES);
         int managingUserId = jwtUtils.getUserId(request.getHeader("Authorization"));
         userRoleDao.deleteUserRole(userId, COMMENTOR_ROLE);
@@ -147,6 +150,8 @@ public class ModerationController {
 
     @MutationMapping
     public String grantUserModeratorRole(@Argument int userId) {
+        UserRoleDao userRoleDao = new UserRoleDao();
+        LoggedActionDao loggedActionDao = new LoggedActionDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),ADMIN_ROLE);
         int managingUserId = jwtUtils.getUserId(request.getHeader("Authorization"));
         userRoleDao.insertUserRole(userId, MODERATOR_ROLE);
@@ -156,6 +161,8 @@ public class ModerationController {
 
     @MutationMapping
     public String revokeUserModeratorRole(@Argument int userId) {
+        UserRoleDao userRoleDao = new UserRoleDao();
+        LoggedActionDao loggedActionDao = new LoggedActionDao();
         jwtUtils.checkForValidRole(request.getHeader("Authorization"),ADMIN_ROLE);
         int managingUserId = jwtUtils.getUserId(request.getHeader("Authorization"));
         userRoleDao.deleteUserRole(userId, MODERATOR_ROLE);

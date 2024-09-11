@@ -39,7 +39,7 @@ public class SavedCikDao extends Dao {
     }
 
     public List<String> getUserSavedCiks(int userId) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         List<String> savedCiks = new ArrayList<String>();
         try {
             PreparedStatement statement = this.connection.prepareStatement(SELECT_QUERY);
@@ -59,7 +59,7 @@ public class SavedCikDao extends Dao {
     }
 
     public void insertSavedCik(int userId, String cik) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         try {
             PreparedStatement statement = this.connection.prepareStatement(INSERT_QUERY);
             statement.setString(1, cik);
@@ -73,7 +73,7 @@ public class SavedCikDao extends Dao {
     }
 
     public void deleteSavedCik(int userId, String cik) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         try {
             PreparedStatement statement = this.connection.prepareStatement(DELETE_QUERY);
             statement.setString(1, cik);

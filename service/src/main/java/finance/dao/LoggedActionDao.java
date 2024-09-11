@@ -35,7 +35,7 @@ public class LoggedActionDao extends Dao {
     }
 
     public void insertLoggedAction(int userId, int affectedId, String action) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         try {
             PreparedStatement statement = this.connection.prepareStatement(INSERT_QUERY);
             statement.setInt(1, userId);

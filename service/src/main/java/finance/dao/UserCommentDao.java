@@ -66,7 +66,7 @@ public class UserCommentDao extends Dao {
         params.getFilters().add(new GenericFilter("hidden","=",false));
         String filter = params.generateFilterString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
         String sort = params.generateSortString(STRING_COLUMN_LIST, DATE_COLUMN_LIST, BOOLEAN_COLUMN_LIST, NUMERIC_COLUMN_LIST);
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql = SELECT_ALL_QUERY +filter+sort+QUERY_LIMIT;
         List<UserComment> userComments = new ArrayList<UserComment>();
         try {
@@ -99,7 +99,7 @@ public class UserCommentDao extends Dao {
     }
 
     public int getUserCommentVotes(int commentId) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         int votes = 0;
         try {
             PreparedStatement statement = this.connection.prepareStatement(SELECT_VOTE_COUNT_QUERY);
@@ -119,7 +119,7 @@ public class UserCommentDao extends Dao {
     }
 
     public int insertUserComment(int userId, String cik, float minPrice, float maxPrice, String comment) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         int commentId = -1;
         try {
             PreparedStatement statement = this.connection.prepareStatement(INSERT_COMMENT_QUERY,Statement.RETURN_GENERATED_KEYS);
@@ -144,7 +144,7 @@ public class UserCommentDao extends Dao {
     }
 
     public void updateCommentVote(int commentId, int userId, int vote) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         try {
             PreparedStatement statement = this.connection.prepareStatement(UPDATE_USER_VOTE);
             statement.setInt(1, commentId);
@@ -161,7 +161,7 @@ public class UserCommentDao extends Dao {
     }
 
     public void hideComment(int commentId) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         try {
             PreparedStatement statement = this.connection.prepareStatement(HIDE_COMMENT_QUERY);
             statement.setInt(1, commentId);

@@ -40,7 +40,7 @@ public class AuthDao extends Dao{
     public int addUser(String userName,
                         String userEmail,
                         String encryptedPassword){
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql = "insert into finance.user (user_name, user_email, user_password) values (?,?,?)";
         int userId = -1;
         try {
@@ -64,7 +64,7 @@ public class AuthDao extends Dao{
     }
 
     public User getUser(int userId){
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql;
         sql = "SELECT user_id, user_name, user_email, user_password FROM finance.user WHERE user_id = ?";
         User user = new User();
@@ -90,7 +90,7 @@ public class AuthDao extends Dao{
     }
 
     public User getUser(String usernameEmail){
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql;
         sql = "SELECT user_id, user_name, user_email, user_password FROM finance.user WHERE user_name = ? OR user_email = ?";
         User user = new User();
@@ -117,7 +117,7 @@ public class AuthDao extends Dao{
     }
 
     public void insertAuthRequest(String userName, String userEmail, int userId, String origin, String authType){
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql = "insert into finance.auth_request (user_name, user_email, user_id_found, origin, auth_type) values (?,?,?,?,?)";
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql);
@@ -136,7 +136,7 @@ public class AuthDao extends Dao{
     }
 
     public int getRecentAuthRequestCount(String origin){
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql = "SELECT count(*) FROM finance.auth_request WHERE origin = ? AND date_attempted > now() - INTERVAL '1 HOURS'";
         int requestCount = 99;
         try {
@@ -158,7 +158,7 @@ public class AuthDao extends Dao{
     }
 
     public void updatePassword(int userId, String newPassword){
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql = "UPDATE finance.user SET user_password = ? WHERE user_id = ?";
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql);
@@ -174,7 +174,7 @@ public class AuthDao extends Dao{
     }
 
     public ArrayList<String> getUserRoles(int userId) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql = "SELECT role FROM finance.user_role WHERE user_id = ?";
         ArrayList<String> roles = new ArrayList<String>();
         try {
@@ -195,7 +195,7 @@ public class AuthDao extends Dao{
     }
 
     public void updateUserName(int userId, String newUserName){
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql = "UPDATE finance.user SET user_name = ? WHERE user_id = ?";
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql);
@@ -211,7 +211,7 @@ public class AuthDao extends Dao{
     }
 
     public void updateEmail(int userId, String newEmail){
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         String sql = "UPDATE finance.user SET user_email = ? WHERE user_id = ?";
         try {
             PreparedStatement statement = this.connection.prepareStatement(sql);

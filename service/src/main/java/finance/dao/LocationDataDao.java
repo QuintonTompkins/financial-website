@@ -45,7 +45,7 @@ public class LocationDataDao extends Dao {
     }
 
     public List<LocationData> getLocationData() {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         List<LocationData> locationDatas = new ArrayList<LocationData>();
         try {
             PreparedStatement statement = this.connection.prepareStatement(SELECT_ALL_LOCATION_DATA_QUERY);
@@ -68,7 +68,7 @@ public class LocationDataDao extends Dao {
     }
 
     public List<SicDetails> getSicDetails(String stateCountry) {
-        getConnection(url, user, password);
+        getConnection(url, user, password, 0);
         List<SicDetails> sicDetails = new ArrayList<SicDetails>();
         try {
             PreparedStatement statement = this.connection.prepareStatement(SELECT_ALL_SIC_DETAILS_QUERY);
