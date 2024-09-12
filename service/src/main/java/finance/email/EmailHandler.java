@@ -18,7 +18,6 @@
 package finance.email;
 
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EmailHandler {
-    private static final Logger LOGGER = Logger.getLogger( EmailHandler.class.getName() );
 
     protected static final String email = System.getenv("EMAILER_EMAIL");
     protected static final String password = System.getenv("EMAILER_PASSWORD");

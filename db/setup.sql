@@ -138,7 +138,10 @@ CREATE UNIQUE INDEX recent_company_filings_view_index ON finance.recent_company_
 
 CREATE MATERIALIZED VIEW finance.recent_company_filings_data_key AS 
     SELECT d.key, count(*) FROM finance.recent_company_filings_view cf 
-        JOIN json_each_text(cf.data) d ON true GROUP BY d.key ORDER BY count(*) DESC;
+        JOIN json_each_text(cf.data) d ON true 
+        WHERE cf.data::text <> '{}'::text
+        GROUP BY d.key 
+        ORDER BY count(*) DESC;
 
 CREATE UNIQUE INDEX recent_company_filings_data_key_index ON finance.recent_company_filings_data_key (key);
 

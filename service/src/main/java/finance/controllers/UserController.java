@@ -34,7 +34,6 @@ import finance.authorization.JwtUtils;
 import finance.dao.AuthDao;
 import finance.dao.SavedCikDao;
 import finance.dao.UserCommentDao;
-import finance.dao.UserRoleDao;
 import finance.exceptions.InvalidInputException;
 import finance.models.GenericParameters;
 import finance.models.UserComment;
