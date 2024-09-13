@@ -74,7 +74,7 @@ export default defineComponent({
         },
         async getCompanyNames(records: any[]){
             for(let record of records){
-                const nameResponse = await FinanceApi.getCompanyName(record.cik)
+                const nameResponse = await FinanceApi.getSmallCompanySummary(record.cik)
                 record.name = nameResponse.data.data.companySummaries[0].name
             }
         },

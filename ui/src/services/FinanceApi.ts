@@ -152,12 +152,13 @@ export function getCompanyFilingKeys(keyFilter: String) {
 }
 
 
-export function getCompanyName(cik: any) {
+export function getSmallCompanySummary(cik: any) {
     return axios.post<{ data: { companySummaries: CompanySummary[] } }>(BASE_URL+'graphql',
         {
             "query": `query ($input: GenericParameters!) {
                             companySummaries(input: $input) {
-                                name
+                                name,
+                                sicDescription
                             }
                         }`,
             "variables": {

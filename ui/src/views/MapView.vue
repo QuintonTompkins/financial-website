@@ -36,7 +36,7 @@ import type { StateCountryCodes } from '@/services/types/StateCountryCodes'
             <div v-if="sicDescSelected !== undefined" style="margin-left: 25px; max-height: 37px;">
                 <v-btn icon="mdi-arrow-left" style="display: inline-block; vertical-align: top;" color="secondary" variant="text" @click="goBack" />
                 <div style="display: inline-block; width: 310px; margin-left: 15px;">
-                    {{ sicDescSelected }} in {{ stateCountryCodes.data[countryStateSelected].name }}
+                    {{ sicDescSelected === "" ? "N/A" : sicDescSelected }} in {{ stateCountryCodes.data[countryStateSelected].name }}
                 </div>
             </div>
             <v-data-table-virtual

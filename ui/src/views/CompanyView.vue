@@ -19,6 +19,7 @@
 import { defineComponent } from 'vue'
 import { jwtDecode } from "jwt-decode";
 
+import * as stateCountryCodesJson from '@/assets/stateCountryCodes.json'
 import * as FinanceApi from '@/services/FinanceApi.js'
 import * as UserApi from '@/services/UserApi.js'
 import type { CompanySummary } from '@/services/types/CompanySummary'
@@ -27,13 +28,14 @@ import type { CompanyFiling } from '@/services/types/CompanyFiling';
 import type { CompanyFilingKey } from '@/services/types/CompanyFilingKey'
 import type { CompanyFilingSelected } from '@/services/types/CompanyFilingExtensions'
 import UserCommentComp from '@/components/UserComment.vue'
+import type { StateCountryCodes } from '@/services/types/StateCountryCodes';
 </script>
 
 <template>
     <div class="view" >
         <div class="left-column" >
             <v-card style="margin-left: 15px;">
-                <div style="height: 195px; width: 480px;">
+                <div style="height: 205px; width: 480px;">
                     <div class="card-title">Company Details</div>
                     <v-btn :icon="cikIsSaved ? 'mdi-bookmark-remove' : 'mdi-bookmark-plus'"
                             :color="cikIsSaved ? 'red' : 'green'" 
@@ -42,28 +44,45 @@ import UserCommentComp from '@/components/UserComment.vue'
                             density="compact"
                             v-tooltip="cikIsSaved ? 'Remove Saved Company' : 'Save Company'"
                             @click="updateSavedCik" 
+                            style="vertical-align: top; margin-top: 5px;"
                             :disabled="jwt==''"/>
                     <br>
-                    <div class="card-text-sub-title company-details">Company Cik:</div>
-                        <a :href="`https://www.sec.gov/edgar/browse/?CIK=${cik}`">{{ cik }}</a>
+                    <div class="card-text-sub-title company-details">Cik:</div>
+                        <v-btn :href="`https://www.sec.gov/edgar/browse/?CIK=${cik}`"
+                                target="_blank"
+                                append-icon="mdi-open-in-new"
+                                color="secondary"
+                                variant="text"
+                                density="compact"
+                                style="vertical-align: top; margin-top: 2px;">
+                                <div style="text-decoration-line: underline;">{{ cik }}</div>
+                        </v-btn>
                         <br>
-                    <div class="card-text-sub-title company-details">Company Name:</div>
-                        <div class="card-text company-details">{{ companySummary.name }}</div>
+                    <div class="card-text-sub-title company-details" style="display: inline-block; width: 50px; vertical-align: top;">Name:</div>
+                        <div class="card-text company-details" style="display: inline-block; width: 410px;">{{ companySummary.name }}</div>
                         <br>
-                    <div class="card-text-sub-title company-details">Company Description:</div>
-                        <div class="card-text company-details">{{ companySummary.sicDescription }}</div>
+                    <div class="card-text-sub-title company-details" style="display: inline-block; width: 100px; vertical-align: top;">Description:</div>
+                        <div class="card-text company-details" style="display: inline-block; width: 360px;">{{ companySummary.sicDescription }}</div>
                         <br>
-                    <div class="card-text-sub-title company-details">Company State/Country:</div>
-                        <div class="card-text company-details">{{ companySummary.stateCountry }}</div>
+                    <div class="card-text-sub-title company-details">State/Country:</div>
+                        <div class="card-text company-details">{{ companySummary?.stateCountry ? stateCountryCodes.data[companySummary?.stateCountry]?.name : "" }}</div>
                         <br>
-                    <div class="card-text-sub-title company-details">Company Exchange/Tickers:</div>
-                        <div class="card-text company-details">
-                            <div  class="card-text company-details" v-for="ticker in companySummary.tickers" :key="ticker.exchange">
-                                <a v-if="ticker.exchange=='NYSE' || ticker.exchange=='Nasdaq'"
-                                    :href="`https://finviz.com/quote.ashx?t=${ticker.ticker}`">({{ ticker.exchange }}:{{ ticker.ticker }})</a>
-                                <div v-if="!(ticker.exchange=='NYSE' || ticker.exchange=='Nasdaq')">({{ ticker.exchange }}:{{ ticker.ticker }})</div>
-                            </div>
+                    <div class="card-text-sub-title company-details">Tickers:</div>
+                    <div class="card-text company-details">
+                        <div class="card-text company-details" v-for="ticker in companySummary.tickers" :key="ticker.exchange" style="vertical-align: top;">
+                            <v-btn v-if="ticker.exchange=='NYSE' || ticker.exchange=='Nasdaq'"
+                                    :href="`https://finviz.com/quote.ashx?t=${ticker.ticker}`"
+                                    target="_blank"
+                                    append-icon="mdi-open-in-new"
+                                    color="secondary"
+                                    variant="text"
+                                    density="compact"
+                                    style="vertical-align: top; margin-top: 1px;">
+                                    <div style="text-decoration-line: underline;">{{ ticker.exchange }}:{{ ticker.ticker }}</div>
+                            </v-btn>
+                            <div v-if="!(ticker.exchange=='NYSE' || ticker.exchange=='Nasdaq')">{{ ticker.exchange }}:{{ ticker.ticker }}</div>
                         </div>
+                    </div>
                 </div>
             </v-card>
             <v-card style="margin-left: 15px; margin-top: 23px;">
@@ -98,8 +117,8 @@ import UserCommentComp from '@/components/UserComment.vue'
             </v-card>
         </div>
         <div class="right-column" >
-            <v-card style="margin: 10px;">
-                <div class="analysis-height-width">
+            <v-card>
+                <div class="analysis-card">
                     <div class="card-title" style="margin-left: 10px; vertical-align: top;">Company Analysis</div>
                     <v-card class="analysis-toggle" variant="tonal">
                         <v-btn-toggle v-model="companyView" color="secondary" variant="flat">
@@ -207,7 +226,8 @@ export default defineComponent({
                 commentText: "" as string
             },
             hasCommentorRole: false as boolean,
-            tenOnly: true as boolean
+            tenOnly: true as boolean,
+            stateCountryCodes: stateCountryCodesJson as StateCountryCodes
         };
     },
     mounted() {
@@ -356,37 +376,12 @@ export default defineComponent({
 }
 
 .right-column {
+    width: v-bind((width-510) + 'px');
+}
+
+.analysis-card {
     width: v-bind((width-530) + 'px');
-}
-
-.filing-card {
-    width: 480px;
-    height: v-bind((height-319) + 'px');
-}
-
-.analysis-height-width {
-    width: v-bind((width-530) + 'px');
-    height: v-bind((height-97) + 'px');
-}
-
-.analysis {
-    height: v-bind((height-145) + 'px');
-    margin-top: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
-.filing-list {
-    height: v-bind((height-355) + 'px');
-}
-
-.scrollable-tbody {
-    overflow-y: auto;
-}
-
-.scrollable-comment-list {
-    height: v-bind((height-250) + 'px');
-    overflow-y: auto;
+    height: v-bind((height-87) + 'px');
 }
 
 .analysis-toggle {
@@ -397,21 +392,46 @@ export default defineComponent({
     vertical-align: bottom;
 }
 
-.selection-table {
-    width: 460px;
-    height: v-bind((height-370) + 'px');
+.analysis {
+    height: v-bind((height-135) + 'px');
     margin-top: 10px;
     margin-left: 10px;
     margin-right: 10px;
 }
 
 .analysis-table {
-    width: v-bind((width-575) + 'px');
-    height: v-bind((height-190) + 'px');
+    width: v-bind((width-555) + 'px');
+    height: v-bind((height-180) + 'px');
 }
 
 .analysis-value{
     text-align: right;
+}
+
+.scrollable-comment-list {
+    height: v-bind((height-250) + 'px');
+    overflow-y: auto;
+}
+
+.filing-card {
+    width: 480px;
+    height: v-bind((height-319) + 'px');
+}
+
+.filing-list {
+    height: v-bind((height-355) + 'px');
+}
+
+.selection-table {
+    width: 455px;
+    height: v-bind((height-390) + 'px');
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.scrollable-tbody {
+    overflow-y: auto;
 }
 
 .v-data-table__td{

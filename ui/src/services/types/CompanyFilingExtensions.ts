@@ -22,6 +22,7 @@ export interface CompanyFilingSelected extends CompanyFiling {
     selected?: boolean;
 }
 
-export interface CompanyFilingWithName extends CompanyFiling {
+export interface CompanyFilingWithSummary extends CompanyFiling {
     name?: String;
+    sicDescription?: String;
 }

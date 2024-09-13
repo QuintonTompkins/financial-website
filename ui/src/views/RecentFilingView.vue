@@ -19,7 +19,7 @@
 import { defineComponent } from 'vue'
 
 import * as FinanceApi from '@/services/FinanceApi.js'
-import type { CompanyFilingWithName } from '@/services/types/CompanyFilingExtensions'
+import type { CompanyFiling } from '@/services/types/CompanyFiling'
 </script>
 
 <template>
@@ -57,13 +57,14 @@ export default defineComponent({
         return {
             companyFilingsHeaders: [
                 {title: 'CIK', key: 'cik', width: '150px'},
-                {title: 'Name', key: 'name', width: '800px'},
+                {title: 'Name', key: 'name', width: '450px'},
+                {title: 'SIC Description', key: 'sicDescription', width: '450px'},
                 {title: 'Accession Number', key: 'accessionNumber'},
                 {title: 'Filing Date', key: 'filingDate'},
                 {title: 'Report Date', key: 'reportDate'},
                 {title: 'Form', key: 'form'}
             ],
-            companyFilings: [] as CompanyFilingWithName[],
+            companyFilings: [] as CompanyFiling[],
             width: window.innerWidth,
             height: window.innerHeight,
             loadingTable: false as boolean | string,
@@ -127,7 +128,7 @@ export default defineComponent({
             })
             const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter, false)
             let companyFilings = responseFilings.data.data.companyFilings
-            this.companyFilings = await this.getCompanyNames(companyFilings)
+            this.companyFilings = await this.getCompanySummary(companyFilings)
             this.loadingTable = false
         },
         async getRecentSpinoffFilings(){
@@ -150,7 +151,7 @@ export default defineComponent({
             })
             const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter, false)
             let companyFilings = responseFilings.data.data.companyFilings
-            this.companyFilings = await this.getCompanyNames(companyFilings)
+            this.companyFilings = await this.getCompanySummary(companyFilings)
             this.loadingTable = false
         },
         async getRecentMergersAndAcquisitionFilings(){
@@ -173,7 +174,7 @@ export default defineComponent({
             })
             const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter, false)
             let companyFilings = responseFilings.data.data.companyFilings
-            this.companyFilings = await this.getCompanyNames(companyFilings)
+            this.companyFilings = await this.getCompanySummary(companyFilings)
             this.loadingTable = false
         },
         async getRecentIpoFilings(){
@@ -196,13 +197,14 @@ export default defineComponent({
             })
             const responseFilings = await FinanceApi.getRecentCompanyFilings(recentGenericFilters, recentCompanyFilingDataFilter, false)
             let companyFilings = responseFilings.data.data.companyFilings
-            this.companyFilings = await this.getCompanyNames(companyFilings)
+            this.companyFilings = await this.getCompanySummary(companyFilings)
             this.loadingTable = false
         },
-        async getCompanyNames(records: any[]){
+        async getCompanySummary(records: any[]){
             for(let record of records){
-                const nameResponse = await FinanceApi.getCompanyName(record.cik)
-                record.name = nameResponse.data.data.companySummaries[0].name
+                const response = await FinanceApi.getSmallCompanySummary(record.cik)
+                record.name = response.data.data.companySummaries[0].name
+                record.sicDescription = response.data.data.companySummaries[0].sicDescription
             }
             return records
         }

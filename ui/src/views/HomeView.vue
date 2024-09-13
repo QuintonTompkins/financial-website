@@ -34,6 +34,17 @@ import { defineComponent } from 'vue'
                     2. The application should encourage user engagement in value investing while avoiding low-effort interactions.
                     <br>
                     <br>
+                    <v-btn :href="`https://github.com/QuintonTompkins/financial-website`"
+                                target="_blank"
+                                append-icon="mdi-open-in-new"
+                                color="secondary"
+                                variant="text"
+                                density="compact"
+                                style="vertical-align: top; margin-top: 2px;">
+                                <div style="text-decoration-line: underline;">Github Source code</div>
+                        </v-btn>
+                    <br>
+                    <br>
                     <h2>Disclaimer</h2>
                     This application shows financial information, but nothing on this application should be considered financial advice. 
                     Data is provided by the SEC and nothing in the application verifies or validates the information provided. Comments on 
@@ -54,9 +65,6 @@ import { defineComponent } from 'vue'
                     <br>
                     Users must request the ability to comment or view comments on the website. Moderators will screen users to ensure they can provide quality assessments on companies.
                     Low-quality comments or a lack of comments may result in commenting abilities being revoked.
-                    <br>
-                    <br>
-                    <a :href="`https://github.com/QuintonTompkins/financial-website`">Source code for this website can be viewed here.</a>
                 </div>
             </div>
         </v-card>
