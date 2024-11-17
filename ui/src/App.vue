@@ -103,11 +103,7 @@ export default defineComponent({
         }
       },
       isMobileDevice(){
-        var hasTouchScreen = false
-        if ("maxTouchPoints" in navigator) {
-            hasTouchScreen = navigator.maxTouchPoints > 0
-        }
-        return hasTouchScreen
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       }
     }
 });
